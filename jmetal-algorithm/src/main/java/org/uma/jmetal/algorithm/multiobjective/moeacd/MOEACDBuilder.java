@@ -1,4 +1,5 @@
 package org.uma.jmetal.algorithm.multiobjective.moeacd;
+
 import org.uma.jmetal.measure.impl.MyAlgorithmMeasures;
 import org.uma.jmetal.operator.MutationOperator;
 import org.uma.jmetal.operator.impl.crossover.DifferentialEvolutionCrossover;
@@ -16,52 +17,54 @@ import java.util.List;
  */
 public class MOEACDBuilder implements AlgorithmBuilder<AbstractMOEACD> {
     public enum Variant {
-        MOEACD,MOEACDMeasure,
-        MOEACDP,MOEACDPMeasure,
-        MOEACDN,MOEACDNMeasure,
-        CMOEACD,CMOEACDMeasure,
-        CMOEACDN,CMOEACDNMeasure,
-        MOEACDD,MOEACDDMeasure,
-        MOEACDND,MOEACDNDMeasure,
-        CMOEACDD,CMOEACDDMeasure,
-        CMOEACDND,CMOEACDNDMeasure,
-        CMOEACDA,CMOEACDAMeasure,
-        CMOEACDNA,CMOEACDNAMeasure,
-        CMOEACDAD,CMOEACDADMeasure,
-        CMOEACDNAD,CMOEACDNADMeasure,
-        MOEACDDE,MOEACDDEMeasure,
-        MOEACDF,MOEACDFMeasure,
-        MOEACDSBX,MOEACDSBXMeasure,
-        MOEACDSCV,MOEACDSCVMeasure,
-        MOEACDPEH,MOEACDPEHMeasure,
-        MOEACDNSBX,MOEACDNSBXMeasure,
-        MOEACDNDE,MOEACDNDEMeasure,
-        MOEACDNF,MOEACDNFMeasure,
-        MOEACDACV,MOEACDACVMeasure,
-        MOEACDAECV,MOEACDAECVMeasure,
-        CMOEACDO,CMOEACDOMeasure,
-        CMOEACDAO,CMOEACDAOMeasure,
-        CMOEACDAOII,CMOEACDAOIIMeasure,
-        CMOEACDAOD,CMOEACDAODMeasure,
+        MOEACD, MOEACDMeasure,
+        MOEACDP, MOEACDPMeasure,
+        MOEACDN, MOEACDNMeasure,
+        CMOEACD, CMOEACDMeasure,
+        CMOEACDN, CMOEACDNMeasure,
+        MOEACDD, MOEACDDMeasure,
+        MOEACDND, MOEACDNDMeasure,
+        CMOEACDD, CMOEACDDMeasure,
+        CMOEACDND, CMOEACDNDMeasure,
+        CMOEACDA, CMOEACDAMeasure,
+        CMOEACDNA, CMOEACDNAMeasure,
+        CMOEACDAD, CMOEACDADMeasure,
+        CMOEACDNAD, CMOEACDNADMeasure,
+        MOEACDDE, MOEACDDEMeasure,
+        MOEACDF, MOEACDFMeasure,
+        MOEACDSBX, MOEACDSBXMeasure,
+        MOEACDSCV, MOEACDSCVMeasure,
+        MOEACDPEH, MOEACDPEHMeasure,
+        MOEACDNSBX, MOEACDNSBXMeasure,
+        MOEACDNDE, MOEACDNDEMeasure,
+        MOEACDNF, MOEACDNFMeasure,
+        MOEACDACV, MOEACDACVMeasure,
+        MOEACDAECV, MOEACDAECVMeasure,
+        CMOEACDO, CMOEACDOMeasure,
+        CMOEACDAO, CMOEACDAOMeasure,
+        CMOEACDAOII, CMOEACDAOIIMeasure,
+        CMOEACDAOD, CMOEACDAODMeasure,
 
-        UCDEA,UCDEAMeasure,
-        CUCDEA,CUCDEAMeasure,
-        CUCDEAII,CUCDEAIIMeasure,
+        UCDEA, UCDEAMeasure,
+        CUCDEA, CUCDEAMeasure,
+        CUCDEAII, CUCDEAIIMeasure,
 
-        CMOEACDII,CMOEACDIIMeasure,
-        CMOEACDIII,CMOEACDIIIMeasure,
-        CMOEACDIV,CMOEACDIVMeasure,
-        CMOEACDV,CMOEACDVMeasure,
-        CMOEACDVI,CMOEACDVIMeasure,
-        CMOEACDVII,CMOEACDVIIMeasure,
-        CMOEACDVIII,CMOEACDVIIIMeasure,
+        CMOEACDII, CMOEACDIIMeasure,
+        CMOEACDIII, CMOEACDIIIMeasure,
+        CMOEACDIV, CMOEACDIVMeasure,
+        CMOEACDV, CMOEACDVMeasure,
+        CMOEACDVI, CMOEACDVIMeasure,
+        CMOEACDVII, CMOEACDVIIMeasure,
+        CMOEACDVIII, CMOEACDVIIIMeasure,
 
-        CMOEACDAII,CMOEACDAIIMeasure,
-        CMOEACDAIII,CMOEACDAIIIMeasure,
-        CMOEACDAIV,CMOEACDAIVMeasure,
-        CMOEACDAV,CMOEACDAVMeasure
-    };
-    protected Problem<DoubleSolution> problem ;
+        CMOEACDAII, CMOEACDAIIMeasure,
+        CMOEACDAIII, CMOEACDAIIIMeasure,
+        CMOEACDAIV, CMOEACDAIVMeasure,
+        CMOEACDAV, CMOEACDAVMeasure
+    }
+
+    ;
+    protected Problem<DoubleSolution> problem;
 
     protected int[] numOfDivision;
     protected double[] integratedTaus;
@@ -72,15 +75,17 @@ public class MOEACDBuilder implements AlgorithmBuilder<AbstractMOEACD> {
     protected DifferentialEvolutionCrossover deCrossover;
     protected MutationOperator<DoubleSolution> mutation;
     protected double neighborhoodSelectionProbability;
+
     protected int populationSize;
+    protected int constraintLayerSize;
 
     protected int neighborhoodSize;
 
     protected int maxEvaluations;
 
-    protected int numberOfThreads ;
+    protected int numberOfThreads;
 
-    protected Variant moeacdVariant ;
+    protected Variant moeacdVariant;
 
     protected MyAlgorithmMeasures<DoubleSolution> measureManager;
 
@@ -92,23 +97,25 @@ public class MOEACDBuilder implements AlgorithmBuilder<AbstractMOEACD> {
 
     protected double c_uneven;
 
-    /** Constructor */
+    /**
+     * Constructor
+     */
     public MOEACDBuilder(Problem<DoubleSolution> problem, Variant variant) {
-        this.problem = problem ;
-        populationSize = 300 ;
+        this.problem = problem;
+        populationSize = 300;
+        constraintLayerSize = 5;
         neighborhoodSize = 20;
-        maxEvaluations = 150000 ;
+        maxEvaluations = 150000;
         pbi_theta = 5.0;
-        sbxCrossover = new SBXCrossover(1.0,30.0) ;
-        deCrossover = new DifferentialEvolutionCrossover(1.0,0.5,"rand/1/bin");
-        mutation = new PolynomialMutation(1.0/problem.getNumberOfVariables(), 20.0);
-        numberOfThreads = 1 ;
-        moeacdVariant = variant ;
+        sbxCrossover = new SBXCrossover(1.0, 30.0);
+        deCrossover = new DifferentialEvolutionCrossover(1.0, 0.5, "rand/1/bin");
+        mutation = new PolynomialMutation(1.0 / problem.getNumberOfVariables(), 20.0);
+        numberOfThreads = 1;
+        moeacdVariant = variant;
         c_uneven = 1.04;
         measureManager = new MyAlgorithmMeasures<>();
     }
 
-    /* Getters/Setters */
     public int getMaxEvaluations() {
         return maxEvaluations;
     }
@@ -117,139 +124,169 @@ public class MOEACDBuilder implements AlgorithmBuilder<AbstractMOEACD> {
         return populationSize;
     }
 
-    public int getNeighborhoodSize(){return neighborhoodSize;}
+    public int getConstraintLayerSize() {
+        return constraintLayerSize;
+    }
 
-    public int[] getNumofDivision(){return this.numOfDivision;}
+    public int getNeighborhoodSize() {
+        return neighborhoodSize;
+    }
 
-    public double[] getIntegratedTaus(){return this.integratedTaus;}
+    public int[] getNumofDivision() {
+        return this.numOfDivision;
+    }
 
-    public double getPBITheta(){return pbi_theta;}
+    public double[] getIntegratedTaus() {
+        return this.integratedTaus;
+    }
+
+    public double getPBITheta() {
+        return pbi_theta;
+    }
 
     public MutationOperator<DoubleSolution> getMutation() {
         return mutation;
     }
 
 
-    public SBXCrossover getSBXCrossover() {return  sbxCrossover;}
-
-    public DifferentialEvolutionCrossover getDECrossover() {return deCrossover;}
-
-
-    public double getNeighborhoodSelectionProbability(){return neighborhoodSelectionProbability;}
-
-    public int getNumberOfThreads() {
-        return numberOfThreads ;
+    public SBXCrossover getSBXCrossover() {
+        return sbxCrossover;
     }
 
-    public int getIndicatorEvaluatingTimes(){return this.indicatorEvaluatingTimes;}
+    public DifferentialEvolutionCrossover getDECrossover() {
+        return deCrossover;
+    }
 
 
-    public boolean getStrictlyFinalPopulationFlitting(){return  this.strictlyFinalPopulationFlitting;}
+    public double getNeighborhoodSelectionProbability() {
+        return neighborhoodSelectionProbability;
+    }
+
+    public int getNumberOfThreads() {
+        return numberOfThreads;
+    }
+
+    public int getIndicatorEvaluatingTimes() {
+        return this.indicatorEvaluatingTimes;
+    }
+
+
+    public boolean getStrictlyFinalPopulationFlitting() {
+        return this.strictlyFinalPopulationFlitting;
+    }
 
     public MOEACDBuilder setPopulationSize(int populationSize) {
         this.populationSize = populationSize;
         return this;
     }
 
-    public MOEACDBuilder setNeighborhoodSize(int neighborhoodSize){
+    public MOEACDBuilder setConstraintLayerSize(int constraintLayerSize) {
+        this.constraintLayerSize = constraintLayerSize;
+        return this;
+    }
+
+    public MOEACDBuilder setNeighborhoodSize(int neighborhoodSize) {
         this.neighborhoodSize = neighborhoodSize;
 
         return this;
     }
 
-    public  MOEACDBuilder setNumOfDivision(int[] numOfDivision){
+    public MOEACDBuilder setNumOfDivision(int[] numOfDivision) {
         this.numOfDivision = numOfDivision;
         return this;
     }
 
-    public MOEACDBuilder setIntegratedTaus(double[] integratedTaus){
+    public MOEACDBuilder setIntegratedTaus(double[] integratedTaus) {
         this.integratedTaus = integratedTaus;
         return this;
     }
+
     public MOEACDBuilder setMaxEvaluations(int maxEvaluations) {
         this.maxEvaluations = maxEvaluations;
 
         return this;
     }
 
-    public MOEACDBuilder setPBITheta(double theta){
+    public MOEACDBuilder setPBITheta(double theta) {
         this.pbi_theta = theta;
 
         return this;
     }
 
 
-    public MOEACDBuilder setSBXCrossover(SBXCrossover crossover){
+    public MOEACDBuilder setSBXCrossover(SBXCrossover crossover) {
         this.sbxCrossover = crossover;
 
         return this;
     }
 
-    public MOEACDBuilder setDECrossover(DifferentialEvolutionCrossover crossover){
+    public MOEACDBuilder setDECrossover(DifferentialEvolutionCrossover crossover) {
         this.deCrossover = crossover;
         return this;
     }
 
     public MOEACDBuilder setMutation(MutationOperator<DoubleSolution> mutation) {
-        this.mutation = mutation ;
+        this.mutation = mutation;
 
-        return this ;
+        return this;
     }
 
-    public MOEACDBuilder setNeighborhoodSelectionProbability(double neighborhoodSelectionProbability){
+    public MOEACDBuilder setNeighborhoodSelectionProbability(double neighborhoodSelectionProbability) {
         this.neighborhoodSelectionProbability = neighborhoodSelectionProbability;
 
         return this;
     }
 
     public MOEACDBuilder setNumberOfThreads(int numberOfThreads) {
-        this.numberOfThreads = numberOfThreads ;
+        this.numberOfThreads = numberOfThreads;
 
-        return this ;
+        return this;
     }
 
-    public MOEACDBuilder setIndicatorEvaluatingTimes(int indicatorEvaluatingTimes){
+    public MOEACDBuilder setIndicatorEvaluatingTimes(int indicatorEvaluatingTimes) {
         this.indicatorEvaluatingTimes = indicatorEvaluatingTimes;
         return this;
     }
 
-    public MOEACDBuilder setStrictlyFinalPopulationFlitting(boolean strictlyFinalPopulationFlitting){
+    public MOEACDBuilder setStrictlyFinalPopulationFlitting(boolean strictlyFinalPopulationFlitting) {
         this.strictlyFinalPopulationFlitting = strictlyFinalPopulationFlitting;
         return this;
     }
 
-    public List<double[]> getPredifineDirections(){
+    public List<double[]> getPredifineDirections() {
         return predifineDirections;
     }
 
-    public MOEACDBuilder setPredifineDirections(List<double[]> predefineDirections){
+    public MOEACDBuilder setPredifineDirections(List<double[]> predefineDirections) {
         this.predifineDirections = predefineDirections;
-        return  this;
+        return this;
     }
 
-    public double getC_UnEven(){return this.c_uneven;}
-    public MOEACDBuilder setCUnEven(double c_uneven){
+    public double getC_UnEven() {
+        return this.c_uneven;
+    }
+
+    public MOEACDBuilder setCUnEven(double c_uneven) {
         this.c_uneven = c_uneven;
         return this;
     }
 
-    public MyAlgorithmMeasures<DoubleSolution> getMeasureManager(){
+    public MyAlgorithmMeasures<DoubleSolution> getMeasureManager() {
         return this.measureManager;
     }
 
-    public MOEACDBuilder setMeasureManager(MyAlgorithmMeasures<DoubleSolution> measureManager)
-    {
+    public MOEACDBuilder setMeasureManager(MyAlgorithmMeasures<DoubleSolution> measureManager) {
         this.measureManager = measureManager;
         return this;
     }
 
     public AbstractMOEACD build() {
         AbstractMOEACD algorithm = null;
-        if (moeacdVariant.equals(Variant.MOEACD)){
-            algorithm = new MOEACD(problem,numOfDivision, integratedTaus,
-                    populationSize,maxEvaluations,neighborhoodSize,
+        if (moeacdVariant.equals(Variant.MOEACD)) {
+            algorithm = new MOEACD(problem, numOfDivision, integratedTaus,
+                    populationSize, constraintLayerSize, maxEvaluations, neighborhoodSize,
                     neighborhoodSelectionProbability,
-                    sbxCrossover,deCrossover, mutation);
+                    sbxCrossover, deCrossover, mutation);
         }
 //        else if(moeacdVariant.equals(Variant.MOEACDMeasure)) {
 //            algorithm = new MOEACD(measureManager,problem, numOfDivision, integratedTaus,

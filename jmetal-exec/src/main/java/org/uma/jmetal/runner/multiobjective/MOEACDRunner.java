@@ -53,7 +53,7 @@ public class MOEACDRunner extends AbstractAlgorithmRunner {
         algorithm = (new MOEACDBuilder(problem, MOEACDBuilder.Variant.MOEACD))
                 .setIntegratedTaus(integratedTaus)
                 .setPopulationSize(91)
-//                .setConstraintLayerSize(5)
+                .setConstraintLayerSize(5)
                 .setNumOfDivision(numOfDivision)
                 .build();
 

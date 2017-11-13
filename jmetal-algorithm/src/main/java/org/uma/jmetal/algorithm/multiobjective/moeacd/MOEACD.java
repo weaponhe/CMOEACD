@@ -49,6 +49,7 @@ public class MOEACD extends AbstractMOEACD{
                   int[] arrayH,
                   double[] integratedTaus,
                   int populationSize,
+                  int constraintLayerSize,
                   int maxEvaluations,
                   int neighborhoodSize,
                   double neighborhoodSelectionProbability,
@@ -57,7 +58,7 @@ public class MOEACD extends AbstractMOEACD{
                   MutationOperator<DoubleSolution> mutation
                 ) {
         super(problem,arrayH, integratedTaus,
-                populationSize,maxEvaluations,neighborhoodSize,
+                populationSize, constraintLayerSize, maxEvaluations, neighborhoodSize,
                 neighborhoodSelectionProbability,
                 sbxCrossoverOperator,deCrossoverOperator, mutation);
         evolvingIdxList = new ArrayList<>(2*populationSize);
@@ -75,6 +76,7 @@ public class MOEACD extends AbstractMOEACD{
                   int[] arrayH,
                   double[] integratedTaus,
                   int populationSize,
+                  int constraintLayerSize,
                   int maxEvaluations,
                   int neighborhoodSize,
                   double neighborhoodSelectionProbability,
@@ -83,7 +85,7 @@ public class MOEACD extends AbstractMOEACD{
                   MutationOperator<DoubleSolution> mutation
     ) {
         super(measureManager,problem,arrayH, integratedTaus,
-                populationSize,maxEvaluations,neighborhoodSize,
+                populationSize, constraintLayerSize, maxEvaluations,neighborhoodSize,
                 neighborhoodSelectionProbability,
                 sbxCrossoverOperator,deCrossoverOperator, mutation);
         evolvingIdxList = new ArrayList<>(2*populationSize);
