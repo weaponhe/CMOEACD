@@ -1,0 +1,219 @@
+package org.uma.jmetal.experiment;
+
+import org.uma.jmetal.algorithm.multiobjective.moead.AbstractMOEAD;
+import org.uma.jmetal.algorithm.multiobjective.moead.MOEADBuilder;
+import org.uma.jmetal.algorithm.multiobjective.moead.MOEADGRMeasure;
+import org.uma.jmetal.measure.MeasureManager;
+import org.uma.jmetal.measure.impl.BasicMeasure;
+import org.uma.jmetal.measure.impl.DurationMeasure;
+import org.uma.jmetal.operator.MutationOperator;
+import org.uma.jmetal.operator.impl.crossover.DifferentialEvolutionCrossover;
+import org.uma.jmetal.operator.impl.mutation.PolynomialMutation;
+import org.uma.jmetal.problem.Problem;
+import org.uma.jmetal.solution.DoubleSolution;
+import org.uma.jmetal.util.AlgorithmRunner;
+import org.uma.jmetal.util.JMetalLogger;
+import org.uma.jmetal.util.front.Front;
+import org.uma.jmetal.util.front.imp.ArrayFront;
+import org.uma.jmetal.util.point.Point;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.List;
+
+/**
+ * Created by X250 on 2016/8/25.
+ */
+public class MOEADGRNStudy {
+    public void executeMeasure(String baseDir,
+                               double crossoverProbability,
+                               double f,
+                               double mutationDistributionIndex,
+                               int neighborSize,
+                               double neighborhoodSelectionProbability,
+                               int indicatorEvaluatingTimes,
+                               int maxRun,
+                               List<Problem<DoubleSolution>> problemList,
+                               int[] popsList,
+                               int[] maxIterationsList,
+                               int[][] divisionConfigList,
+                               double[][] tauConfigList,
+                               String[] frontFileList,
+                               Point[] hvRefPointList,
+                               MyExperimentIndicatorConfig indicatorConfig) throws FileNotFoundException {
+
+        DifferentialEvolutionCrossover differentialEvolutionCrossover;
+        double mutationProbability;
+        MutationOperator<DoubleSolution> mutation;
+        int indicatorInterval;
+        int maxEvaluations;
+
+
+        String[] variantName = {
+//                "MOEADGRN_TCH"
+//                ,
+                "MOEADGRN_PBI"
+        };
+        AbstractMOEAD.FunctionType[] variantConfig = {
+//                AbstractMOEAD.FunctionType.TCH
+//                ,
+                AbstractMOEAD.FunctionType.PBI
+        };
+
+        differentialEvolutionCrossover = new DifferentialEvolutionCrossover(crossoverProbability, f, "rand/1/bin");
+
+        for(int iProblem=0;iProblem<problemList.size();++iProblem){
+
+            maxEvaluations = popsList[iProblem] * maxIterationsList[iProblem];
+
+            mutationProbability = 1.0 / problemList.get(iProblem).getNumberOfVariables();
+            mutation = new PolynomialMutation(mutationProbability, mutationDistributionIndex);
+
+            Front referenceFront  = new ArrayFront(frontFileList[iProblem]);
+            indicatorInterval = maxIterationsList[iProblem] / indicatorEvaluatingTimes;
+
+            for(int iV = 0;iV<variantConfig.length;++iV) {
+                String instance = variantName[iV]+"_" + problemList.get(iProblem).getName() + "(" + problemList.get(iProblem).getNumberOfObjectives() + ")_" + popsList[iProblem] + "_" + maxIterationsList[iProblem];
+                MyExperimentAnalysis experimentAnalysis = new MyExperimentAnalysis(baseDir, instance);
+
+                for (int iRun = 0; iRun < maxRun; ++iRun) {
+                    JMetalLogger.logger.info("[" + variantName[iV] +"--"+ problemList.get(iProblem).getName() +"(" + problemList.get(iProblem).getNumberOfObjectives() + ")]  Run : " + iRun);
+                    //configure the algorithm
+                    AbstractMOEAD<DoubleSolution> algorithm = new MOEADBuilder(problemList.get(iProblem), MOEADBuilder.Variant.MOEADGRNMeasure)
+                            .setCrossover(differentialEvolutionCrossover)
+                            .setMutation(mutation)
+                            .setMaxEvaluations(maxEvaluations)
+                            .setPopulationSize(popsList[iProblem])
+                            .setResultPopulationSize(popsList[iProblem])
+                            .setNeighborSize(neighborSize)
+                            .setNeighborhoodSelectionProbability(neighborhoodSelectionProbability)
+                            .setFunctionType(variantConfig[iV])
+                            .setNumofDivision(divisionConfigList[iProblem])
+                            .setIntegratedTau(tauConfigList[iProblem])
+                            .build();
+
+                /* Measure management */
+                    MeasureManager measureManager = ((MOEADGRMeasure) algorithm).getMeasureManager();
+                    DurationMeasure currentComputingTime =
+                            (DurationMeasure) measureManager.<Long>getPullMeasure("currentExecutionTime");
+                    BasicMeasure<List<DoubleSolution>> solutionListMeasure =
+                            (BasicMeasure<List<DoubleSolution>>) measureManager.<List<DoubleSolution>>getPushMeasure("currentPopulation");
+
+//                    MyExperimentIndicator experimentIndicator = new MyExperimentIndicator(referenceFront);
+//                    WFGHypervolume hvEvaluator = new WFGHypervolume();
+//                    hvEvaluator.setReferencePoint(hvRefPointList[iProblem]);
+//                    hvEvaluator.setMiniming();
+//                    experimentIndicator.addIndicatorEvaluator(hvEvaluator);
+//                    experimentIndicator.addIndicatorEvaluator(new InvertedGenerationalDistance());
+                    MyExperimentIndicator experimentIndicator = indicatorConfig.generate(referenceFront,hvRefPointList[iProblem]);
+
+                    IndicatorsListener<DoubleSolution> indicatorsListener = new IndicatorsListener<DoubleSolution>(experimentIndicator, maxIterationsList[iProblem],indicatorEvaluatingTimes);//indicatorInterval);
+                    solutionListMeasure.register(indicatorsListener);
+                /* End of measure management */
+
+                    //run algorithm
+                    algorithm.run();
+
+                    //print or save solution or indivcators
+                    List<DoubleSolution> population = algorithm.getMeasurePopulation();
+                    experimentIndicator = indicatorsListener.getExperimentIndicator();
+                    experimentIndicator.setComputingTime(currentComputingTime.get());
+                    experimentAnalysis.addIndicator(experimentIndicator);
+
+                    //save final population attained each run
+                    experimentAnalysis.printFinalSolutionSet(iRun, population);
+                }
+                //analizing all statistics atain by algorithm
+                experimentAnalysis.analyzingResults();
+            }
+        }
+    }
+
+    public void execute(String baseDir,
+                        double crossoverProbability,
+                        double f,
+                        double mutationDistributionIndex,
+                        int neighborSize,
+                        double neighborhoodSelectionProbability,
+                        int indicatorEvaluatingTimes,
+                        int maxRun,
+                        List<Problem<DoubleSolution>> problemList,
+                        int[] popsList,
+                        int[] maxIterationsList,
+                        int[][] divisionConfigList,
+                        double[][] tauConfigList,
+                        String[] frontFileList,
+                        Point[] hvRefPointList,
+                        MyExperimentIndicatorConfig indicatorConfig) throws FileNotFoundException {
+
+        DifferentialEvolutionCrossover differentialEvolutionCrossover;
+        double mutationProbability;
+        MutationOperator<DoubleSolution> mutation;
+        int maxEvaluations;
+
+        String[] variantName = {
+//                "MOEADGRN_TCH"
+//                ,
+                "MOEADGRN_PBI",
+        };
+        AbstractMOEAD.FunctionType[] variantConfig = {
+//                AbstractMOEAD.FunctionType.TCH
+//                ,
+                AbstractMOEAD.FunctionType.PBI
+        };
+
+        differentialEvolutionCrossover = new DifferentialEvolutionCrossover(crossoverProbability, f, "rand/1/bin");
+
+        for(int iProblem=0;iProblem<problemList.size();++iProblem){
+
+            maxEvaluations = popsList[iProblem] * maxIterationsList[iProblem];
+
+            mutationProbability = 1.0 / problemList.get(iProblem).getNumberOfVariables();
+            mutation = new PolynomialMutation(mutationProbability, mutationDistributionIndex);
+
+            Front referenceFront  = new ArrayFront(frontFileList[iProblem]);
+
+            for(int iV = 0;iV<variantConfig.length;++iV) {
+                String instance = variantName[iV]+"_" + problemList.get(iProblem).getName() + "(" + problemList.get(iProblem).getNumberOfObjectives() + ")_" + popsList[iProblem] + "_" + maxIterationsList[iProblem];
+                MyExperimentAnalysis experimentAnalysis = new MyExperimentAnalysis(baseDir, instance);
+
+                for (int iRun = 0; iRun < maxRun; ++iRun) {
+                    JMetalLogger.logger.info("[" + variantName[iV] +"--"+ problemList.get(iProblem).getName() +"(" + problemList.get(iProblem).getNumberOfObjectives() + ")]  Run : " + iRun);
+                    //configure the algorithm
+                    AbstractMOEAD<DoubleSolution> algorithm = new MOEADBuilder(problemList.get(iProblem), MOEADBuilder.Variant.MOEADGRN)
+                            .setCrossover(differentialEvolutionCrossover)
+                            .setMutation(mutation)
+                            .setMaxEvaluations(maxEvaluations)
+                            .setPopulationSize(popsList[iProblem])
+                            .setResultPopulationSize(popsList[iProblem])
+                            .setNeighborSize(neighborSize)
+                            .setNeighborhoodSelectionProbability(neighborhoodSelectionProbability)
+                            .setFunctionType(variantConfig[iV])
+                            .setNumofDivision(divisionConfigList[iProblem])
+                            .setIntegratedTau(tauConfigList[iProblem])
+                            .build();
+
+
+                    AlgorithmRunner algorithmRunner = new AlgorithmRunner.Executor(algorithm)
+                            .execute() ;
+
+                    List<DoubleSolution> population = algorithm.getMeasurePopulation() ;
+
+                    MyExperimentIndicator experimentIndicator = indicatorConfig.generate(referenceFront,hvRefPointList[iProblem]);
+                    experimentIndicator.computeQualityIndicators(maxIterationsList[iProblem],population);
+                    experimentIndicator.setComputingTime(algorithmRunner.getComputingTime());
+                    experimentAnalysis.addIndicator(experimentIndicator);
+
+                    //save final population attained each run
+                    experimentAnalysis.printFinalSolutionSet(iRun, population);
+                }
+                //analizing all statistics atain by algorithm
+                experimentAnalysis.analyzingResults();
+            }
+        }
+    }
+
+    public static void main(String[] args) throws IOException {
+
+    }
+}
