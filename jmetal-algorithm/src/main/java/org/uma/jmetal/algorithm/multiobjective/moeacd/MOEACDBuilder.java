@@ -250,393 +250,394 @@ public class MOEACDBuilder implements AlgorithmBuilder<AbstractMOEACD> {
                     populationSize,maxEvaluations,neighborhoodSize,
                     neighborhoodSelectionProbability,
                     sbxCrossover,deCrossover, mutation);
-        }else if(moeacdVariant.equals(Variant.MOEACDMeasure)) {
-            algorithm = new MOEACD(measureManager,problem, numOfDivision, integratedTaus,
-                    populationSize, maxEvaluations,neighborhoodSize,
-                    neighborhoodSelectionProbability,
-                    sbxCrossover,deCrossover, mutation);
-        }else if (moeacdVariant.equals(Variant.MOEACDP)){
-            algorithm = new MOEACDP(problem,predifineDirections,
-                    populationSize,maxEvaluations,neighborhoodSize,
-                    neighborhoodSelectionProbability,
-                    sbxCrossover,deCrossover, mutation);
-        }else if(moeacdVariant.equals(Variant.MOEACDPMeasure)) {
-            algorithm = new MOEACDP(measureManager,problem, predifineDirections,
-                    populationSize, maxEvaluations,neighborhoodSize,
-                    neighborhoodSelectionProbability,
-                    sbxCrossover,deCrossover, mutation);
         }
-        else if (moeacdVariant.equals(Variant.MOEACDN)){
-            algorithm = new MOEACDN(problem,numOfDivision, integratedTaus,
-                    populationSize,maxEvaluations,neighborhoodSize,
-                    neighborhoodSelectionProbability,
-                    sbxCrossover,deCrossover, mutation);
-        }else if(moeacdVariant.equals(Variant.MOEACDNMeasure)) {
-            algorithm = new MOEACDN(measureManager,problem, numOfDivision, integratedTaus,
-                    populationSize, maxEvaluations,neighborhoodSize,
-                    neighborhoodSelectionProbability,
-                    sbxCrossover,deCrossover, mutation);
-        }
-      else if (moeacdVariant.equals(Variant.CMOEACD)){
-            algorithm = new CMOEACD(problem,numOfDivision, integratedTaus,
-                    populationSize,maxEvaluations,neighborhoodSize,
-                    neighborhoodSelectionProbability,
-                    sbxCrossover,deCrossover, mutation);
-        }else if(moeacdVariant.equals(Variant.CMOEACDMeasure)) {
-            algorithm = new CMOEACD(measureManager,problem, numOfDivision, integratedTaus,
-                    populationSize, maxEvaluations,neighborhoodSize,
-                    neighborhoodSelectionProbability,
-                    sbxCrossover,deCrossover, mutation);
-        }
-        else if (moeacdVariant.equals(Variant.CMOEACDN)){
-            algorithm = new CMOEACDN(problem,numOfDivision, integratedTaus,
-                    populationSize,maxEvaluations,neighborhoodSize,
-                    neighborhoodSelectionProbability,
-                    sbxCrossover,deCrossover, mutation);
-        }else if(moeacdVariant.equals(Variant.CMOEACDNMeasure)) {
-            algorithm = new CMOEACDN(measureManager,problem, numOfDivision, integratedTaus,
-                    populationSize, maxEvaluations,neighborhoodSize,
-                    neighborhoodSelectionProbability,
-                    sbxCrossover,deCrossover, mutation);
-        } else if (moeacdVariant.equals(Variant.MOEACDD)){
-            algorithm = new MOEACDD(problem,numOfDivision, integratedTaus,
-                    populationSize,maxEvaluations,neighborhoodSize,
-                    neighborhoodSelectionProbability,
-                    sbxCrossover,deCrossover, mutation);
-        }else if(moeacdVariant.equals(Variant.MOEACDDMeasure)) {
-            algorithm = new MOEACDD(measureManager,problem, numOfDivision, integratedTaus,
-                    populationSize, maxEvaluations,neighborhoodSize,
-                    neighborhoodSelectionProbability,
-                    sbxCrossover,deCrossover, mutation);
-        }
-        else if (moeacdVariant.equals(Variant.MOEACDND)){
-            algorithm = new MOEACDND(problem,numOfDivision, integratedTaus,
-                    populationSize,maxEvaluations,neighborhoodSize,
-                    neighborhoodSelectionProbability,
-                    sbxCrossover,deCrossover, mutation);
-        }else if(moeacdVariant.equals(Variant.MOEACDNDMeasure)) {
-            algorithm = new MOEACDND(measureManager,problem, numOfDivision, integratedTaus,
-                    populationSize, maxEvaluations,neighborhoodSize,
-                    neighborhoodSelectionProbability,
-                    sbxCrossover,deCrossover, mutation);
-        }else if (moeacdVariant.equals(Variant.CMOEACDD)){
-            algorithm = new CMOEACDD(problem,numOfDivision, integratedTaus,
-                    populationSize,maxEvaluations,neighborhoodSize,
-                    neighborhoodSelectionProbability,
-                    sbxCrossover,deCrossover, mutation);
-        }else if(moeacdVariant.equals(Variant.CMOEACDDMeasure)) {
-            algorithm = new CMOEACDD(measureManager,problem, numOfDivision, integratedTaus,
-                    populationSize, maxEvaluations,neighborhoodSize,
-                    neighborhoodSelectionProbability,
-                    sbxCrossover,deCrossover, mutation);
-        }else  if (moeacdVariant.equals(Variant.CMOEACDND)){
-            algorithm = new CMOEACDND(problem,numOfDivision, integratedTaus,
-                    populationSize,maxEvaluations,neighborhoodSize,
-                    neighborhoodSelectionProbability,
-                    sbxCrossover,deCrossover, mutation);
-        }else if(moeacdVariant.equals(Variant.CMOEACDNDMeasure)) {
-            algorithm = new CMOEACDND(measureManager,problem, numOfDivision, integratedTaus,
-                    populationSize, maxEvaluations,neighborhoodSize,
-                    neighborhoodSelectionProbability,
-                    sbxCrossover,deCrossover, mutation);
-        }else if (moeacdVariant.equals(Variant.CMOEACDA)){
-            algorithm = new CMOEACDA(problem,numOfDivision, integratedTaus,
-                    populationSize,maxEvaluations,neighborhoodSize,
-                    neighborhoodSelectionProbability,
-                    sbxCrossover,deCrossover, mutation);
-        }else if(moeacdVariant.equals(Variant.CMOEACDAMeasure)) {
-            algorithm = new CMOEACDA(measureManager,problem, numOfDivision, integratedTaus,
-                    populationSize, maxEvaluations,neighborhoodSize,
-                    neighborhoodSelectionProbability,
-                    sbxCrossover,deCrossover, mutation);
-        }else if (moeacdVariant.equals(Variant.CMOEACDNA)){
-            algorithm = new CMOEACDNA(problem,numOfDivision, integratedTaus,
-                    populationSize,maxEvaluations,neighborhoodSize,
-                    neighborhoodSelectionProbability,
-                    sbxCrossover,deCrossover, mutation);
-        }else if(moeacdVariant.equals(Variant.CMOEACDNAMeasure)) {
-            algorithm = new CMOEACDNA(measureManager,problem, numOfDivision, integratedTaus,
-                    populationSize, maxEvaluations,neighborhoodSize,
-                    neighborhoodSelectionProbability,
-                    sbxCrossover,deCrossover, mutation);
-        }
-        else if (moeacdVariant.equals(Variant.CMOEACDAD)){
-            algorithm = new CMOEACDAD(problem,numOfDivision, integratedTaus,
-                    populationSize,maxEvaluations,neighborhoodSize,
-                    neighborhoodSelectionProbability,
-                    sbxCrossover,deCrossover, mutation);
-        }else if(moeacdVariant.equals(Variant.CMOEACDADMeasure)) {
-            algorithm = new CMOEACDAD(measureManager,problem, numOfDivision, integratedTaus,
-                    populationSize, maxEvaluations,neighborhoodSize,
-                    neighborhoodSelectionProbability,
-                    sbxCrossover,deCrossover, mutation);
-        }
-        else if (moeacdVariant.equals(Variant.CMOEACDNAD)){
-            algorithm = new CMOEACDNAD(problem,numOfDivision, integratedTaus,
-                    populationSize,maxEvaluations,neighborhoodSize,
-                    neighborhoodSelectionProbability,
-                    sbxCrossover,deCrossover, mutation);
-        }else if(moeacdVariant.equals(Variant.CMOEACDNADMeasure)) {
-            algorithm = new CMOEACDNAD(measureManager,problem, numOfDivision, integratedTaus,
-                    populationSize, maxEvaluations,neighborhoodSize,
-                    neighborhoodSelectionProbability,
-                    sbxCrossover,deCrossover, mutation);
-        }else if (moeacdVariant.equals(Variant.MOEACDDE)){
-            algorithm = new MOEACDDE(problem,numOfDivision, integratedTaus,
-                    populationSize,maxEvaluations,neighborhoodSize,
-                    neighborhoodSelectionProbability,
-                    deCrossover, mutation);
-        }else if(moeacdVariant.equals(Variant.MOEACDDEMeasure)) {
-            algorithm = new MOEACDDE(measureManager,problem, numOfDivision, integratedTaus,
-                    populationSize, maxEvaluations,neighborhoodSize,
-                    neighborhoodSelectionProbability,deCrossover, mutation);
-        }else if (moeacdVariant.equals(Variant.MOEACDF)){
-            algorithm = new MOEACDF(problem,numOfDivision, integratedTaus,
-                    populationSize,maxEvaluations,neighborhoodSize,
-                    neighborhoodSelectionProbability,
-                    sbxCrossover,deCrossover, mutation);
-        }else if(moeacdVariant.equals(Variant.MOEACDFMeasure)) {
-            algorithm = new MOEACDF(measureManager,problem, numOfDivision, integratedTaus,
-                    populationSize, maxEvaluations,neighborhoodSize,
-                    neighborhoodSelectionProbability,
-                    sbxCrossover,deCrossover, mutation);
-        }else if (moeacdVariant.equals(Variant.MOEACDSBX)){
-            algorithm = new MOEACDSBX(problem,numOfDivision, integratedTaus,
-                    populationSize,maxEvaluations,neighborhoodSize,
-                    neighborhoodSelectionProbability,
-                    sbxCrossover, mutation);
-        }else if(moeacdVariant.equals(Variant.MOEACDSBXMeasure)) {
-            algorithm = new MOEACDSBX(measureManager,problem, numOfDivision, integratedTaus,
-                    populationSize, maxEvaluations,neighborhoodSize,
-                    neighborhoodSelectionProbability,
-                    sbxCrossover, mutation);
-        }
-        else if (moeacdVariant.equals(Variant.MOEACDSCV)){
-            algorithm = new MOEACDSCV(problem,numOfDivision, integratedTaus,
-                    populationSize,maxEvaluations,neighborhoodSize,
-                    neighborhoodSelectionProbability,
-                    sbxCrossover,deCrossover, mutation);
-        }else if(moeacdVariant.equals(Variant.MOEACDSCVMeasure)) {
-            algorithm = new MOEACDSCV(measureManager,problem, numOfDivision, integratedTaus,
-                    populationSize, maxEvaluations,neighborhoodSize,
-                    neighborhoodSelectionProbability,
-                    sbxCrossover,deCrossover, mutation);
-        }
-
-        else if (moeacdVariant.equals(Variant.MOEACDPEH)){
-            algorithm = new MOEACDPEH(problem,numOfDivision, integratedTaus,
-                    populationSize,maxEvaluations,neighborhoodSize,
-                    neighborhoodSelectionProbability,
-                    sbxCrossover,deCrossover, mutation);
-        }else if(moeacdVariant.equals(Variant.MOEACDPEHMeasure)) {
-            algorithm = new MOEACDPEH(measureManager,problem, numOfDivision, integratedTaus,
-                    populationSize, maxEvaluations,neighborhoodSize,
-                    neighborhoodSelectionProbability,
-                    sbxCrossover,deCrossover, mutation);
-        }else if (moeacdVariant.equals(Variant.MOEACDNDE)){
-            algorithm = new MOEACDNDE(problem,numOfDivision, integratedTaus,
-                    populationSize,maxEvaluations,neighborhoodSize,
-                    neighborhoodSelectionProbability,
-                    deCrossover, mutation);
-        }else if(moeacdVariant.equals(Variant.MOEACDNDEMeasure)) {
-            algorithm = new MOEACDNDE(measureManager,problem, numOfDivision, integratedTaus,
-                    populationSize, maxEvaluations,neighborhoodSize,
-                    neighborhoodSelectionProbability,deCrossover, mutation);
-        }else if (moeacdVariant.equals(Variant.MOEACDNF)){
-            algorithm = new MOEACDNF(problem,numOfDivision, integratedTaus,
-                    populationSize,maxEvaluations,neighborhoodSize,
-                    neighborhoodSelectionProbability,
-                    sbxCrossover,deCrossover, mutation);
-        }else if(moeacdVariant.equals(Variant.MOEACDNFMeasure)) {
-            algorithm = new MOEACDNF(measureManager,problem, numOfDivision, integratedTaus,
-                    populationSize, maxEvaluations,neighborhoodSize,
-                    neighborhoodSelectionProbability,
-                    sbxCrossover,deCrossover, mutation);
-        }else if (moeacdVariant.equals(Variant.MOEACDNSBX)){
-            algorithm = new MOEACDNSBX(problem,numOfDivision, integratedTaus,
-                    populationSize,maxEvaluations,neighborhoodSize,
-                    neighborhoodSelectionProbability,
-                    sbxCrossover, mutation);
-        }else if(moeacdVariant.equals(Variant.MOEACDNSBXMeasure)) {
-            algorithm = new MOEACDNSBX(measureManager,problem, numOfDivision, integratedTaus,
-                    populationSize, maxEvaluations,neighborhoodSize,
-                    neighborhoodSelectionProbability,
-                    sbxCrossover, mutation);
-        }
-
-        else if (moeacdVariant.equals(Variant.MOEACDACV)){
-            algorithm = new MOEACDACV(problem,numOfDivision, integratedTaus,
-                    populationSize,maxEvaluations,neighborhoodSize,
-                    neighborhoodSelectionProbability,
-                    sbxCrossover,deCrossover, mutation);
-        }else if(moeacdVariant.equals(Variant.MOEACDACVMeasure)) {
-            algorithm = new MOEACDACV(measureManager,problem, numOfDivision, integratedTaus,
-                    populationSize, maxEvaluations,neighborhoodSize,
-                    neighborhoodSelectionProbability,
-                    sbxCrossover,deCrossover, mutation);
-        }
-        else if (moeacdVariant.equals(Variant.MOEACDAECV)){
-            algorithm = new MOEACDAECV(problem,numOfDivision, integratedTaus,
-                    populationSize,maxEvaluations,neighborhoodSize,
-                    neighborhoodSelectionProbability,
-                    sbxCrossover,deCrossover, mutation);
-        }else if(moeacdVariant.equals(Variant.MOEACDAECVMeasure)) {
-            algorithm = new MOEACDAECV(measureManager,problem, numOfDivision, integratedTaus,
-                    populationSize, maxEvaluations,neighborhoodSize,
-                    neighborhoodSelectionProbability,
-                    sbxCrossover,deCrossover, mutation);
-        }else if (moeacdVariant.equals(Variant.CMOEACDO)){
-            algorithm = new CMOEACDO(problem,numOfDivision, integratedTaus,
-                    populationSize,maxEvaluations,neighborhoodSize,
-                    neighborhoodSelectionProbability,
-                    sbxCrossover,deCrossover, mutation);
-        }else if(moeacdVariant.equals(Variant.CMOEACDOMeasure)) {
-            algorithm = new CMOEACDO(measureManager,problem, numOfDivision, integratedTaus,
-                    populationSize, maxEvaluations,neighborhoodSize,
-                    neighborhoodSelectionProbability,
-                    sbxCrossover,deCrossover, mutation);
-        }
-        else if (moeacdVariant.equals(Variant.CMOEACDAO)){
-            algorithm = new CMOEACDAO(problem,numOfDivision, integratedTaus,
-                    populationSize,maxEvaluations,neighborhoodSize,
-                    neighborhoodSelectionProbability,
-                    sbxCrossover,deCrossover, mutation);
-        }else if(moeacdVariant.equals(Variant.CMOEACDAOMeasure)) {
-            algorithm = new CMOEACDAO(measureManager,problem, numOfDivision, integratedTaus,
-                    populationSize, maxEvaluations,neighborhoodSize,
-                    neighborhoodSelectionProbability,
-                    sbxCrossover,deCrossover, mutation);
-        }else if (moeacdVariant.equals(Variant.CMOEACDAOII)){
-            algorithm = new CMOEACDAOII(problem,numOfDivision, integratedTaus,
-                    populationSize,maxEvaluations,neighborhoodSize,
-                    neighborhoodSelectionProbability,
-                    sbxCrossover,deCrossover, mutation);
-        }else if(moeacdVariant.equals(Variant.CMOEACDAOIIMeasure)) {
-            algorithm = new CMOEACDAOII(measureManager,problem, numOfDivision, integratedTaus,
-                    populationSize, maxEvaluations,neighborhoodSize,
-                    neighborhoodSelectionProbability,
-                    sbxCrossover,deCrossover, mutation);
-        }else if (moeacdVariant.equals(Variant.CMOEACDAOD)){
-            algorithm = new CMOEACDAOD(problem,numOfDivision, integratedTaus,
-                    populationSize,maxEvaluations,neighborhoodSize,
-                    neighborhoodSelectionProbability,
-                    sbxCrossover,deCrossover, mutation);
-        }else if(moeacdVariant.equals(Variant.CMOEACDAODMeasure)) {
-            algorithm = new CMOEACDAOD(measureManager,problem, numOfDivision, integratedTaus,
-                    populationSize, maxEvaluations,neighborhoodSize,
-                    neighborhoodSelectionProbability,
-                    sbxCrossover,deCrossover, mutation);
-        }
-
-
-        else if (moeacdVariant.equals(Variant.UCDEA)){
-            algorithm = new UCDEA(problem,numOfDivision, integratedTaus,
-                    populationSize,maxEvaluations,neighborhoodSize,
-                    neighborhoodSelectionProbability,
-                    sbxCrossover,deCrossover, mutation,c_uneven);
-        }else if(moeacdVariant.equals(Variant.UCDEAMeasure)) {
-            algorithm = new UCDEA(measureManager,problem, numOfDivision, integratedTaus,
-                    populationSize, maxEvaluations,neighborhoodSize,
-                    neighborhoodSelectionProbability,
-                    sbxCrossover,deCrossover, mutation,c_uneven);
-        }
-        else if (moeacdVariant.equals(Variant.CUCDEA)){
-            algorithm = new CUCDEA(problem,numOfDivision, integratedTaus,
-                    populationSize,maxEvaluations,neighborhoodSize,
-                    neighborhoodSelectionProbability,
-                    sbxCrossover,deCrossover, mutation,c_uneven);
-        }else if(moeacdVariant.equals(Variant.CUCDEAMeasure)) {
-            algorithm = new CUCDEA(measureManager,problem, numOfDivision, integratedTaus,
-                    populationSize, maxEvaluations,neighborhoodSize,
-                    neighborhoodSelectionProbability,
-                    sbxCrossover,deCrossover, mutation,c_uneven);
-        }
-        else if (moeacdVariant.equals(Variant.CUCDEAII)){
-            algorithm = new CUCDEAII(problem,numOfDivision, integratedTaus,
-                    populationSize,maxEvaluations,neighborhoodSize,
-                    neighborhoodSelectionProbability,
-                    sbxCrossover,deCrossover, mutation,c_uneven);
-        }else if(moeacdVariant.equals(Variant.CUCDEAIIMeasure)) {
-            algorithm = new CUCDEAII(measureManager,problem, numOfDivision, integratedTaus,
-                    populationSize, maxEvaluations,neighborhoodSize,
-                    neighborhoodSelectionProbability,
-                    sbxCrossover,deCrossover, mutation,c_uneven);
-        }
-
-        else if (moeacdVariant.equals(Variant.CMOEACDII)){
-            algorithm = new CMOEACDII(problem,numOfDivision, integratedTaus,
-                    populationSize,maxEvaluations,neighborhoodSize,
-                    neighborhoodSelectionProbability,
-                    sbxCrossover,deCrossover, mutation);
-        }else if(moeacdVariant.equals(Variant.CMOEACDIIMeasure)) {
-            algorithm = new CMOEACDII(measureManager,problem, numOfDivision, integratedTaus,
-                    populationSize, maxEvaluations,neighborhoodSize,
-                    neighborhoodSelectionProbability,
-                    sbxCrossover,deCrossover, mutation);
-        }
-        else if (moeacdVariant.equals(Variant.CMOEACDIII)){
-            algorithm = new CMOEACDIII(problem,numOfDivision, integratedTaus,
-                    populationSize,maxEvaluations,neighborhoodSize,
-                    neighborhoodSelectionProbability,
-                    sbxCrossover,deCrossover, mutation);
-        }else if(moeacdVariant.equals(Variant.CMOEACDIIIMeasure)) {
-            algorithm = new CMOEACDIII(measureManager,problem, numOfDivision, integratedTaus,
-                    populationSize, maxEvaluations,neighborhoodSize,
-                    neighborhoodSelectionProbability,
-                    sbxCrossover,deCrossover, mutation);
-        }
-        else if (moeacdVariant.equals(Variant.CMOEACDIV)){
-            algorithm = new CMOEACDIV(problem,numOfDivision, integratedTaus,
-                    populationSize,maxEvaluations,neighborhoodSize,
-                    neighborhoodSelectionProbability,
-                    sbxCrossover,deCrossover, mutation);
-        }else if(moeacdVariant.equals(Variant.CMOEACDIVMeasure)) {
-            algorithm = new CMOEACDIV(measureManager,problem, numOfDivision, integratedTaus,
-                    populationSize, maxEvaluations,neighborhoodSize,
-                    neighborhoodSelectionProbability,
-                    sbxCrossover,deCrossover, mutation);
-        }
-        else if (moeacdVariant.equals(Variant.CMOEACDV)){
-            algorithm = new CMOEACDV(problem,numOfDivision, integratedTaus,
-                    populationSize,maxEvaluations,neighborhoodSize,
-                    neighborhoodSelectionProbability,
-                    sbxCrossover,deCrossover, mutation);
-        }else if(moeacdVariant.equals(Variant.CMOEACDVMeasure)) {
-            algorithm = new CMOEACDV(measureManager,problem, numOfDivision, integratedTaus,
-                    populationSize, maxEvaluations,neighborhoodSize,
-                    neighborhoodSelectionProbability,
-                    sbxCrossover,deCrossover, mutation);
-        }else if (moeacdVariant.equals(Variant.CMOEACDVI)){
-            algorithm = new CMOEACDVI(problem,numOfDivision, integratedTaus,
-                    populationSize,maxEvaluations,neighborhoodSize,
-                    neighborhoodSelectionProbability,
-                    sbxCrossover,deCrossover, mutation);
-        }else if(moeacdVariant.equals(Variant.CMOEACDVIMeasure)) {
-            algorithm = new CMOEACDVI(measureManager,problem, numOfDivision, integratedTaus,
-                    populationSize, maxEvaluations,neighborhoodSize,
-                    neighborhoodSelectionProbability,
-                    sbxCrossover,deCrossover, mutation);
-        }else if (moeacdVariant.equals(Variant.CMOEACDVII)){
-            algorithm = new CMOEACDVII(problem,numOfDivision, integratedTaus,
-                    populationSize,maxEvaluations,neighborhoodSize,
-                    neighborhoodSelectionProbability,
-                    sbxCrossover,deCrossover, mutation);
-        }else if(moeacdVariant.equals(Variant.CMOEACDVIIMeasure)) {
-            algorithm = new CMOEACDVII(measureManager,problem, numOfDivision, integratedTaus,
-                    populationSize, maxEvaluations,neighborhoodSize,
-                    neighborhoodSelectionProbability,
-                    sbxCrossover,deCrossover, mutation);
-        }else if (moeacdVariant.equals(Variant.CMOEACDVIII)){
-            algorithm = new CMOEACDVIII(problem,numOfDivision, integratedTaus,
-                    populationSize,maxEvaluations,neighborhoodSize,
-                    neighborhoodSelectionProbability,
-                    sbxCrossover,deCrossover, mutation);
-        }else if(moeacdVariant.equals(Variant.CMOEACDVIIIMeasure)) {
-            algorithm = new CMOEACDVIII(measureManager,problem, numOfDivision, integratedTaus,
-                    populationSize, maxEvaluations,neighborhoodSize,
-                    neighborhoodSelectionProbability,
-                    sbxCrossover,deCrossover, mutation);
-        }
+//        else if(moeacdVariant.equals(Variant.MOEACDMeasure)) {
+//            algorithm = new MOEACD(measureManager,problem, numOfDivision, integratedTaus,
+//                    populationSize, maxEvaluations,neighborhoodSize,
+//                    neighborhoodSelectionProbability,
+//                    sbxCrossover,deCrossover, mutation);
+//        }else if (moeacdVariant.equals(Variant.MOEACDP)){
+//            algorithm = new MOEACDP(problem,predifineDirections,
+//                    populationSize,maxEvaluations,neighborhoodSize,
+//                    neighborhoodSelectionProbability,
+//                    sbxCrossover,deCrossover, mutation);
+//        }else if(moeacdVariant.equals(Variant.MOEACDPMeasure)) {
+//            algorithm = new MOEACDP(measureManager,problem, predifineDirections,
+//                    populationSize, maxEvaluations,neighborhoodSize,
+//                    neighborhoodSelectionProbability,
+//                    sbxCrossover,deCrossover, mutation);
+//        }
+//        else if (moeacdVariant.equals(Variant.MOEACDN)){
+//            algorithm = new MOEACDN(problem,numOfDivision, integratedTaus,
+//                    populationSize,maxEvaluations,neighborhoodSize,
+//                    neighborhoodSelectionProbability,
+//                    sbxCrossover,deCrossover, mutation);
+//        }else if(moeacdVariant.equals(Variant.MOEACDNMeasure)) {
+//            algorithm = new MOEACDN(measureManager,problem, numOfDivision, integratedTaus,
+//                    populationSize, maxEvaluations,neighborhoodSize,
+//                    neighborhoodSelectionProbability,
+//                    sbxCrossover,deCrossover, mutation);
+//        }
+//      else if (moeacdVariant.equals(Variant.CMOEACD)){
+//            algorithm = new CMOEACD(problem,numOfDivision, integratedTaus,
+//                    populationSize,maxEvaluations,neighborhoodSize,
+//                    neighborhoodSelectionProbability,
+//                    sbxCrossover,deCrossover, mutation);
+//        }else if(moeacdVariant.equals(Variant.CMOEACDMeasure)) {
+//            algorithm = new CMOEACD(measureManager,problem, numOfDivision, integratedTaus,
+//                    populationSize, maxEvaluations,neighborhoodSize,
+//                    neighborhoodSelectionProbability,
+//                    sbxCrossover,deCrossover, mutation);
+//        }
+//        else if (moeacdVariant.equals(Variant.CMOEACDN)){
+//            algorithm = new CMOEACDN(problem,numOfDivision, integratedTaus,
+//                    populationSize,maxEvaluations,neighborhoodSize,
+//                    neighborhoodSelectionProbability,
+//                    sbxCrossover,deCrossover, mutation);
+//        }else if(moeacdVariant.equals(Variant.CMOEACDNMeasure)) {
+//            algorithm = new CMOEACDN(measureManager,problem, numOfDivision, integratedTaus,
+//                    populationSize, maxEvaluations,neighborhoodSize,
+//                    neighborhoodSelectionProbability,
+//                    sbxCrossover,deCrossover, mutation);
+//        } else if (moeacdVariant.equals(Variant.MOEACDD)){
+//            algorithm = new MOEACDD(problem,numOfDivision, integratedTaus,
+//                    populationSize,maxEvaluations,neighborhoodSize,
+//                    neighborhoodSelectionProbability,
+//                    sbxCrossover,deCrossover, mutation);
+//        }else if(moeacdVariant.equals(Variant.MOEACDDMeasure)) {
+//            algorithm = new MOEACDD(measureManager,problem, numOfDivision, integratedTaus,
+//                    populationSize, maxEvaluations,neighborhoodSize,
+//                    neighborhoodSelectionProbability,
+//                    sbxCrossover,deCrossover, mutation);
+//        }
+//        else if (moeacdVariant.equals(Variant.MOEACDND)){
+//            algorithm = new MOEACDND(problem,numOfDivision, integratedTaus,
+//                    populationSize,maxEvaluations,neighborhoodSize,
+//                    neighborhoodSelectionProbability,
+//                    sbxCrossover,deCrossover, mutation);
+//        }else if(moeacdVariant.equals(Variant.MOEACDNDMeasure)) {
+//            algorithm = new MOEACDND(measureManager,problem, numOfDivision, integratedTaus,
+//                    populationSize, maxEvaluations,neighborhoodSize,
+//                    neighborhoodSelectionProbability,
+//                    sbxCrossover,deCrossover, mutation);
+//        }else if (moeacdVariant.equals(Variant.CMOEACDD)){
+//            algorithm = new CMOEACDD(problem,numOfDivision, integratedTaus,
+//                    populationSize,maxEvaluations,neighborhoodSize,
+//                    neighborhoodSelectionProbability,
+//                    sbxCrossover,deCrossover, mutation);
+//        }else if(moeacdVariant.equals(Variant.CMOEACDDMeasure)) {
+//            algorithm = new CMOEACDD(measureManager,problem, numOfDivision, integratedTaus,
+//                    populationSize, maxEvaluations,neighborhoodSize,
+//                    neighborhoodSelectionProbability,
+//                    sbxCrossover,deCrossover, mutation);
+//        }else  if (moeacdVariant.equals(Variant.CMOEACDND)){
+//            algorithm = new CMOEACDND(problem,numOfDivision, integratedTaus,
+//                    populationSize,maxEvaluations,neighborhoodSize,
+//                    neighborhoodSelectionProbability,
+//                    sbxCrossover,deCrossover, mutation);
+//        }else if(moeacdVariant.equals(Variant.CMOEACDNDMeasure)) {
+//            algorithm = new CMOEACDND(measureManager,problem, numOfDivision, integratedTaus,
+//                    populationSize, maxEvaluations,neighborhoodSize,
+//                    neighborhoodSelectionProbability,
+//                    sbxCrossover,deCrossover, mutation);
+//        }else if (moeacdVariant.equals(Variant.CMOEACDA)){
+//            algorithm = new CMOEACDA(problem,numOfDivision, integratedTaus,
+//                    populationSize,maxEvaluations,neighborhoodSize,
+//                    neighborhoodSelectionProbability,
+//                    sbxCrossover,deCrossover, mutation);
+//        }else if(moeacdVariant.equals(Variant.CMOEACDAMeasure)) {
+//            algorithm = new CMOEACDA(measureManager,problem, numOfDivision, integratedTaus,
+//                    populationSize, maxEvaluations,neighborhoodSize,
+//                    neighborhoodSelectionProbability,
+//                    sbxCrossover,deCrossover, mutation);
+//        }else if (moeacdVariant.equals(Variant.CMOEACDNA)){
+//            algorithm = new CMOEACDNA(problem,numOfDivision, integratedTaus,
+//                    populationSize,maxEvaluations,neighborhoodSize,
+//                    neighborhoodSelectionProbability,
+//                    sbxCrossover,deCrossover, mutation);
+//        }else if(moeacdVariant.equals(Variant.CMOEACDNAMeasure)) {
+//            algorithm = new CMOEACDNA(measureManager,problem, numOfDivision, integratedTaus,
+//                    populationSize, maxEvaluations,neighborhoodSize,
+//                    neighborhoodSelectionProbability,
+//                    sbxCrossover,deCrossover, mutation);
+//        }
+//        else if (moeacdVariant.equals(Variant.CMOEACDAD)){
+//            algorithm = new CMOEACDAD(problem,numOfDivision, integratedTaus,
+//                    populationSize,maxEvaluations,neighborhoodSize,
+//                    neighborhoodSelectionProbability,
+//                    sbxCrossover,deCrossover, mutation);
+//        }else if(moeacdVariant.equals(Variant.CMOEACDADMeasure)) {
+//            algorithm = new CMOEACDAD(measureManager,problem, numOfDivision, integratedTaus,
+//                    populationSize, maxEvaluations,neighborhoodSize,
+//                    neighborhoodSelectionProbability,
+//                    sbxCrossover,deCrossover, mutation);
+//        }
+//        else if (moeacdVariant.equals(Variant.CMOEACDNAD)){
+//            algorithm = new CMOEACDNAD(problem,numOfDivision, integratedTaus,
+//                    populationSize,maxEvaluations,neighborhoodSize,
+//                    neighborhoodSelectionProbability,
+//                    sbxCrossover,deCrossover, mutation);
+//        }else if(moeacdVariant.equals(Variant.CMOEACDNADMeasure)) {
+//            algorithm = new CMOEACDNAD(measureManager,problem, numOfDivision, integratedTaus,
+//                    populationSize, maxEvaluations,neighborhoodSize,
+//                    neighborhoodSelectionProbability,
+//                    sbxCrossover,deCrossover, mutation);
+//        }else if (moeacdVariant.equals(Variant.MOEACDDE)){
+//            algorithm = new MOEACDDE(problem,numOfDivision, integratedTaus,
+//                    populationSize,maxEvaluations,neighborhoodSize,
+//                    neighborhoodSelectionProbability,
+//                    deCrossover, mutation);
+//        }else if(moeacdVariant.equals(Variant.MOEACDDEMeasure)) {
+//            algorithm = new MOEACDDE(measureManager,problem, numOfDivision, integratedTaus,
+//                    populationSize, maxEvaluations,neighborhoodSize,
+//                    neighborhoodSelectionProbability,deCrossover, mutation);
+//        }else if (moeacdVariant.equals(Variant.MOEACDF)){
+//            algorithm = new MOEACDF(problem,numOfDivision, integratedTaus,
+//                    populationSize,maxEvaluations,neighborhoodSize,
+//                    neighborhoodSelectionProbability,
+//                    sbxCrossover,deCrossover, mutation);
+//        }else if(moeacdVariant.equals(Variant.MOEACDFMeasure)) {
+//            algorithm = new MOEACDF(measureManager,problem, numOfDivision, integratedTaus,
+//                    populationSize, maxEvaluations,neighborhoodSize,
+//                    neighborhoodSelectionProbability,
+//                    sbxCrossover,deCrossover, mutation);
+//        }else if (moeacdVariant.equals(Variant.MOEACDSBX)){
+//            algorithm = new MOEACDSBX(problem,numOfDivision, integratedTaus,
+//                    populationSize,maxEvaluations,neighborhoodSize,
+//                    neighborhoodSelectionProbability,
+//                    sbxCrossover, mutation);
+//        }else if(moeacdVariant.equals(Variant.MOEACDSBXMeasure)) {
+//            algorithm = new MOEACDSBX(measureManager,problem, numOfDivision, integratedTaus,
+//                    populationSize, maxEvaluations,neighborhoodSize,
+//                    neighborhoodSelectionProbability,
+//                    sbxCrossover, mutation);
+//        }
+//        else if (moeacdVariant.equals(Variant.MOEACDSCV)){
+//            algorithm = new MOEACDSCV(problem,numOfDivision, integratedTaus,
+//                    populationSize,maxEvaluations,neighborhoodSize,
+//                    neighborhoodSelectionProbability,
+//                    sbxCrossover,deCrossover, mutation);
+//        }else if(moeacdVariant.equals(Variant.MOEACDSCVMeasure)) {
+//            algorithm = new MOEACDSCV(measureManager,problem, numOfDivision, integratedTaus,
+//                    populationSize, maxEvaluations,neighborhoodSize,
+//                    neighborhoodSelectionProbability,
+//                    sbxCrossover,deCrossover, mutation);
+//        }
+//
+//        else if (moeacdVariant.equals(Variant.MOEACDPEH)){
+//            algorithm = new MOEACDPEH(problem,numOfDivision, integratedTaus,
+//                    populationSize,maxEvaluations,neighborhoodSize,
+//                    neighborhoodSelectionProbability,
+//                    sbxCrossover,deCrossover, mutation);
+//        }else if(moeacdVariant.equals(Variant.MOEACDPEHMeasure)) {
+//            algorithm = new MOEACDPEH(measureManager,problem, numOfDivision, integratedTaus,
+//                    populationSize, maxEvaluations,neighborhoodSize,
+//                    neighborhoodSelectionProbability,
+//                    sbxCrossover,deCrossover, mutation);
+//        }else if (moeacdVariant.equals(Variant.MOEACDNDE)){
+//            algorithm = new MOEACDNDE(problem,numOfDivision, integratedTaus,
+//                    populationSize,maxEvaluations,neighborhoodSize,
+//                    neighborhoodSelectionProbability,
+//                    deCrossover, mutation);
+//        }else if(moeacdVariant.equals(Variant.MOEACDNDEMeasure)) {
+//            algorithm = new MOEACDNDE(measureManager,problem, numOfDivision, integratedTaus,
+//                    populationSize, maxEvaluations,neighborhoodSize,
+//                    neighborhoodSelectionProbability,deCrossover, mutation);
+//        }else if (moeacdVariant.equals(Variant.MOEACDNF)){
+//            algorithm = new MOEACDNF(problem,numOfDivision, integratedTaus,
+//                    populationSize,maxEvaluations,neighborhoodSize,
+//                    neighborhoodSelectionProbability,
+//                    sbxCrossover,deCrossover, mutation);
+//        }else if(moeacdVariant.equals(Variant.MOEACDNFMeasure)) {
+//            algorithm = new MOEACDNF(measureManager,problem, numOfDivision, integratedTaus,
+//                    populationSize, maxEvaluations,neighborhoodSize,
+//                    neighborhoodSelectionProbability,
+//                    sbxCrossover,deCrossover, mutation);
+//        }else if (moeacdVariant.equals(Variant.MOEACDNSBX)){
+//            algorithm = new MOEACDNSBX(problem,numOfDivision, integratedTaus,
+//                    populationSize,maxEvaluations,neighborhoodSize,
+//                    neighborhoodSelectionProbability,
+//                    sbxCrossover, mutation);
+//        }else if(moeacdVariant.equals(Variant.MOEACDNSBXMeasure)) {
+//            algorithm = new MOEACDNSBX(measureManager,problem, numOfDivision, integratedTaus,
+//                    populationSize, maxEvaluations,neighborhoodSize,
+//                    neighborhoodSelectionProbability,
+//                    sbxCrossover, mutation);
+//        }
+//
+//        else if (moeacdVariant.equals(Variant.MOEACDACV)){
+//            algorithm = new MOEACDACV(problem,numOfDivision, integratedTaus,
+//                    populationSize,maxEvaluations,neighborhoodSize,
+//                    neighborhoodSelectionProbability,
+//                    sbxCrossover,deCrossover, mutation);
+//        }else if(moeacdVariant.equals(Variant.MOEACDACVMeasure)) {
+//            algorithm = new MOEACDACV(measureManager,problem, numOfDivision, integratedTaus,
+//                    populationSize, maxEvaluations,neighborhoodSize,
+//                    neighborhoodSelectionProbability,
+//                    sbxCrossover,deCrossover, mutation);
+//        }
+//        else if (moeacdVariant.equals(Variant.MOEACDAECV)){
+//            algorithm = new MOEACDAECV(problem,numOfDivision, integratedTaus,
+//                    populationSize,maxEvaluations,neighborhoodSize,
+//                    neighborhoodSelectionProbability,
+//                    sbxCrossover,deCrossover, mutation);
+//        }else if(moeacdVariant.equals(Variant.MOEACDAECVMeasure)) {
+//            algorithm = new MOEACDAECV(measureManager,problem, numOfDivision, integratedTaus,
+//                    populationSize, maxEvaluations,neighborhoodSize,
+//                    neighborhoodSelectionProbability,
+//                    sbxCrossover,deCrossover, mutation);
+//        }else if (moeacdVariant.equals(Variant.CMOEACDO)){
+//            algorithm = new CMOEACDO(problem,numOfDivision, integratedTaus,
+//                    populationSize,maxEvaluations,neighborhoodSize,
+//                    neighborhoodSelectionProbability,
+//                    sbxCrossover,deCrossover, mutation);
+//        }else if(moeacdVariant.equals(Variant.CMOEACDOMeasure)) {
+//            algorithm = new CMOEACDO(measureManager,problem, numOfDivision, integratedTaus,
+//                    populationSize, maxEvaluations,neighborhoodSize,
+//                    neighborhoodSelectionProbability,
+//                    sbxCrossover,deCrossover, mutation);
+//        }
+//        else if (moeacdVariant.equals(Variant.CMOEACDAO)){
+//            algorithm = new CMOEACDAO(problem,numOfDivision, integratedTaus,
+//                    populationSize,maxEvaluations,neighborhoodSize,
+//                    neighborhoodSelectionProbability,
+//                    sbxCrossover,deCrossover, mutation);
+//        }else if(moeacdVariant.equals(Variant.CMOEACDAOMeasure)) {
+//            algorithm = new CMOEACDAO(measureManager,problem, numOfDivision, integratedTaus,
+//                    populationSize, maxEvaluations,neighborhoodSize,
+//                    neighborhoodSelectionProbability,
+//                    sbxCrossover,deCrossover, mutation);
+//        }else if (moeacdVariant.equals(Variant.CMOEACDAOII)){
+//            algorithm = new CMOEACDAOII(problem,numOfDivision, integratedTaus,
+//                    populationSize,maxEvaluations,neighborhoodSize,
+//                    neighborhoodSelectionProbability,
+//                    sbxCrossover,deCrossover, mutation);
+//        }else if(moeacdVariant.equals(Variant.CMOEACDAOIIMeasure)) {
+//            algorithm = new CMOEACDAOII(measureManager,problem, numOfDivision, integratedTaus,
+//                    populationSize, maxEvaluations,neighborhoodSize,
+//                    neighborhoodSelectionProbability,
+//                    sbxCrossover,deCrossover, mutation);
+//        }else if (moeacdVariant.equals(Variant.CMOEACDAOD)){
+//            algorithm = new CMOEACDAOD(problem,numOfDivision, integratedTaus,
+//                    populationSize,maxEvaluations,neighborhoodSize,
+//                    neighborhoodSelectionProbability,
+//                    sbxCrossover,deCrossover, mutation);
+//        }else if(moeacdVariant.equals(Variant.CMOEACDAODMeasure)) {
+//            algorithm = new CMOEACDAOD(measureManager,problem, numOfDivision, integratedTaus,
+//                    populationSize, maxEvaluations,neighborhoodSize,
+//                    neighborhoodSelectionProbability,
+//                    sbxCrossover,deCrossover, mutation);
+//        }
+//
+//
+//        else if (moeacdVariant.equals(Variant.UCDEA)){
+//            algorithm = new UCDEA(problem,numOfDivision, integratedTaus,
+//                    populationSize,maxEvaluations,neighborhoodSize,
+//                    neighborhoodSelectionProbability,
+//                    sbxCrossover,deCrossover, mutation,c_uneven);
+//        }else if(moeacdVariant.equals(Variant.UCDEAMeasure)) {
+//            algorithm = new UCDEA(measureManager,problem, numOfDivision, integratedTaus,
+//                    populationSize, maxEvaluations,neighborhoodSize,
+//                    neighborhoodSelectionProbability,
+//                    sbxCrossover,deCrossover, mutation,c_uneven);
+//        }
+//        else if (moeacdVariant.equals(Variant.CUCDEA)){
+//            algorithm = new CUCDEA(problem,numOfDivision, integratedTaus,
+//                    populationSize,maxEvaluations,neighborhoodSize,
+//                    neighborhoodSelectionProbability,
+//                    sbxCrossover,deCrossover, mutation,c_uneven);
+//        }else if(moeacdVariant.equals(Variant.CUCDEAMeasure)) {
+//            algorithm = new CUCDEA(measureManager,problem, numOfDivision, integratedTaus,
+//                    populationSize, maxEvaluations,neighborhoodSize,
+//                    neighborhoodSelectionProbability,
+//                    sbxCrossover,deCrossover, mutation,c_uneven);
+//        }
+//        else if (moeacdVariant.equals(Variant.CUCDEAII)){
+//            algorithm = new CUCDEAII(problem,numOfDivision, integratedTaus,
+//                    populationSize,maxEvaluations,neighborhoodSize,
+//                    neighborhoodSelectionProbability,
+//                    sbxCrossover,deCrossover, mutation,c_uneven);
+//        }else if(moeacdVariant.equals(Variant.CUCDEAIIMeasure)) {
+//            algorithm = new CUCDEAII(measureManager,problem, numOfDivision, integratedTaus,
+//                    populationSize, maxEvaluations,neighborhoodSize,
+//                    neighborhoodSelectionProbability,
+//                    sbxCrossover,deCrossover, mutation,c_uneven);
+//        }
+//
+//        else if (moeacdVariant.equals(Variant.CMOEACDII)){
+//            algorithm = new CMOEACDII(problem,numOfDivision, integratedTaus,
+//                    populationSize,maxEvaluations,neighborhoodSize,
+//                    neighborhoodSelectionProbability,
+//                    sbxCrossover,deCrossover, mutation);
+//        }else if(moeacdVariant.equals(Variant.CMOEACDIIMeasure)) {
+//            algorithm = new CMOEACDII(measureManager,problem, numOfDivision, integratedTaus,
+//                    populationSize, maxEvaluations,neighborhoodSize,
+//                    neighborhoodSelectionProbability,
+//                    sbxCrossover,deCrossover, mutation);
+//        }
+//        else if (moeacdVariant.equals(Variant.CMOEACDIII)){
+//            algorithm = new CMOEACDIII(problem,numOfDivision, integratedTaus,
+//                    populationSize,maxEvaluations,neighborhoodSize,
+//                    neighborhoodSelectionProbability,
+//                    sbxCrossover,deCrossover, mutation);
+//        }else if(moeacdVariant.equals(Variant.CMOEACDIIIMeasure)) {
+//            algorithm = new CMOEACDIII(measureManager,problem, numOfDivision, integratedTaus,
+//                    populationSize, maxEvaluations,neighborhoodSize,
+//                    neighborhoodSelectionProbability,
+//                    sbxCrossover,deCrossover, mutation);
+//        }
+//        else if (moeacdVariant.equals(Variant.CMOEACDIV)){
+//            algorithm = new CMOEACDIV(problem,numOfDivision, integratedTaus,
+//                    populationSize,maxEvaluations,neighborhoodSize,
+//                    neighborhoodSelectionProbability,
+//                    sbxCrossover,deCrossover, mutation);
+//        }else if(moeacdVariant.equals(Variant.CMOEACDIVMeasure)) {
+//            algorithm = new CMOEACDIV(measureManager,problem, numOfDivision, integratedTaus,
+//                    populationSize, maxEvaluations,neighborhoodSize,
+//                    neighborhoodSelectionProbability,
+//                    sbxCrossover,deCrossover, mutation);
+//        }
+//        else if (moeacdVariant.equals(Variant.CMOEACDV)){
+//            algorithm = new CMOEACDV(problem,numOfDivision, integratedTaus,
+//                    populationSize,maxEvaluations,neighborhoodSize,
+//                    neighborhoodSelectionProbability,
+//                    sbxCrossover,deCrossover, mutation);
+//        }else if(moeacdVariant.equals(Variant.CMOEACDVMeasure)) {
+//            algorithm = new CMOEACDV(measureManager,problem, numOfDivision, integratedTaus,
+//                    populationSize, maxEvaluations,neighborhoodSize,
+//                    neighborhoodSelectionProbability,
+//                    sbxCrossover,deCrossover, mutation);
+//        }else if (moeacdVariant.equals(Variant.CMOEACDVI)){
+//            algorithm = new CMOEACDVI(problem,numOfDivision, integratedTaus,
+//                    populationSize,maxEvaluations,neighborhoodSize,
+//                    neighborhoodSelectionProbability,
+//                    sbxCrossover,deCrossover, mutation);
+//        }else if(moeacdVariant.equals(Variant.CMOEACDVIMeasure)) {
+//            algorithm = new CMOEACDVI(measureManager,problem, numOfDivision, integratedTaus,
+//                    populationSize, maxEvaluations,neighborhoodSize,
+//                    neighborhoodSelectionProbability,
+//                    sbxCrossover,deCrossover, mutation);
+//        }else if (moeacdVariant.equals(Variant.CMOEACDVII)){
+//            algorithm = new CMOEACDVII(problem,numOfDivision, integratedTaus,
+//                    populationSize,maxEvaluations,neighborhoodSize,
+//                    neighborhoodSelectionProbability,
+//                    sbxCrossover,deCrossover, mutation);
+//        }else if(moeacdVariant.equals(Variant.CMOEACDVIIMeasure)) {
+//            algorithm = new CMOEACDVII(measureManager,problem, numOfDivision, integratedTaus,
+//                    populationSize, maxEvaluations,neighborhoodSize,
+//                    neighborhoodSelectionProbability,
+//                    sbxCrossover,deCrossover, mutation);
+//        }else if (moeacdVariant.equals(Variant.CMOEACDVIII)){
+//            algorithm = new CMOEACDVIII(problem,numOfDivision, integratedTaus,
+//                    populationSize,maxEvaluations,neighborhoodSize,
+//                    neighborhoodSelectionProbability,
+//                    sbxCrossover,deCrossover, mutation);
+//        }else if(moeacdVariant.equals(Variant.CMOEACDVIIIMeasure)) {
+//            algorithm = new CMOEACDVIII(measureManager,problem, numOfDivision, integratedTaus,
+//                    populationSize, maxEvaluations,neighborhoodSize,
+//                    neighborhoodSelectionProbability,
+//                    sbxCrossover,deCrossover, mutation);
+//        }
         return algorithm;
     }
 }

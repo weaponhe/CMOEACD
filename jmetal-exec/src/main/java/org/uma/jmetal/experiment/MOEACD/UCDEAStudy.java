@@ -2,7 +2,6 @@ package org.uma.jmetal.experiment.MOEACD;
 
 import org.uma.jmetal.algorithm.multiobjective.moeacd.AbstractMOEACD;
 import org.uma.jmetal.algorithm.multiobjective.moeacd.MOEACDBuilder;
-import org.uma.jmetal.algorithm.multiobjective.moeacd.UCDEA;
 import org.uma.jmetal.experiment.MonoIndicatorsListener;
 import org.uma.jmetal.experiment.MyExperimentMonoAnalysis;
 import org.uma.jmetal.experiment.MyExperimentMonoIndicator;
