@@ -2,6 +2,8 @@ package org.uma.jmetal.algorithm.multiobjective.moeacd;
 
 import org.apache.commons.lang3.builder.Diff;
 import org.uma.jmetal.algorithm.Algorithm;
+import org.uma.jmetal.algorithm.multiobjective.moead.AbstractMOEAD;
+import org.uma.jmetal.algorithm.multiobjective.moead.MOEAD;
 import org.uma.jmetal.algorithm.multiobjective.paes.PAES;
 import org.uma.jmetal.algorithm.multiobjective.udea.SubRegion;
 import org.uma.jmetal.algorithm.singleobjective.differentialevolution.DifferentialEvolution;
@@ -15,7 +17,9 @@ import org.uma.jmetal.operator.impl.crossover.SBXCrossover;
 import org.uma.jmetal.problem.ConstrainedProblem;
 import org.uma.jmetal.problem.Problem;
 import org.uma.jmetal.solution.DoubleSolution;
+import org.uma.jmetal.solution.Solution;
 import org.uma.jmetal.util.Constant;
+import org.uma.jmetal.util.JMetalException;
 import org.uma.jmetal.util.SolutionListUtils;
 import org.uma.jmetal.util.pseudorandom.JMetalRandom;
 import org.uma.jmetal.util.solutionattribute.impl.OverallConstraintViolation;
@@ -79,6 +83,7 @@ public abstract class AbstractMOEACD implements Algorithm<List<DoubleSolution>> 
 
     protected int updateInterval = 10;
 
+    protected AbstractMOEAD.FunctionType functionType;
 
     public AbstractMOEACD() {
     }
@@ -91,6 +96,7 @@ public abstract class AbstractMOEACD implements Algorithm<List<DoubleSolution>> 
                           int maxEvaluations,
                           int neighborhoodSize,
                           double neighborhoodSelectionProbability,
+                          AbstractMOEAD.FunctionType functionType,
                           SBXCrossover sbxCrossoverOperator,
                           DifferentialEvolutionCrossover deCrossoverOperator,
                           MutationOperator<DoubleSolution> mutation) {
@@ -104,6 +110,7 @@ public abstract class AbstractMOEACD implements Algorithm<List<DoubleSolution>> 
         this.deCrossoverOperator = deCrossoverOperator;
         this.neighborhoodSize = neighborhoodSize;
         this.neighborhoodSelectionProbability = neighborhoodSelectionProbability;
+        this.functionType = functionType;
         randomGenerator = JMetalRandom.getInstance();
 
         idealPoint = new double[problem.getNumberOfObjectives()];
@@ -126,11 +133,12 @@ public abstract class AbstractMOEACD implements Algorithm<List<DoubleSolution>> 
                           int maxEvaluations,
                           int neighborhoodSize,
                           double neighborhoodSelectionProbability,
+                          AbstractMOEAD.FunctionType functionType,
                           SBXCrossover sbxCrossoverOperator,
                           DifferentialEvolutionCrossover deCrossoverOperator,
                           MutationOperator<DoubleSolution> mutation) {
         this(problem, arrayH, integratedTaus, populationSize, constraintLayerSize, maxEvaluations, neighborhoodSize,
-                neighborhoodSelectionProbability,
+                neighborhoodSelectionProbability,functionType,
                 sbxCrossoverOperator, deCrossoverOperator, mutation);
         this.measureManager = (MyAlgorithmMeasures<DoubleSolution>) measureManager;
         this.measureManager.initMeasures();
@@ -185,6 +193,64 @@ public abstract class AbstractMOEACD implements Algorithm<List<DoubleSolution>> 
 
 
         } while (evaluations < maxEvaluations);
+    }
+
+    double fitnessFunction(Solution individual, double[] lambda) throws JMetalException {
+        double fitness;
+
+
+        if (MOEAD.FunctionType.TCH.equals(functionType)) {
+            double maxFun = -1.0e+30;
+
+            for (int n = 0; n < problem.getNumberOfObjectives(); n++) {
+                double diff = Math.abs(individual.getObjective(n) - idealPoint[n]);
+
+                double feval;
+                if (Math.abs(lambda[n]) < Constant.TOLERATION) {
+                    feval = 0.0001 * diff;
+                } else {
+                    feval = diff * lambda[n];
+                }
+
+                if (feval > maxFun) {
+                    maxFun = feval;
+                }
+            }
+
+            fitness = maxFun;
+        } else if (MOEAD.FunctionType.AGG.equals(functionType)) {
+            double sum = 0.0;
+            for (int n = 0; n < problem.getNumberOfObjectives(); n++) {
+                sum += (lambda[n]) * (individual.getObjective(n) - idealPoint[n]);
+            }
+
+            fitness = sum;
+
+        } else if (MOEAD.FunctionType.PBI.equals(functionType)) {
+            double d1, d2, nl;
+            double theta = 5.0;
+
+            d1 = d2 = nl = 0.0;
+
+            for (int i = 0; i < problem.getNumberOfObjectives(); i++) {
+                d1 += (individual.getObjective(i) - idealPoint[i]) * lambda[i];
+                nl += Math.pow(lambda[i], 2.0);
+            }
+            nl = Math.sqrt(nl);
+            if(nl < 1e-10)
+                nl = 1e-10;
+            d1 = Math.abs(d1) / nl;
+
+            for (int i = 0; i < problem.getNumberOfObjectives(); i++) {
+                d2 += Math.pow((individual.getObjective(i) - idealPoint[i]) - d1 * (lambda[i] / nl), 2.0);
+            }
+            d2 = Math.sqrt(d2);
+
+            fitness = (d1 + theta * d2);
+        }  else {
+            throw new JMetalException(" MOEAD.fitnessFunction: unknown type " + functionType);
+        }
+        return fitness;
     }
 
     public void measureRun() {
@@ -244,7 +310,7 @@ public abstract class AbstractMOEACD implements Algorithm<List<DoubleSolution>> 
 
 
     protected void initializePopulation() {
-//        int populationSize = this.populationSize * this.constraintLayerSize;
+        int populationSize = this.populationSize * this.constraintLayerSize;
         population = new ArrayList<>(populationSize);
         for (int i = 0; i < populationSize; i++) {
             DoubleSolution newSolution = (DoubleSolution) problem.createSolution();

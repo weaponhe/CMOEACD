@@ -41,6 +41,11 @@ public class ConeSubRegionManager {
     public List<ConeSubRegion> getConeSubRegionsList(){return coneSubRegions;}
 
     public void generateConeSubRegionList() {
+        List<double[]> uniformDirections = UniformWeightUtils.generateArrayList(arrayH, integratedTaus, nObj);
+        generateConeSubRegionList(uniformDirections);
+    }
+
+    public void generateConeSubRegionList(int constraintLayerSize) {
 //        numsOfLayers = new int[this.arrayH.length];
 //        startIdxLayers = new int[this.arrayH.length];
 //        startIdxLayers[0] = 0;
@@ -65,7 +70,7 @@ public class ConeSubRegionManager {
 //        marginalConeSRIdxList = calcMarginalConeSubRegionIdx();
         List<double[]> uniformDirections = UniformWeightUtils.generateArrayList(arrayH, integratedTaus, nObj);
 
-        generateConeSubRegionList(uniformDirections);
+        generateConeSubRegionList(uniformDirections, constraintLayerSize);
     }
 
 
@@ -86,9 +91,27 @@ public class ConeSubRegionManager {
 
     }
 
-    public void reconstructConeSubRegionList(List<double[]> refDirections) {
-        generateConeSubRegionList(refDirections);
+    public void generateConeSubRegionList(List<double[]> predefinedDirections, int constraintLayerSize) {
+        coneSubRegions = new ArrayList<>();
+
+        for (int i=0;i<predefinedDirections.size();i++) {
+            ConeSubRegion coneSR = new ConeSubRegion();
+            coneSR.setRefDirection(predefinedDirections.get(i));
+            coneSR.setSubPopulation(constraintLayerSize);
+            coneSR.setIdxConeSubRegion(i);
+            coneSubRegions.add(coneSR);
+        }
+
+        kdTree =  KDTree.build(predefinedDirections);
+
+        extremeConeSRIdxList = calcExtremeConeSubRegionIdx();
+        marginalConeSRIdxList = calcMarginalConeSubRegionIdx();
+
     }
+
+//    public void reconstructConeSubRegionList(List<double[]> refDirections) {
+//        generateConeSubRegionList(refDirections);
+//    }
 
     /**
      * recalculate neighborhoods
@@ -476,28 +499,28 @@ public class ConeSubRegionManager {
         return mIndex;
     }
 
-    public static void main(String[] argc){
-        int[] arrayH = new int[1];
-        arrayH[0] = 12;
-        double[] tau = new double[1];
-        tau[0] = 1.0;
-        ConeSubRegionManager coneSubRegionManager = new ConeSubRegionManager(3,arrayH,tau);
-        coneSubRegionManager.generateConeSubRegionList();
-        coneSubRegionManager.initializingSubRegionsNeighbors(20);
-        for(int i=0;i<coneSubRegionManager.getConeSubRegionsNum();++i){
-            int[] mIndex = coneSubRegionManager.getConeSubRegion(i).getmIndex();
-            double[] refObservation = coneSubRegionManager.getConeSubRegion(i).getRefDirection();
-            String outputStr = "["+i+"] ("+coneSubRegionManager.getConeSubRegion(i).getIdxConeSubRegion()+")<";
-            for(int j=0;j<mIndex.length;++j)
-                outputStr += mIndex[j]+",";
-            outputStr+="> <";
-            for (int j = 0;j<refObservation.length;++j)
-                outputStr += refObservation[j]+",";
-            outputStr += "> \nNei:  ";
-//            List<Integer> neighbors = coneSubRegionManager.getConeSubRegion(i).getNeighbors();
-//            for(int j=0;j<neighbors.size();++j)
-//                outputStr += neighbors.get(j)+"\t";
-            JMetalLogger.logger.info(outputStr);
-        }
-    }
+//    public static void main(String[] argc){
+//        int[] arrayH = new int[1];
+//        arrayH[0] = 12;
+//        double[] tau = new double[1];
+//        tau[0] = 1.0;
+//        ConeSubRegionManager coneSubRegionManager = new ConeSubRegionManager(3,arrayH,tau);
+//        coneSubRegionManager.generateConeSubRegionList();
+//        coneSubRegionManager.initializingSubRegionsNeighbors(20);
+//        for(int i=0;i<coneSubRegionManager.getConeSubRegionsNum();++i){
+//            int[] mIndex = coneSubRegionManager.getConeSubRegion(i).getmIndex();
+//            double[] refObservation = coneSubRegionManager.getConeSubRegion(i).getRefDirection();
+//            String outputStr = "["+i+"] ("+coneSubRegionManager.getConeSubRegion(i).getIdxConeSubRegion()+")<";
+//            for(int j=0;j<mIndex.length;++j)
+//                outputStr += mIndex[j]+",";
+//            outputStr+="> <";
+//            for (int j = 0;j<refObservation.length;++j)
+//                outputStr += refObservation[j]+",";
+//            outputStr += "> \nNei:  ";
+////            List<Integer> neighbors = coneSubRegionManager.getConeSubRegion(i).getNeighbors();
+////            for(int j=0;j<neighbors.size();++j)
+////                outputStr += neighbors.get(j)+"\t";
+//            JMetalLogger.logger.info(outputStr);
+//        }
+//    }
 }

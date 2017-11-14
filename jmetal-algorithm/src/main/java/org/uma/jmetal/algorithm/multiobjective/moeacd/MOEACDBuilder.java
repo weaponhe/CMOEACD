@@ -1,5 +1,6 @@
 package org.uma.jmetal.algorithm.multiobjective.moeacd;
 
+import org.uma.jmetal.algorithm.multiobjective.moead.AbstractMOEAD;
 import org.uma.jmetal.measure.impl.MyAlgorithmMeasures;
 import org.uma.jmetal.operator.MutationOperator;
 import org.uma.jmetal.operator.impl.crossover.DifferentialEvolutionCrossover;
@@ -75,6 +76,7 @@ public class MOEACDBuilder implements AlgorithmBuilder<AbstractMOEACD> {
     protected DifferentialEvolutionCrossover deCrossover;
     protected MutationOperator<DoubleSolution> mutation;
     protected double neighborhoodSelectionProbability;
+    protected AbstractMOEAD.FunctionType functionType;
 
     protected int populationSize;
     protected int constraintLayerSize;
@@ -114,6 +116,16 @@ public class MOEACDBuilder implements AlgorithmBuilder<AbstractMOEACD> {
         moeacdVariant = variant;
         c_uneven = 1.04;
         measureManager = new MyAlgorithmMeasures<>();
+        this.functionType = AbstractMOEAD.FunctionType.TCH;
+    }
+
+    public AbstractMOEAD.FunctionType getFunctionType() {
+        return functionType;
+    }
+
+    public MOEACDBuilder setFunctionType(AbstractMOEAD.FunctionType functionType) {
+        this.functionType = functionType;
+        return this;
     }
 
     public int getMaxEvaluations() {
@@ -285,7 +297,7 @@ public class MOEACDBuilder implements AlgorithmBuilder<AbstractMOEACD> {
         if (moeacdVariant.equals(Variant.MOEACD)) {
             algorithm = new MOEACD(problem, numOfDivision, integratedTaus,
                     populationSize, constraintLayerSize, maxEvaluations, neighborhoodSize,
-                    neighborhoodSelectionProbability,
+                    neighborhoodSelectionProbability,functionType,
                     sbxCrossover, deCrossover, mutation);
         }
 //        else if(moeacdVariant.equals(Variant.MOEACDMeasure)) {

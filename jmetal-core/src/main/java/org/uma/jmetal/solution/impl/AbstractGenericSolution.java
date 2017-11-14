@@ -26,155 +26,190 @@ import java.util.*;
  * @author Antonio J. Nebro <antonio@lcc.uma.es>
  */
 public abstract class AbstractGenericSolution<T, P extends Problem<?>> implements Solution<T> {
-  private double[] objectives;
-  //modified by xieyuehong
-  private double[] constraints = null;
-  private List<T> variables;
-  protected P problem ;
-  protected double overallConstraintViolationDegree ;
-  protected int numberOfViolatedConstraints ;
-  protected Map<Object, Object> attributes ;
-  protected final JMetalRandom randomGenerator ;
-
-  /**
-   * Constructor
-   */
-  protected AbstractGenericSolution(P problem) {
-    this.problem = problem ;
-    attributes = new HashMap<>() ;
-    randomGenerator = JMetalRandom.getInstance() ;
-
-    objectives = new double[problem.getNumberOfObjectives()] ;
+    private double[] objectives;
     //modified by xieyuehong
-    if(problem instanceof ConstrainedProblem) {
-      constraints = new double[problem.getNumberOfConstraints()];
+    private double[] constraints = null;
+    private List<T> variables;
+    protected P problem;
+    protected double overallConstraintViolationDegree;
+    protected int numberOfViolatedConstraints;
+    protected Map<Object, Object> attributes;
+    protected final JMetalRandom randomGenerator;
+
+    //modified by heweipeng
+    private int subproblemIndex;
+    private int constraintLayerIndex;
+    private double fitness;
+
+    /**
+     * Constructor
+     */
+    protected AbstractGenericSolution(P problem) {
+        this.problem = problem;
+        attributes = new HashMap<>();
+        randomGenerator = JMetalRandom.getInstance();
+
+        objectives = new double[problem.getNumberOfObjectives()];
+        //modified by xieyuehong
+        if (problem instanceof ConstrainedProblem) {
+            constraints = new double[problem.getNumberOfConstraints()];
+        }
+        variables = new ArrayList<>(problem.getNumberOfVariables());
+        for (int i = 0; i < problem.getNumberOfVariables(); i++) {
+            variables.add(i, null);
+        }
     }
-    variables = new ArrayList<>(problem.getNumberOfVariables()) ;
-    for (int i = 0; i < problem.getNumberOfVariables(); i++) {
-      variables.add(i, null) ;
+
+    @Override
+    public void setAttribute(Object id, Object value) {
+        attributes.put(id, value);
     }
-  }
 
-  @Override
-  public void setAttribute(Object id, Object value) {
-    attributes.put(id, value) ;
-  }
-
-  @Override
-  public Object getAttribute(Object id) {
-    return attributes.get(id) ;
-  }
-
-  @Override
-  public void setObjective(int index, double value) {
-    objectives[index] = value ;
-  }
-
-  @Override
-  public double getObjective(int index) {
-    return objectives[index];
-  }
-
-  //modified by xieyuehong
-  @Override
-  public void setConstraintViolation(int index, double value) {
-    constraints[index] = value ;
-  }
-
-  @Override
-  public double getConstraintViolation(int index) {
-    return constraints[index];
-  }
-
-
-  @Override
-  public T getVariableValue(int index) {
-    return variables.get(index);
-  }
-
-  @Override
-  public void setVariableValue(int index, T value) {
-    variables.set(index, value);
-  }
-
-  @Override
-  public int getNumberOfVariables() {
-    return variables.size();
-  }
-
-  @Override
-  public int getNumberOfObjectives() {
-    return objectives.length;
-  }
-
-  @Override
-  public int getNumberOfConstraints() {
-    return constraints.length;
-  }
-
-  protected void initializeObjectiveValues() {
-    for (int i = 0; i < problem.getNumberOfObjectives(); i++) {
-      objectives[i] = 0.0 ;
+    @Override
+    public Object getAttribute(Object id) {
+        return attributes.get(id);
     }
-  }
 
-  //modified by xieyuehong
-  protected void initializeConstraintViolations() {
-    for (int i = 0; i < problem.getNumberOfConstraints(); i++) {
-      constraints[i] = 0.0 ;
+    @Override
+    public void setObjective(int index, double value) {
+        objectives[index] = value;
     }
-  }
 
-  @Override
-  public String toString() {
-    String result = "Variables: " ;
-    for (T var : variables) {
-      result += "" + var + " " ;
+    @Override
+    public double getObjective(int index) {
+        return objectives[index];
     }
-    result += "Objectives: " ;
-    for (Double obj : objectives) {
-      result += "" + obj + " " ;
+
+    public double[] getObjectives() {
+        return objectives;
     }
+
     //modified by xieyuehong
-    if(constraints != null){
-      result += "Constraints: ";
-      for (Double constraint : constraints){
-        result += "" + constraint + " ";
-      }
+    @Override
+    public void setConstraintViolation(int index, double value) {
+        constraints[index] = value;
     }
-    result += "\t" ;
-    result += "AlgorithmAttributes: " + attributes + "\n" ;
 
-    return result ;
-  }
+    @Override
+    public double getConstraintViolation(int index) {
+        return constraints[index];
+    }
 
-  @Override public boolean equals(Object o) {
-    if (this == o)
-      return true;
-    if (o == null || getClass() != o.getClass())
-      return false;
 
-    AbstractGenericSolution<?, ?> that = (AbstractGenericSolution<?, ?>) o;
+    @Override
+    public T getVariableValue(int index) {
+        return variables.get(index);
+    }
 
-    if (!attributes.equals(that.attributes))
-      return false;
-    if (!Arrays.equals(objectives, that.objectives))
-      return false;
+    @Override
+    public void setVariableValue(int index, T value) {
+        variables.set(index, value);
+    }
+
+    @Override
+    public int getNumberOfVariables() {
+        return variables.size();
+    }
+
+    @Override
+    public int getNumberOfObjectives() {
+        return objectives.length;
+    }
+
+    @Override
+    public int getNumberOfConstraints() {
+        return constraints.length;
+    }
+
+    protected void initializeObjectiveValues() {
+        for (int i = 0; i < problem.getNumberOfObjectives(); i++) {
+            objectives[i] = 0.0;
+        }
+    }
+
     //modified by xieyuehong
-    if (constraints!=null && !Arrays.equals(constraints,that.constraints))
-      return false;
-    if (!variables.equals(that.variables))
-      return false;
+    protected void initializeConstraintViolations() {
+        for (int i = 0; i < problem.getNumberOfConstraints(); i++) {
+            constraints[i] = 0.0;
+        }
+    }
 
-    return true;
-  }
+    public int getSubproblemIndex() {
+        return subproblemIndex;
+    }
 
-  @Override public int hashCode() {
-    int result = Arrays.hashCode(objectives);
-    //modified by xieyuehong
-    result = 31 * result + Arrays.hashCode(constraints);
-    result = 31 * result + variables.hashCode();
-    result = 31 * result + attributes.hashCode();
-    return result;
-  }
+    public void setSubproblemIndex(int subproblemIndex) {
+        this.subproblemIndex = subproblemIndex;
+    }
+
+    public int getConstraintLayerIndex() {
+        return constraintLayerIndex;
+    }
+
+    public void setConstraintLayerIndex(int constraintLayerIndex) {
+        this.constraintLayerIndex = constraintLayerIndex;
+    }
+
+    public double getFitness() {
+        return fitness;
+    }
+
+    public void setFitness(double fitness) {
+        this.fitness = fitness;
+    }
+
+    @Override
+    public String toString() {
+        String result = "Variables: ";
+        for (T var : variables) {
+            result += "" + var + " ";
+        }
+        result += "Objectives: ";
+        for (Double obj : objectives) {
+            result += "" + obj + " ";
+        }
+        //modified by xieyuehong
+        if (constraints != null) {
+            result += "Constraints: ";
+            for (Double constraint : constraints) {
+                result += "" + constraint + " ";
+            }
+        }
+        result += "\t";
+        result += "AlgorithmAttributes: " + attributes + "\n";
+
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+
+        AbstractGenericSolution<?, ?> that = (AbstractGenericSolution<?, ?>) o;
+
+        if (!attributes.equals(that.attributes))
+            return false;
+        if (!Arrays.equals(objectives, that.objectives))
+            return false;
+        //modified by xieyuehong
+        if (constraints != null && !Arrays.equals(constraints, that.constraints))
+            return false;
+        if (!variables.equals(that.variables))
+            return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = Arrays.hashCode(objectives);
+        //modified by xieyuehong
+        result = 31 * result + Arrays.hashCode(constraints);
+        result = 31 * result + variables.hashCode();
+        result = 31 * result + attributes.hashCode();
+        return result;
+    }
 }
