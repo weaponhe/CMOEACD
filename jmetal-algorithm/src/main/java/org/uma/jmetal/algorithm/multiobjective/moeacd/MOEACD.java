@@ -102,7 +102,6 @@ public class MOEACD extends AbstractMOEACD {
 
     @Override
     public void run() {
-
         initializeConeSubRegions();
         initializePopulation();
         evaluations = populationSize;
@@ -734,7 +733,8 @@ public class MOEACD extends AbstractMOEACD {
         if (crossoverType == CrossoverType.DE)
             parentPoolSize = 3;
 
-        List<DoubleSolution> parents = parentSelection(idxSubRegion, parentPoolSize);
+//        List<DoubleSolution> parents = parentSelection(idxSubRegion, parentPoolSize);
+        List<DoubleSolution> parents = selectParent(idxSubRegion, parentPoolSize);
 
         if (CrossoverType.DE == crossoverType) {
             DoubleSolution tmp = parents.get(0);
@@ -753,6 +753,45 @@ public class MOEACD extends AbstractMOEACD {
         mutationOperator.execute(children.get(0));
 
         return children;
+    }
+
+    protected List<DoubleSolution> selectParent(int idxSubRegion, int parentPoolSize) {
+        List<DoubleSolution> parents = new ArrayList<>(parentPoolSize);
+        ConeSubRegion coneSubRegion = subRegionManager.getConeSubRegion(idxSubRegion);
+        List<Integer> neighbors = coneSubRegion.getNeighbors();
+
+        double delta1 = 0.25;
+        double delta2 = 0.5;
+        double delta3 = 0.75;
+        double rand = randomGenerator.nextDouble(0, 1);
+
+        while (parents.size() < parentPoolSize) {
+            int idxTargetSubproblem = 0;
+            int idxTargetLayer = 0;
+            if (rand < delta1) {
+                //neighbors子问题的第一个约束子层中找
+                idxTargetSubproblem = randomGenerator.nextInt(0, neighbors.size() - 1);
+                idxTargetLayer = 0;
+            } else if (rand < delta2) {
+                //neighbors子问题的所有约束子层中找
+                idxTargetSubproblem = randomGenerator.nextInt(0, neighbors.size() - 1);
+                idxTargetLayer = randomGenerator.nextInt(0, constraintLayerSize - 1);
+            } else if (rand < delta3) {
+                //所有子问题的第一个约束子层中找
+                idxTargetSubproblem = randomGenerator.nextInt(0, populationSize);
+                idxTargetLayer = 0;
+            } else {
+                //所有子问题的所有约束子层
+                idxTargetSubproblem = randomGenerator.nextInt(0, populationSize);
+                idxTargetLayer = randomGenerator.nextInt(0, constraintLayerSize - 1);
+            }
+            int idxTargetSolution = subRegionManager.getConeSubRegion(idxTargetSubproblem).getSubPopulation().get(idxTargetLayer);
+            DoubleSolution targetSolution = population.get(idxTargetSolution);
+            if (!parents.contains(targetSolution)) {
+                parents.add(targetSolution);
+            }
+        }
+        return parents;
     }
 
     protected List<DoubleSolution> parentSelection(int idxSubRegion, int parentPoolSize) {
