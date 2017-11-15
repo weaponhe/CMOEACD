@@ -40,6 +40,8 @@ public abstract class AbstractMOEACD implements Algorithm<List<DoubleSolution>> 
     //Ideal Point
     protected double[] idealPoint;
     protected double[] utopianPoint;
+    protected  List<List<Double>> subPlaneUtopianPointList;
+
     //maximum value of each objective in the seached objective space
     protected double[] nadirPoint;
     //maximum value of each objective in the objective space of current population
@@ -116,6 +118,9 @@ public abstract class AbstractMOEACD implements Algorithm<List<DoubleSolution>> 
         idealPoint = new double[problem.getNumberOfObjectives()];
         utopianPoint = new double[problem.getNumberOfObjectives()];
         nadirPoint = new double[problem.getNumberOfObjectives()];
+
+        subPlaneUtopianPointList = new ArrayList<>(populationSize);
+
         referencePoint = new double[problem.getNumberOfObjectives()];
         intercepts = new double[problem.getNumberOfObjectives()];
         normIntercepts = new double[problem.getNumberOfObjectives()];
