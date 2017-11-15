@@ -29,9 +29,9 @@ import org.uma.jmetal.util.solutionattribute.impl.OverallConstraintViolation;
  * @author Antonio J. Nebro <antonio@lcc.uma.es>
  */
 public class C1_DTLZ1 extends DTLZ1 implements ConstrainedProblem<DoubleSolution> {
-//    public OverallConstraintViolation<DoubleSolution> overallConstraintViolationDegree;
-//    public NumberOfViolatedConstraints<DoubleSolution> numberOfViolatedConstraints;
-//    public MaximumConstraintViolation<DoubleSolution> maximumConstraintViolationDegree;
+    public OverallConstraintViolation<DoubleSolution> overallConstraintViolationDegree;
+    public NumberOfViolatedConstraints<DoubleSolution> numberOfViolatedConstraints;
+    public MaximumConstraintViolation<DoubleSolution> maximumConstraintViolationDegree;
 
     /**
      * Constructor
@@ -45,9 +45,9 @@ public class C1_DTLZ1 extends DTLZ1 implements ConstrainedProblem<DoubleSolution
         setNumberOfConstraints(1);
         setName("C1_DTLZ1");
 
-//        overallConstraintViolationDegree = new OverallConstraintViolation<DoubleSolution>();
-//        numberOfViolatedConstraints = new NumberOfViolatedConstraints<DoubleSolution>();
-//        maximumConstraintViolationDegree = new MaximumConstraintViolation<>();
+        overallConstraintViolationDegree = new OverallConstraintViolation<DoubleSolution>();
+        numberOfViolatedConstraints = new NumberOfViolatedConstraints<DoubleSolution>();
+        maximumConstraintViolationDegree = new MaximumConstraintViolation<>();
     }
 
     public C1_DTLZ1() {
@@ -56,9 +56,9 @@ public class C1_DTLZ1 extends DTLZ1 implements ConstrainedProblem<DoubleSolution
         setNumberOfConstraints(1);
         setName("C1_DTLZ1");
 
-//        overallConstraintViolationDegree = new OverallConstraintViolation<DoubleSolution>();
-//        numberOfViolatedConstraints = new NumberOfViolatedConstraints<DoubleSolution>();
-//        maximumConstraintViolationDegree = new MaximumConstraintViolation<>();
+        overallConstraintViolationDegree = new OverallConstraintViolation<DoubleSolution>();
+        numberOfViolatedConstraints = new NumberOfViolatedConstraints<DoubleSolution>();
+        maximumConstraintViolationDegree = new MaximumConstraintViolation<>();
     }
 
     @Override
@@ -92,8 +92,8 @@ public class C1_DTLZ1 extends DTLZ1 implements ConstrainedProblem<DoubleSolution
         }
 
         solution.setAttribute("overallConstraintViolationDegree", overallConstraintViolation);
-//        overallConstraintViolationDegree.setAttribute(solution, overallConstraintViolation);
-//        numberOfViolatedConstraints.setAttribute(solution, violatedConstraints);
-//        maximumConstraintViolationDegree.setAttribute(solution, maximumConstraintViolation);
+        overallConstraintViolationDegree.setAttribute(solution, overallConstraintViolation);
+        numberOfViolatedConstraints.setAttribute(solution, violatedConstraints);
+        maximumConstraintViolationDegree.setAttribute(solution, maximumConstraintViolation);
     }
 }

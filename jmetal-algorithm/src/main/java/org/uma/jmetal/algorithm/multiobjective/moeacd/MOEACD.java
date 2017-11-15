@@ -131,10 +131,12 @@ public class MOEACD extends AbstractMOEACD {
                 if (updateExtremePoints(child, utopianPoint, idealPoint, nadirPoint, referencePoint)) {
                     updateNormIntercepts(normIntercepts, utopianPoint, intercepts);
                 }
+                updateSubPlaneUtopianPointList(child);
 
-                ConeSubRegion subRegion = locateConeSubRegion(child, utopianPoint, normIntercepts);
+//                boolean isUpdated = coneUpdate(child, subRegion, utopianPoint, normIntercepts);
+                System.out.println("第" + gen + "代, " + "第" + i + "个子问题");
+                boolean isUpdated = updatePopulation(child);
 
-                boolean isUpdated = coneUpdate(child, subRegion, utopianPoint, normIntercepts);
 //
 //                if(!isUpdated){
 //                    isUpdated |= coneNeighborUpdate(child, subRegion, utopianPoint, normIntercepts);
@@ -464,7 +466,7 @@ public class MOEACD extends AbstractMOEACD {
         for (int i = 0; i < population.size(); ++i) {
             DoubleSolution solution = population.get(i);
             ConeSubRegion subproblem = locateConeSubRegion(solution, utopianPoint, normIntercepts);
-            solution.setAttribute("idealConstraintLayerIndex", queryConstraitLayer(constraintLayerSize, solution, subproblem));
+            solution.setAttribute("idealConstraintLayerIndex", queryConstraitLayer(solution, subproblem));
         }
     }
 
@@ -480,6 +482,20 @@ public class MOEACD extends AbstractMOEACD {
             classifiedPopulation.get(subproblemIndex).add(i);
         }
         return classifiedPopulation;
+    }
+
+    protected void updateSubPlaneUtopianPointList(DoubleSolution solution) {
+        ConeSubRegion targetSubRegion = locateConeSubRegion(solution, utopianPoint, normIntercepts);
+        int idxSR = targetSubRegion.getIdxConeSubRegion();
+        List<Double> utopianPoint = subPlaneUtopianPointList.get(idxSR);
+        double x = Math.abs((double) solution.getAttribute("overallConstraintViolationDegree"));
+        double y = fitnessFunction(solution, targetSubRegion.getRefDirection());
+        if (x < utopianPoint.get(0)) {
+            utopianPoint.set(0, x);
+        }
+        if (y < utopianPoint.get(1)) {
+            utopianPoint.set(1, y);
+        }
     }
 
     protected void initSubPlaneUtopianPointList(List<List<Integer>> classifiedPopulation) {
@@ -516,14 +532,17 @@ public class MOEACD extends AbstractMOEACD {
         return true;
     }
 
-    protected int queryConstraitLayer(int constraintLayerSize, DoubleSolution solution, ConeSubRegion subproblem) {
+    protected int queryConstraitLayer(DoubleSolution solution, ConeSubRegion subproblem) {
         int subproblemIndex = subproblem.getIdxConeSubRegion();
         double x = Math.abs((double) solution.getAttribute("overallConstraintViolationDegree"));
-        double y = (double) solution.getAttribute("idealFitness");
+        double y = fitnessFunction(solution, subproblem.getRefDirection());
         List<Double> utopianPoint = this.subPlaneUtopianPointList.get(subproblemIndex);
         double xTrans = x - utopianPoint.get(0);
         double yTrans = y - utopianPoint.get(1);
         int k = (int) Math.floor(((constraintLayerSize - 1) * xTrans / (xTrans + yTrans)) + 0.5);
+        if (k >= constraintLayerSize) {
+            System.out.println("asdasd");
+        }
         return k;
     }
 
@@ -599,6 +618,43 @@ public class MOEACD extends AbstractMOEACD {
             D0Mean += minDist;
         }
         D0Mean /= subRegionManager.getConeSubRegionsNum();
+    }
+
+    protected boolean updatePopulation(DoubleSolution solution) {
+        ConeSubRegion targetSubRegion = locateConeSubRegion(solution, utopianPoint, normIntercepts);
+        boolean isUpdated = false;
+        List<Integer> pop = targetSubRegion.getSubPopulation();
+        List<Integer> waitingReplacedLayers = new ArrayList<>();
+        int idxTargetSubRegion = targetSubRegion.getIdxConeSubRegion();
+        for (int i = 0; i < constraintLayerSize; i++) {
+            int idxStoredSolution = pop.get(i);
+            int idealSubproblemIndex = locateConeSubRegion(population.get(idxStoredSolution), utopianPoint, normIntercepts).getIdxConeSubRegion();
+            if (idealSubproblemIndex != idxTargetSubRegion) {
+                waitingReplacedLayers.add(i);
+            }
+        }
+        DoubleSolution remainedSolution = null;
+        if (waitingReplacedLayers.size() == 0) {
+            int idxTargetLayer = queryConstraitLayer(solution, targetSubRegion);
+            double newArea = calcConicalArea(constraintLayerSize, solution, targetSubRegion.getRefDirection());
+            int idxOldSolution = pop.get(idxTargetLayer);
+            DoubleSolution oldSolution = population.get(idxOldSolution);
+            double oldArea = calcConicalArea(constraintLayerSize, oldSolution, targetSubRegion.getRefDirection());
+            if (newArea < oldArea) {
+                remainedSolution = population.get(pop.get(idxTargetLayer));
+                population.set(pop.get(idxTargetLayer), solution);
+            }
+        } else {
+            int idxTargetLayer = waitingReplacedLayers.get(randomGenerator.nextInt(0, waitingReplacedLayers.size() - 1));
+            remainedSolution = population.get(pop.get(idxTargetLayer));
+            population.set(pop.get(idxTargetLayer), solution);
+        }
+
+        if (remainedSolution != null) {
+            updatePopulation(remainedSolution);
+        }
+
+        return isUpdated;
     }
 
     protected boolean coneUpdate(DoubleSolution _solution, ConeSubRegion targetSubRegion, double[] utopianPoint, double[] normIntercepts) {
@@ -778,11 +834,11 @@ public class MOEACD extends AbstractMOEACD {
                 idxTargetLayer = randomGenerator.nextInt(0, constraintLayerSize - 1);
             } else if (rand < delta3) {
                 //所有子问题的第一个约束子层中找
-                idxTargetSubproblem = randomGenerator.nextInt(0, populationSize);
+                idxTargetSubproblem = randomGenerator.nextInt(0, populationSize - 1);
                 idxTargetLayer = 0;
             } else {
                 //所有子问题的所有约束子层
-                idxTargetSubproblem = randomGenerator.nextInt(0, populationSize);
+                idxTargetSubproblem = randomGenerator.nextInt(0, populationSize - 1);
                 idxTargetLayer = randomGenerator.nextInt(0, constraintLayerSize - 1);
             }
             int idxTargetSolution = subRegionManager.getConeSubRegion(idxTargetSubproblem).getSubPopulation().get(idxTargetLayer);
