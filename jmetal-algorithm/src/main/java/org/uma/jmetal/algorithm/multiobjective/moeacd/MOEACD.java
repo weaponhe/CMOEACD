@@ -44,6 +44,13 @@ public class MOEACD extends AbstractMOEACD {
     protected double beta_ConeUpdate = 3.0;
     protected double beta_NeighborUpdate = 3.0;
 
+    protected enum ComparisonMethod {
+        CDP,
+        CORE_AREA
+    }
+
+    ;
+
     public MOEACD(Problem<DoubleSolution> problem,
                   int[] arrayH,
                   double[] integratedTaus,
@@ -277,24 +284,15 @@ public class MOEACD extends AbstractMOEACD {
                 if (subPopulation.get(layerIndex) == -1) {
                     subPopulation.set(layerIndex, candidateIndex);
                 } else {
-                    if (layerIndex == 0) {
-                        //fessible rule
-                        int domination = MOEACDUtils.constraintDominateCompare(population.get(candidateIndex), population.get(subPopulation.get(layerIndex)));
-                        if (domination == -1) {
-                            remainedIndexList.add(subPopulation.get(layerIndex));
-                            subPopulation.set(layerIndex, candidateIndex);
-                        } else {
-                            remainedIndexList.add(candidateIndex);
-                        }
+                    DoubleSolution newSolution = population.get(candidateIndex);
+                    DoubleSolution storedSolution = population.get(subPopulation.get(layerIndex));
+                    ComparisonMethod method = layerIndex == 0 ? ComparisonMethod.CDP : ComparisonMethod.CORE_AREA;
+                    DoubleSolution betterSolution = getBetterSolution(newSolution, storedSolution, subproblem, method);
+                    if (betterSolution == newSolution) {
+                        remainedIndexList.add(subPopulation.get(layerIndex));
+                        subPopulation.set(layerIndex, candidateIndex);
                     } else {
-                        double newArea = calcConicalArea(constraintLayerSize, population.get(candidateIndex), subproblem.getRefDirection());
-                        double oldArea = calcConicalArea(constraintLayerSize, population.get(subPopulation.get(layerIndex)), subproblem.getRefDirection());
-                        if (newArea < oldArea) {
-                            remainedIndexList.add(subPopulation.get(layerIndex));
-                            subPopulation.set(layerIndex, candidateIndex);
-                        } else {
-                            remainedIndexList.add(candidateIndex);
-                        }
+                        remainedIndexList.add(candidateIndex);
                     }
                 }
             }
@@ -564,21 +562,13 @@ public class MOEACD extends AbstractMOEACD {
         if (waitingReplacedLayers.size() == 0) {
             int idxTargetLayer = queryConstraitLayer(solution);
             int idxOldSolution = pop.get(idxTargetLayer);
-            DoubleSolution oldSolution = population.get(idxOldSolution);
-            if (idxTargetLayer == 0) {
-                //fessible rule
-                int domination = MOEACDUtils.constraintDominateCompare(solution, oldSolution);
-                if (domination == -1) {
-                    remainedSolution = population.get(pop.get(idxTargetLayer));
-                    population.set(pop.get(idxTargetLayer), solution);
-                }
-            }else {
-                double newArea = calcConicalArea(constraintLayerSize, solution, targetSubRegion.getRefDirection());
-                double oldArea = calcConicalArea(constraintLayerSize, oldSolution, targetSubRegion.getRefDirection());
-                if (newArea < oldArea) {
-                    remainedSolution = population.get(pop.get(idxTargetLayer));
-                    population.set(pop.get(idxTargetLayer), solution);
-                }
+            DoubleSolution newSolution = solution;
+            DoubleSolution storedSolution = population.get(idxOldSolution);
+            ComparisonMethod method = idxTargetLayer == 0 ? ComparisonMethod.CDP : ComparisonMethod.CORE_AREA;
+            DoubleSolution betterSolution = getBetterSolution(newSolution, storedSolution, targetSubRegion, method);
+            if (betterSolution == newSolution) {
+                remainedSolution = population.get(pop.get(idxTargetLayer));
+                population.set(pop.get(idxTargetLayer), solution);
             }
         } else {
             int idxTargetLayer = waitingReplacedLayers.get(randomGenerator.nextInt(0, waitingReplacedLayers.size() - 1));
@@ -678,6 +668,26 @@ public class MOEACD extends AbstractMOEACD {
                 return storedSolution;
         }
     }
+
+    protected DoubleSolution getBetterSolution(DoubleSolution newSolution, DoubleSolution storedSolution, ConeSubRegion targetSubRegion, ComparisonMethod method) {
+        if (method == ComparisonMethod.CDP) {
+            int domination = MOEACDUtils.constraintDominateCompare(newSolution, storedSolution);
+            if (domination == -1) {
+                return newSolution;
+            } else {
+                return storedSolution;
+            }
+        } else {
+            double newArea = calcConicalArea(constraintLayerSize, newSolution, targetSubRegion.getRefDirection());
+            double oldArea = calcConicalArea(constraintLayerSize, storedSolution, targetSubRegion.getRefDirection());
+            if (newArea < oldArea) {
+                return newSolution;
+            } else {
+                return storedSolution;
+            }
+        }
+    }
+
 
     protected double PDD(DoubleSolution solution, double[] direction, double[] utopianPoint, double[] normIntercepts, double beta) {
         double p = 1.0 * evaluations / maxEvaluations;
