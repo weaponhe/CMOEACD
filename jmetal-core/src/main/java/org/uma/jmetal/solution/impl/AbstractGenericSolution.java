@@ -36,11 +36,6 @@ public abstract class AbstractGenericSolution<T, P extends Problem<?>> implement
     protected Map<Object, Object> attributes;
     protected final JMetalRandom randomGenerator;
 
-    //modified by heweipeng
-    private int subproblemIndex;
-    private int constraintLayerIndex;
-    private double fitness;
-
     /**
      * Constructor
      */
@@ -132,30 +127,6 @@ public abstract class AbstractGenericSolution<T, P extends Problem<?>> implement
         for (int i = 0; i < problem.getNumberOfConstraints(); i++) {
             constraints[i] = 0.0;
         }
-    }
-
-    public int getSubproblemIndex() {
-        return subproblemIndex;
-    }
-
-    public void setSubproblemIndex(int subproblemIndex) {
-        this.subproblemIndex = subproblemIndex;
-    }
-
-    public int getConstraintLayerIndex() {
-        return constraintLayerIndex;
-    }
-
-    public void setConstraintLayerIndex(int constraintLayerIndex) {
-        this.constraintLayerIndex = constraintLayerIndex;
-    }
-
-    public double getFitness() {
-        return fitness;
-    }
-
-    public void setFitness(double fitness) {
-        this.fitness = fitness;
     }
 
     @Override

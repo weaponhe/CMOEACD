@@ -25,23 +25,13 @@ public class MOEACDRunner extends AbstractAlgorithmRunner {
         MutationOperator<DoubleSolution> mutation;
         DifferentialEvolutionCrossover crossover;
 
-        String problemName ;
-//        String referenceParetoFront = "";
-//        if (args.length == 1) {
-//            problemName = args[0];
-//        } else if (args.length == 2) {
-//            problemName = args[0] ;
-//            referenceParetoFront = args[1] ;
-//        } else {
-//        problemName = "org.uma.jmetal.problem.multiobjective.dtlz.DTLZ1";//zdt.ZDT1";//lz09.LZ09F2";
+        String problemName;
         problemName = "org.uma.jmetal.problem.multiobjective.cdtlz.C1_DTLZ1";
-//        referenceParetoFront = "jmetal-problem/src/test/resources/pareto_fronts/DTLZ1.3D.pf";//ZDT1.pf";//LZ09_F2.pf";
-//        }
 
-        problem = (DoubleProblem) ProblemUtils.<DoubleSolution> loadProblem(problemName);
+        problem = (DoubleProblem) ProblemUtils.<DoubleSolution>loadProblem(problemName);
 
-        double cr = 1.0 ;
-        double f = 0.5 ;
+        double cr = 1.0;
+        double f = 0.5;
         crossover = new DifferentialEvolutionCrossover(cr, f, "rand/1/bin");
 
         double mutationProbability = 1.0 / problem.getNumberOfVariables();
@@ -58,16 +48,8 @@ public class MOEACDRunner extends AbstractAlgorithmRunner {
                 .build();
 
         AlgorithmRunner algorithmRunner = new AlgorithmRunner.Executor(algorithm)
-                .execute() ;
-        List<DoubleSolution> population = algorithm.getResult() ;
-        int fessibleCount = 0;
-//        for (DoubleSolution ind : population) {
-//            int numberOfConstrait = ind.getNumberOfConstraints();
-//            double cv = 0;
-//            for (int i = 0; i < numberOfConstrait; i++) {
-//                cv += ind.getConstraintViolation(i);
-//                if (cv > 0)
-//            }
-//        }
+                .execute();
+        List<DoubleSolution> population = algorithm.getResult();
+        System.out.println("asd");
     }
 }
