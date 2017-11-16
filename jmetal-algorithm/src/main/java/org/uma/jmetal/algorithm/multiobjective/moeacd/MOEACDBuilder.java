@@ -295,9 +295,9 @@ public class MOEACDBuilder implements AlgorithmBuilder<AbstractMOEACD> {
     public AbstractMOEACD build() {
         AbstractMOEACD algorithm = null;
         if (moeacdVariant.equals(Variant.MOEACD)) {
-            algorithm = new MOEACD(problem, numOfDivision, integratedTaus,
+            algorithm = new MOEACD(measureManager, problem, numOfDivision, integratedTaus,
                     populationSize, constraintLayerSize, maxEvaluations, neighborhoodSize,
-                    neighborhoodSelectionProbability,functionType,
+                    neighborhoodSelectionProbability, functionType,
                     sbxCrossover, deCrossover, mutation);
         }
 //        else if(moeacdVariant.equals(Variant.MOEACDMeasure)) {

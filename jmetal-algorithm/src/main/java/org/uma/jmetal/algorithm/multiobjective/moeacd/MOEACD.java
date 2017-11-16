@@ -109,6 +109,7 @@ public class MOEACD extends AbstractMOEACD {
 
     @Override
     public void run() {
+        measureManager.durationMeasure.start();
         initializeConeSubRegions();
         initializePopulation();
         evaluations = populationSize;
@@ -120,6 +121,8 @@ public class MOEACD extends AbstractMOEACD {
 
         associateSubRegion(population, utopianPoint, normIntercepts);
 
+        //calculate measure
+        measureManager.updateMeasureProgress(getMeasurePopulation());
         do {
             calcEvolvingSubproblemList();
 
@@ -159,8 +162,9 @@ public class MOEACD extends AbstractMOEACD {
 //            associateSubRegion(population,utopianPoint,normIntercepts);
 
             updateAdaptiveCrossover();
-
+            measureManager.updateMeasureProgress(getMeasurePopulation());
         } while (evaluations < maxEvaluations);
+        measureManager.durationMeasure.stop();
     }
 
     public void measureRun() {
