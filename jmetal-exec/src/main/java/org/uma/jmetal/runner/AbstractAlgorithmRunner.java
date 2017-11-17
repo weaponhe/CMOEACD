@@ -1,5 +1,6 @@
 package org.uma.jmetal.runner;
 
+import com.sun.org.apache.regexp.internal.RE;
 import org.uma.jmetal.qualityindicator.impl.*;
 import org.uma.jmetal.qualityindicator.impl.hypervolume.PISAHypervolume;
 import org.uma.jmetal.solution.DoubleSolution;
@@ -90,5 +91,35 @@ public abstract class AbstractAlgorithmRunner {
         new ErrorRatio<List<? extends Solution<?>>>(referenceFront).evaluate(population) + "\n";
     
     JMetalLogger.logger.info(outputString);
+  }
+
+  @SuppressWarnings("unchecked")
+  public static void printHypervolume(List<? extends Solution<?>> population, String paretoFrontFile)
+          throws FileNotFoundException {
+    Front referenceFront = new ArrayFront(paretoFrontFile);
+    FrontNormalizer frontNormalizer = new FrontNormalizer(referenceFront) ;
+
+    Front normalizedReferenceFront = frontNormalizer.normalize(referenceFront) ;
+    Front normalizedFront = frontNormalizer.normalize(new ArrayFront(population)) ;
+    List<DoubleSolution> normalizedPopulation = FrontUtils
+            .convertFrontToSolutionList(normalizedFront) ;
+
+    String outputString = "\n" ;
+    outputString += "Hypervolume (N) : " +
+            new PISAHypervolume<DoubleSolution>(normalizedReferenceFront).evaluate(normalizedPopulation) + "\n";
+    outputString += "Hypervolume     : " +
+            new PISAHypervolume(referenceFront).evaluate(population) + "\n";
+    JMetalLogger.logger.info(outputString);
+  }
+  public static Double getHypervolume(List<? extends Solution<?>> population, String paretoFrontFile)
+          throws FileNotFoundException {
+    Front referenceFront = new ArrayFront(paretoFrontFile);
+    FrontNormalizer frontNormalizer = new FrontNormalizer(referenceFront) ;
+
+    Front normalizedReferenceFront = frontNormalizer.normalize(referenceFront) ;
+    Front normalizedFront = frontNormalizer.normalize(new ArrayFront(population)) ;
+    List<DoubleSolution> normalizedPopulation = FrontUtils.convertFrontToSolutionList(normalizedFront);
+
+    return new PISAHypervolume(referenceFront).evaluate(population);
   }
 }
