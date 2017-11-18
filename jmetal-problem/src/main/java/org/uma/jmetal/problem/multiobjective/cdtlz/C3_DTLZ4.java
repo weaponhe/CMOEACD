@@ -89,6 +89,7 @@ public class C3_DTLZ4 extends DTLZ4 implements ConstrainedProblem<DoubleSolution
       }
     }
 
+    solution.setAttribute("overallConstraintViolationDegree", overallConstraintViolation);
     overallConstraintViolationDegree.setAttribute(solution,  overallConstraintViolation);
     numberOfViolatedConstraints.setAttribute(solution, violatedConstraints);
     maximumConstraintViolationDegree.setAttribute(solution,maximumConstraintViolation);

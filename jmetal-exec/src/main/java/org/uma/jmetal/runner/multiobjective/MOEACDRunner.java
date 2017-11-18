@@ -61,10 +61,6 @@ public class MOEACDRunner extends AbstractAlgorithmRunner {
         AlgorithmRunner algorithmRunner = new AlgorithmRunner.Executor(algorithm)
                 .execute();
         List<DoubleSolution> population = algorithm.getResult();
-//        printFinalSolutionSet(population);
-//        if (!referenceParetoFront.equals("")) {
-//            printHypervolume(population, referenceParetoFront);
-//        }
     }
 
 
