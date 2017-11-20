@@ -13,3 +13,7 @@ hs_err_pid*
 
 .idea
 .DS_Store
+
+jMetal.log*
+
+jmetal-data

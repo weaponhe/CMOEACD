@@ -17,6 +17,7 @@ import org.uma.jmetal.solution.Solution;
 import org.uma.jmetal.solution.util.RepairDoubleSolution;
 import org.uma.jmetal.solution.util.RepairDoubleSolutionAtBounds;
 import org.uma.jmetal.util.Constant;
+import org.uma.jmetal.util.JMetalException;
 import org.uma.jmetal.util.JMetalLogger;
 import org.uma.jmetal.util.KDTree;
 import org.uma.jmetal.util.comparator.impl.NormallizedMaximumViolationThresholdComparator;
@@ -43,6 +44,7 @@ public class MOEACD extends AbstractMOEACD {
 
     protected double beta_ConeUpdate = 3.0;
     protected double beta_NeighborUpdate = 3.0;
+    protected int idxSR;
 
     protected enum ComparisonMethod {
         CDP,
@@ -62,12 +64,13 @@ public class MOEACD extends AbstractMOEACD {
                   AbstractMOEAD.FunctionType functionType,
                   SBXCrossover sbxCrossoverOperator,
                   DifferentialEvolutionCrossover deCrossoverOperator,
-                  MutationOperator<DoubleSolution> mutation
+                  MutationOperator<DoubleSolution> mutation,
+                  double[] delta
     ) {
         super(problem, arrayH, integratedTaus,
                 populationSize, constraintLayerSize, maxEvaluations, neighborhoodSize,
                 neighborhoodSelectionProbability, functionType,
-                sbxCrossoverOperator, deCrossoverOperator, mutation);
+                sbxCrossoverOperator, deCrossoverOperator, mutation, delta);
         evolvingIdxList = new ArrayList<>(2 * populationSize);
 
         chooseR = 0.5;
@@ -90,12 +93,13 @@ public class MOEACD extends AbstractMOEACD {
                   AbstractMOEAD.FunctionType functionType,
                   SBXCrossover sbxCrossoverOperator,
                   DifferentialEvolutionCrossover deCrossoverOperator,
-                  MutationOperator<DoubleSolution> mutation
+                  MutationOperator<DoubleSolution> mutation,
+                  double[] delta
     ) {
         super(measureManager, problem, arrayH, integratedTaus,
                 populationSize, constraintLayerSize, maxEvaluations, neighborhoodSize,
                 neighborhoodSelectionProbability, functionType,
-                sbxCrossoverOperator, deCrossoverOperator, mutation);
+                sbxCrossoverOperator, deCrossoverOperator, mutation, delta);
         evolvingIdxList = new ArrayList<>(2 * populationSize);
 
         chooseR = 0.5;
@@ -125,7 +129,6 @@ public class MOEACD extends AbstractMOEACD {
         measureManager.updateMeasureProgress(getMeasurePopulation());
         do {
             calcEvolvingSubproblemList();
-
             for (int i = 0; i < populationSize; i++) {
 
                 List<DoubleSolution> children = reproduction(evolvingIdxList.get(i));
@@ -141,25 +144,19 @@ public class MOEACD extends AbstractMOEACD {
                 if (updateExtremePoints(child, utopianPoint, idealPoint, nadirPoint, referencePoint)) {
                     updateNormIntercepts(normIntercepts, utopianPoint, intercepts);
                 }
-                updateSubPlaneUtopianPointList(child);
 
-//                boolean isUpdated = coneUpdate(child, subRegion, utopianPoint, normIntercepts);
-                boolean isUpdated = updatePopulation(child);
+                updateSubPlaneUtopianPointList(child, intercepts, utopianPoint, nadirPoint, normIntercepts);
 
-//
-//                if(!isUpdated){
-//                    isUpdated |= coneNeighborUpdate(child, subRegion, utopianPoint, normIntercepts);
-//                }
+                boolean isUpdated = updatePopulation(child, idealPoint, utopianPoint, normIntercepts);
                 collectForAdaptiveCrossover(isUpdated);
             }
 
             gen++;
 
-            initializeNadirPoint(population, nadirPoint);
-            if (gen % updateInterval == 0)
-                updateIntercepts(population, intercepts, utopianPoint, nadirPoint);
-            updateNormIntercepts(normIntercepts, utopianPoint, intercepts);
-//            associateSubRegion(population,utopianPoint,normIntercepts);
+//            initializeNadirPoint(population, nadirPoint);
+//            if (gen % updateInterval == 0)
+//                updateIntercepts(population, intercepts, utopianPoint, nadirPoint);
+//            updateNormIntercepts(normIntercepts, utopianPoint, intercepts);
 
             updateAdaptiveCrossover();
             measureManager.updateMeasureProgress(getMeasurePopulation());
@@ -284,7 +281,7 @@ public class MOEACD extends AbstractMOEACD {
 
             for (int j = 0; j < candidateIndexList.size(); j++) {
                 int candidateIndex = candidateIndexList.get(j);
-                int layerIndex = queryConstraitLayer(population.get(candidateIndex));
+                int layerIndex = queryConstraitLayer(population.get(candidateIndex), utopianPoint, normIntercepts);
                 if (subPopulation.get(layerIndex) == -1) {
                     subPopulation.set(layerIndex, candidateIndex);
                 } else {
@@ -415,17 +412,18 @@ public class MOEACD extends AbstractMOEACD {
         return classifiedPopulation;
     }
 
-    protected void updateSubPlaneUtopianPointList(DoubleSolution solution) {
+    protected void updateSubPlaneUtopianPointList(DoubleSolution solution, double[] intercepts, double[] utopianPoint, double[] nadirPoint, double[] normIntercepts) {
         ConeSubRegion targetSubRegion = locateConeSubRegion(solution, utopianPoint, normIntercepts);
         int idxSR = targetSubRegion.getIdxConeSubRegion();
-        List<Double> utopianPoint = subPlaneUtopianPointList.get(idxSR);
+        this.idxSR = idxSR;
+        List<Double> subUtopianPoint = subPlaneUtopianPointList.get(idxSR);
         double x = Math.abs((double) solution.getAttribute("overallConstraintViolationDegree"));
         double y = fitnessFunction(solution, targetSubRegion.getRefDirection());
-        if (x < utopianPoint.get(0)) {
-            utopianPoint.set(0, x);
+        if (x < subUtopianPoint.get(0)) {
+            subUtopianPoint.set(0, x);
         }
-        if (y < utopianPoint.get(1)) {
-            utopianPoint.set(1, y);
+        if (y < subUtopianPoint.get(1)) {
+            subUtopianPoint.set(1, y);
         }
     }
 
@@ -463,14 +461,14 @@ public class MOEACD extends AbstractMOEACD {
         return true;
     }
 
-    protected int queryConstraitLayer(DoubleSolution solution) {
+    protected int queryConstraitLayer(DoubleSolution solution, double[] utopianPoint, double[] normIntercepts) {
         ConeSubRegion subproblem = locateConeSubRegion(solution, utopianPoint, normIntercepts);
         int subproblemIndex = subproblem.getIdxConeSubRegion();
         double x = Math.abs((double) solution.getAttribute("overallConstraintViolationDegree"));
         double y = fitnessFunction(solution, subproblem.getRefDirection());
-        List<Double> utopianPoint = this.subPlaneUtopianPointList.get(subproblemIndex);
-        double xTrans = x - utopianPoint.get(0);
-        double yTrans = y - utopianPoint.get(1);
+        List<Double> subUtopianPoint = this.subPlaneUtopianPointList.get(subproblemIndex);
+        double xTrans = x - subUtopianPoint.get(0);
+        double yTrans = y - subUtopianPoint.get(1);
         int k = (int) Math.floor(((constraintLayerSize - 1) * xTrans / (xTrans + yTrans)) + 0.5);
         return k;
     }
@@ -549,7 +547,7 @@ public class MOEACD extends AbstractMOEACD {
         D0Mean /= subRegionManager.getConeSubRegionsNum();
     }
 
-    protected boolean updatePopulation(DoubleSolution solution) {
+    protected boolean updatePopulation(DoubleSolution solution, double[] idealPoint, double[] utopianPoint, double[] normIntercepts) {
         ConeSubRegion targetSubRegion = locateConeSubRegion(solution, utopianPoint, normIntercepts);
         boolean isUpdated = false;
         List<Integer> pop = targetSubRegion.getSubPopulation();
@@ -564,7 +562,10 @@ public class MOEACD extends AbstractMOEACD {
         }
         DoubleSolution remainedSolution = null;
         if (waitingReplacedLayers.size() == 0) {
-            int idxTargetLayer = queryConstraitLayer(solution);
+            int idxTargetLayer = queryConstraitLayer(solution, utopianPoint, normIntercepts);
+            if (idxTargetLayer >= constraintLayerSize || idxTargetLayer < 0) {
+                idxTargetLayer = 0;
+            }
             int idxOldSolution = pop.get(idxTargetLayer);
             DoubleSolution newSolution = solution;
             DoubleSolution storedSolution = population.get(idxOldSolution);
@@ -581,7 +582,7 @@ public class MOEACD extends AbstractMOEACD {
         }
 
         if (remainedSolution != null) {
-            updatePopulation(remainedSolution);
+            updatePopulation(remainedSolution, idealPoint, utopianPoint, normIntercepts);
         }
 
         return isUpdated;
@@ -766,23 +767,21 @@ public class MOEACD extends AbstractMOEACD {
         ConeSubRegion coneSubRegion = subRegionManager.getConeSubRegion(idxSubRegion);
         List<Integer> neighbors = coneSubRegion.getNeighbors();
 
-        double delta1 = 0.8;
-        double delta2 = 0.9;
-        double delta3 = 0.95;
+        double[] delta = computeDelta();
         double rand = randomGenerator.nextDouble(0, 1);
 
         while (parents.size() < parentPoolSize) {
             int idxTargetSubproblem = 0;
             int idxTargetLayer = 0;
-            if (rand < delta1) {
+            if (rand < delta[0]) {
                 //neighbors子问题的第一个约束子层中找
                 idxTargetSubproblem = randomGenerator.nextInt(0, neighbors.size() - 1);
                 idxTargetLayer = 0;
-            } else if (rand < delta2) {
+            } else if (rand < delta[1]) {
                 //neighbors子问题的所有约束子层中找
                 idxTargetSubproblem = randomGenerator.nextInt(0, neighbors.size() - 1);
                 idxTargetLayer = randomGenerator.nextInt(0, constraintLayerSize - 1);
-            } else if (rand < delta3) {
+            } else if (rand < delta[2]) {
                 //所有子问题的第一个约束子层中找
                 idxTargetSubproblem = randomGenerator.nextInt(0, populationSize - 1);
                 idxTargetLayer = 0;
@@ -851,6 +850,14 @@ public class MOEACD extends AbstractMOEACD {
             }
         }
         return parents;
+    }
+
+    protected double[] computeDelta() {
+        double[] ret = new double[3];
+        ret[0] = this.delta[0];
+        ret[1] = this.delta[0] + delta[1];
+        ret[2] = this.delta[0] + delta[1] + delta[2];
+        return ret;
     }
 
     protected DoubleSolution tourmentSelection(int idx1, int idx2) {

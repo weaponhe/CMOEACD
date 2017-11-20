@@ -84,7 +84,7 @@ public class MOEADBuilder implements AlgorithmBuilder<AbstractMOEAD<DoubleSoluti
     maximumNumberOfReplacedSolutions = 2 ;
     /*modified by Yuehong Xie 2016/03/22 */
     kIndex = 9;
-    isFromFile = true;
+    isFromFile = false;
     /**/
     dataDirectory = "" ;
     neighborSize = 20 ;

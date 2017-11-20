@@ -2,6 +2,8 @@ package org.uma.jmetal.experiment;
 
 import org.uma.jmetal.algorithm.Algorithm;
 import org.uma.jmetal.algorithm.multiobjective.moeacd.MOEACDBuilder;
+import org.uma.jmetal.algorithm.multiobjective.moead.ConstraintMOEAD;
+import org.uma.jmetal.algorithm.multiobjective.moead.MOEADBuilder;
 import org.uma.jmetal.problem.Problem;
 import org.uma.jmetal.problem.multiobjective.cdtlz.*;
 import org.uma.jmetal.qualityindicator.impl.*;
@@ -25,15 +27,22 @@ public class MOEACDStudy {
 
     public static void main(String[] args) throws IOException {
         String experimentBaseDirectory = "jmetal-data";
+//        List<Problem<DoubleSolution>> problemList = Arrays.<Problem<DoubleSolution>>asList(
+//                new C1_DTLZ1(),
+//                new C2_DTLZ2(7, 3),
+//                new C3_DTLZ1(7, 3, 2),
+//                new C3_DTLZ4(7, 3, 2));
+//
+//        List<TaggedAlgorithm<List<DoubleSolution>>> algorithmList = configureAlgorithmList(problemList, INDEPENDENT_RUNS);
+//
+//        List<String> referenceFrontFileNames = Arrays.asList("DTLZ1.3D.pf", "DTLZ2.3D.pf", "DTLZ1.3D.pf", "DTLZ4.3D.pf");
+
         List<Problem<DoubleSolution>> problemList = Arrays.<Problem<DoubleSolution>>asList(
-                new C1_DTLZ1(),
-                new C2_DTLZ2(7, 3),
-                new C3_DTLZ1(7, 3, 2),
-                new C3_DTLZ4(7, 3, 2));
+                new C1_DTLZ1());
 
         List<TaggedAlgorithm<List<DoubleSolution>>> algorithmList = configureAlgorithmList(problemList, INDEPENDENT_RUNS);
 
-        List<String> referenceFrontFileNames = Arrays.asList("DTLZ1.3D.pf", "DTLZ2.3D.pf", "DTLZ1.3D.pf", "DTLZ4.3D.pf");
+        List<String> referenceFrontFileNames = Arrays.asList("DTLZ1.3D.pf");
 
         Experiment<DoubleSolution, List<DoubleSolution>> experiment =
                 new ExperimentBuilder<DoubleSolution, List<DoubleSolution>>("MOEACDStudy")
@@ -47,6 +56,7 @@ public class MOEACDStudy {
                         .setIndicatorList(Arrays.asList(new PISAHypervolume<DoubleSolution>(),
                                 new InvertedGenerationalDistancePlus<DoubleSolution>()))
                         .setIndependentRuns(INDEPENDENT_RUNS)
+                        .setNumberOfCores(8)
                         .build();
         new ExecuteAlgorithms<>(experiment).run();
         new ComputeQualityIndicators<>(experiment).run();
@@ -63,18 +73,28 @@ public class MOEACDStudy {
         double[] integratedTaus = {1.0};
 
         for (int run = 0; run < independentRuns; run++) {
-
             for (int i = 0; i < problemList.size(); i++) {
                 Algorithm<List<DoubleSolution>> algorithm = (new MOEACDBuilder(problemList.get(i), MOEACDBuilder.Variant.MOEACD))
                         .setIntegratedTaus(integratedTaus)
                         .setPopulationSize(91)
                         .setConstraintLayerSize(5)
                         .setNumOfDivision(numOfDivision)
+                        .setDelta(new double[]{0.3, 0.3, 0.3, 0.1})
                         .build();
-                algorithms.add(new TaggedAlgorithm<List<DoubleSolution>>(algorithm, "MOEACDa", problemList.get(i), run));
+                algorithms.add(new TaggedAlgorithm<List<DoubleSolution>>(algorithm, "CMOEACD", problemList.get(i), run));
             }
         }
 
+        for (int run = 0; run < independentRuns; run++) {
+            for (int i = 0; i < problemList.size(); i++) {
+                Algorithm<List<DoubleSolution>> algorithm = (new MOEADBuilder(problemList.get(i), MOEADBuilder.Variant.ConstraintMOEAD))
+                        .setIntegratedTau(integratedTaus)
+                        .setNumofDivision(numOfDivision)
+                        .setPopulationSize(91)
+                        .build();
+                algorithms.add(new TaggedAlgorithm<List<DoubleSolution>>(algorithm, "CMOEAD", problemList.get(i), run));
+            }
+        }
         return algorithms;
     }
 }

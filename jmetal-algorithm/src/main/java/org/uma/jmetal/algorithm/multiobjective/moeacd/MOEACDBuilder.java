@@ -70,6 +70,8 @@ public class MOEACDBuilder implements AlgorithmBuilder<AbstractMOEACD> {
     protected int[] numOfDivision;
     protected double[] integratedTaus;
 
+    protected double[] delta;
+
     protected double pbi_theta;
 
     protected SBXCrossover sbxCrossover;
@@ -117,6 +119,9 @@ public class MOEACDBuilder implements AlgorithmBuilder<AbstractMOEACD> {
         c_uneven = 1.04;
         measureManager = new MyAlgorithmMeasures<>();
         this.functionType = AbstractMOEAD.FunctionType.TCH;
+
+        this.delta = new double[]{0.8, 0.1, 0.05, 0.05};
+
     }
 
     public AbstractMOEAD.FunctionType getFunctionType() {
@@ -125,6 +130,15 @@ public class MOEACDBuilder implements AlgorithmBuilder<AbstractMOEACD> {
 
     public MOEACDBuilder setFunctionType(AbstractMOEAD.FunctionType functionType) {
         this.functionType = functionType;
+        return this;
+    }
+
+    public double[] getDelta() {
+        return delta;
+    }
+
+    public MOEACDBuilder setDelta(double[] delta) {
+        this.delta = delta;
         return this;
     }
 
@@ -298,7 +312,7 @@ public class MOEACDBuilder implements AlgorithmBuilder<AbstractMOEACD> {
             algorithm = new MOEACD(measureManager, problem, numOfDivision, integratedTaus,
                     populationSize, constraintLayerSize, maxEvaluations, neighborhoodSize,
                     neighborhoodSelectionProbability, functionType,
-                    sbxCrossover, deCrossover, mutation);
+                    sbxCrossover, deCrossover, mutation, delta);
         }
 //        else if(moeacdVariant.equals(Variant.MOEACDMeasure)) {
 //            algorithm = new MOEACD(measureManager,problem, numOfDivision, integratedTaus,

@@ -40,7 +40,7 @@ public abstract class AbstractMOEACD implements Algorithm<List<DoubleSolution>> 
     //Ideal Point
     protected double[] idealPoint;
     protected double[] utopianPoint;
-    protected  List<List<Double>> subPlaneUtopianPointList;
+    protected List<List<Double>> subPlaneUtopianPointList;
 
     //maximum value of each objective in the seached objective space
     protected double[] nadirPoint;
@@ -50,6 +50,7 @@ public abstract class AbstractMOEACD implements Algorithm<List<DoubleSolution>> 
     //intercepts of hyper-plane
     protected double[] intercepts;
     protected double[] normIntercepts;
+    protected double[] delta;
 
     protected ConeSubRegionManager subRegionManager;
 
@@ -101,7 +102,8 @@ public abstract class AbstractMOEACD implements Algorithm<List<DoubleSolution>> 
                           AbstractMOEAD.FunctionType functionType,
                           SBXCrossover sbxCrossoverOperator,
                           DifferentialEvolutionCrossover deCrossoverOperator,
-                          MutationOperator<DoubleSolution> mutation) {
+                          MutationOperator<DoubleSolution> mutation,
+                          double[] delta) {
         this.problem = problem;
         subRegionManager = new ConeSubRegionManager(problem.getNumberOfObjectives(), arrayH, integratedTaus);
         this.populationSize = populationSize;
@@ -113,6 +115,7 @@ public abstract class AbstractMOEACD implements Algorithm<List<DoubleSolution>> 
         this.neighborhoodSize = neighborhoodSize;
         this.neighborhoodSelectionProbability = neighborhoodSelectionProbability;
         this.functionType = functionType;
+        this.delta = delta;
         randomGenerator = JMetalRandom.getInstance();
 
         idealPoint = new double[problem.getNumberOfObjectives()];
@@ -141,10 +144,11 @@ public abstract class AbstractMOEACD implements Algorithm<List<DoubleSolution>> 
                           AbstractMOEAD.FunctionType functionType,
                           SBXCrossover sbxCrossoverOperator,
                           DifferentialEvolutionCrossover deCrossoverOperator,
-                          MutationOperator<DoubleSolution> mutation) {
+                          MutationOperator<DoubleSolution> mutation,
+                          double[] delta) {
         this(problem, arrayH, integratedTaus, populationSize, constraintLayerSize, maxEvaluations, neighborhoodSize,
-                neighborhoodSelectionProbability,functionType,
-                sbxCrossoverOperator, deCrossoverOperator, mutation);
+                neighborhoodSelectionProbability, functionType,
+                sbxCrossoverOperator, deCrossoverOperator, mutation, delta);
         this.measureManager = (MyAlgorithmMeasures<DoubleSolution>) measureManager;
         this.measureManager.initMeasures();
         overallConstraintViolationDegree = new OverallConstraintViolation<>();
@@ -242,7 +246,7 @@ public abstract class AbstractMOEACD implements Algorithm<List<DoubleSolution>> 
                 nl += Math.pow(lambda[i], 2.0);
             }
             nl = Math.sqrt(nl);
-            if(nl < 1e-10)
+            if (nl < 1e-10)
                 nl = 1e-10;
             d1 = Math.abs(d1) / nl;
 
@@ -252,7 +256,7 @@ public abstract class AbstractMOEACD implements Algorithm<List<DoubleSolution>> 
             d2 = Math.sqrt(d2);
 
             fitness = (d1 + theta * d2);
-        }  else {
+        } else {
             throw new JMetalException(" MOEAD.fitnessFunction: unknown type " + functionType);
         }
         return fitness;
