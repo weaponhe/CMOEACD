@@ -62,6 +62,7 @@ public abstract class AbstractMOEACD implements Algorithm<List<DoubleSolution>> 
 
     protected int evaluations;
     protected int maxEvaluations;
+    protected int maxGen;
 
     protected JMetalRandom randomGenerator;
 
@@ -97,6 +98,7 @@ public abstract class AbstractMOEACD implements Algorithm<List<DoubleSolution>> 
                           int populationSize,
                           int constraintLayerSize,
                           int maxEvaluations,
+                          int maxGen,
                           int neighborhoodSize,
                           double neighborhoodSelectionProbability,
                           AbstractMOEAD.FunctionType functionType,
@@ -109,6 +111,7 @@ public abstract class AbstractMOEACD implements Algorithm<List<DoubleSolution>> 
         this.populationSize = populationSize;
         this.constraintLayerSize = constraintLayerSize;
         this.maxEvaluations = maxEvaluations;
+        this.maxGen = maxGen;
         this.mutationOperator = mutation;
         this.sbxCrossoverOperator = sbxCrossoverOperator;
         this.deCrossoverOperator = deCrossoverOperator;
@@ -121,15 +124,18 @@ public abstract class AbstractMOEACD implements Algorithm<List<DoubleSolution>> 
         idealPoint = new double[problem.getNumberOfObjectives()];
         utopianPoint = new double[problem.getNumberOfObjectives()];
         nadirPoint = new double[problem.getNumberOfObjectives()];
-
-        subPlaneUtopianPointList = new ArrayList<>(populationSize);
-
         referencePoint = new double[problem.getNumberOfObjectives()];
         intercepts = new double[problem.getNumberOfObjectives()];
         normIntercepts = new double[problem.getNumberOfObjectives()];
 
         dominatedCount = new int[populationSize];
         overallConstraintViolationDegree = new OverallConstraintViolation<>();
+
+        //modified by heweipeng
+        subPlaneUtopianPointList = new ArrayList<>(populationSize);
+        for (int i = 0; i < populationSize; i++) {
+            subPlaneUtopianPointList.add(new ArrayList<Double>(constraintLayerSize));
+        }
     }
 
     public AbstractMOEACD(Measurable measureManager,
@@ -139,6 +145,7 @@ public abstract class AbstractMOEACD implements Algorithm<List<DoubleSolution>> 
                           int populationSize,
                           int constraintLayerSize,
                           int maxEvaluations,
+                          int maxGen,
                           int neighborhoodSize,
                           double neighborhoodSelectionProbability,
                           AbstractMOEAD.FunctionType functionType,
@@ -146,7 +153,7 @@ public abstract class AbstractMOEACD implements Algorithm<List<DoubleSolution>> 
                           DifferentialEvolutionCrossover deCrossoverOperator,
                           MutationOperator<DoubleSolution> mutation,
                           double[] delta) {
-        this(problem, arrayH, integratedTaus, populationSize, constraintLayerSize, maxEvaluations, neighborhoodSize,
+        this(problem, arrayH, integratedTaus, populationSize, constraintLayerSize, maxEvaluations, maxGen, neighborhoodSize,
                 neighborhoodSelectionProbability, functionType,
                 sbxCrossoverOperator, deCrossoverOperator, mutation, delta);
         this.measureManager = (MyAlgorithmMeasures<DoubleSolution>) measureManager;

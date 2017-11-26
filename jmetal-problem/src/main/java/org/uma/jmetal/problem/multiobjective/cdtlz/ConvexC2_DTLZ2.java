@@ -97,6 +97,7 @@ public class ConvexC2_DTLZ2 extends Convex_DTLZ2 implements ConstrainedProblem<D
       }
     }
 
+    solution.setAttribute("overallConstraintViolationDegree", overallConstraintViolation);
     overallConstraintViolationDegree.setAttribute(solution,overallConstraintViolation);
     numberOfViolatedConstraints.setAttribute(solution, violatedConstraints);
     maximumConstraintViolationDegree.setAttribute(solution,maximumConstraintViolation);

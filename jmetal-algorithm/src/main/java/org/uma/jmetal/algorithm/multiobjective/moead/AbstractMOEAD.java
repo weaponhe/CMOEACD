@@ -44,23 +44,34 @@ public abstract class AbstractMOEAD<S extends Solution<?>> implements Algorithm<
     public OverallConstraintViolation<S> overallConstraintViolationDegree = new OverallConstraintViolation<>();
 
     protected enum NeighborType {NEIGHBOR, POPULATION}
+
     public enum FunctionType {TCH, PBI, AGG}
 
 
-    protected Problem<S> problem ;
+    protected Problem<S> problem;
 
-    /** Z vector in Zhang & Li paper */
+    /**
+     * Z vector in Zhang & Li paper
+     */
     protected double[] idealPoint;
     // nadir point
     protected double[] nadirPoint;
-    /** Lambda vectors */
+    /**
+     * Lambda vectors
+     */
     protected double[][] lambda;
-    /** T in Zhang & Li paper */
+    /**
+     * T in Zhang & Li paper
+     */
     protected int neighborSize;
     protected int[][] neighborhood;
-    /** Delta in Zhang & Li paper */
+    /**
+     * Delta in Zhang & Li paper
+     */
     protected double neighborhoodSelectionProbability;
-    /** nr in Zhang & Li paper */
+    /**
+     * nr in Zhang & Li paper
+     */
     protected int maximumNumberOfReplacedSolutions;
 
     protected Solution<?>[] indArray;
@@ -73,37 +84,79 @@ public abstract class AbstractMOEAD<S extends Solution<?>> implements Algorithm<
     protected List<S> jointPopulation;
 
     protected int populationSize;
-    protected int resultPopulationSize ;
+    protected int resultPopulationSize;
 
     protected int evaluations;
     protected int maxEvaluations;
+    protected int maxGen;
 
-    protected JMetalRandom randomGenerator ;
+    protected JMetalRandom randomGenerator;
 
-    protected CrossoverOperator<S> crossoverOperator ;
-    protected MutationOperator<S> mutationOperator ;
+    protected CrossoverOperator<S> crossoverOperator;
+    protected MutationOperator<S> mutationOperator;
 
     protected boolean isFromFile;
     protected int[] arrayH;
     protected double[] integratedTau;
 
     public AbstractMOEAD(Problem<S> problem, int populationSize, int resultPopulationSize,
+                         int maxEvaluations, int maxGen, CrossoverOperator<S> crossoverOperator, MutationOperator<S> mutation,
+                         FunctionType functionType, String dataDirectory, double neighborhoodSelectionProbability,
+                         int maximumNumberOfReplacedSolutions, int neighborSize) {
+        this.problem = problem;
+        this.populationSize = populationSize;
+        this.resultPopulationSize = resultPopulationSize;
+        this.maxEvaluations = maxEvaluations;
+        this.maxGen = maxGen;
+        this.mutationOperator = mutation;
+        this.crossoverOperator = crossoverOperator;
+        this.functionType = functionType;
+        this.dataDirectory = dataDirectory;
+        this.neighborhoodSelectionProbability = neighborhoodSelectionProbability;
+        this.maximumNumberOfReplacedSolutions = maximumNumberOfReplacedSolutions;
+        this.neighborSize = neighborSize;
+
+        randomGenerator = JMetalRandom.getInstance();
+
+        population = new ArrayList<>(populationSize);
+        indArray = new Solution[problem.getNumberOfObjectives()];
+        neighborhood = new int[populationSize][neighborSize];
+        idealPoint = new double[problem.getNumberOfObjectives()];
+        nadirPoint = new double[problem.getNumberOfObjectives()];
+        lambda = new double[populationSize][problem.getNumberOfObjectives()];
+        isFromFile = true;
+    }
+
+    public AbstractMOEAD(Problem<S> problem, int populationSize, int resultPopulationSize,
+                         int maxEvaluations, int maxGen, CrossoverOperator<S> crossoverOperator, MutationOperator<S> mutation,
+                         FunctionType functionType, int[] arrayH, double[] integratedTau, double neighborhoodSelectionProbability,
+                         int maximumNumberOfReplacedSolutions, int neighborSize) {
+        this(problem, populationSize, resultPopulationSize,
+                maxEvaluations, maxGen, crossoverOperator, mutation,
+                functionType, "", neighborhoodSelectionProbability, maximumNumberOfReplacedSolutions, neighborSize);
+
+        isFromFile = false;
+        this.arrayH = arrayH;
+        this.integratedTau = integratedTau;
+    }
+
+    public AbstractMOEAD(Problem<S> problem, int populationSize, int resultPopulationSize,
                          int maxEvaluations, CrossoverOperator<S> crossoverOperator, MutationOperator<S> mutation,
                          FunctionType functionType, String dataDirectory, double neighborhoodSelectionProbability,
                          int maximumNumberOfReplacedSolutions, int neighborSize) {
-        this.problem = problem ;
-        this.populationSize = populationSize ;
-        this.resultPopulationSize = resultPopulationSize ;
-        this.maxEvaluations = maxEvaluations ;
-        this.mutationOperator = mutation ;
-        this.crossoverOperator = crossoverOperator ;
-        this.functionType = functionType ;
-        this.dataDirectory = dataDirectory ;
-        this.neighborhoodSelectionProbability = neighborhoodSelectionProbability ;
-        this.maximumNumberOfReplacedSolutions = maximumNumberOfReplacedSolutions ;
-        this.neighborSize = neighborSize ;
+        this.problem = problem;
+        this.populationSize = populationSize;
+        this.resultPopulationSize = resultPopulationSize;
+        this.maxEvaluations = maxEvaluations;
+        this.mutationOperator = mutation;
+        this.crossoverOperator = crossoverOperator;
+        this.functionType = functionType;
+        this.dataDirectory = dataDirectory;
+        this.neighborhoodSelectionProbability = neighborhoodSelectionProbability;
+        this.maximumNumberOfReplacedSolutions = maximumNumberOfReplacedSolutions;
+        this.neighborSize = neighborSize;
 
-        randomGenerator = JMetalRandom.getInstance() ;
+        randomGenerator = JMetalRandom.getInstance();
 
         population = new ArrayList<>(populationSize);
         indArray = new Solution[problem.getNumberOfObjectives()];
@@ -118,9 +171,9 @@ public abstract class AbstractMOEAD<S extends Solution<?>> implements Algorithm<
                          int maxEvaluations, CrossoverOperator<S> crossoverOperator, MutationOperator<S> mutation,
                          FunctionType functionType, int[] arrayH, double[] integratedTau, double neighborhoodSelectionProbability,
                          int maximumNumberOfReplacedSolutions, int neighborSize) {
-        this(problem,populationSize, resultPopulationSize,
-        maxEvaluations,  crossoverOperator,  mutation,
-         functionType, "", neighborhoodSelectionProbability,maximumNumberOfReplacedSolutions, neighborSize);
+        this(problem, populationSize, resultPopulationSize,
+                maxEvaluations, crossoverOperator, mutation,
+                functionType, "", neighborhoodSelectionProbability, maximumNumberOfReplacedSolutions, neighborSize);
 
         isFromFile = false;
         this.arrayH = arrayH;
@@ -128,13 +181,17 @@ public abstract class AbstractMOEAD<S extends Solution<?>> implements Algorithm<
     }
 
 
-    public int getCurrentEvalution(){return evaluations;};
+    public int getCurrentEvalution() {
+        return evaluations;
+    }
+
+    ;
 
     /**
      * Initialize weight vectors
      */
     protected void initializeUniformWeight() {
-        if(isFromFile) {
+        if (isFromFile) {
             if ((problem.getNumberOfObjectives() == 2) && (populationSize <= 300)) {
                 for (int n = 0; n < populationSize; n++) {
                     double a = 1.0 * n / (populationSize - 1);
@@ -171,9 +228,8 @@ public abstract class AbstractMOEAD<S extends Solution<?>> implements Algorithm<
                             + dataDirectory + "/" + dataFileName, e);
                 }
             }
-        }
-        else{
-            lambda = UniformWeightUtils.generateArray(arrayH,integratedTau,problem.getNumberOfObjectives());
+        } else {
+            lambda = UniformWeightUtils.generateArray(arrayH, integratedTau, problem.getNumberOfObjectives());
 //            UniformSimplexCentroidWeightsUtils uniformWeightsManager = new UniformSimplexCentroidWeightsUtils(problem.getNumberOfObjectives(),arrayH[0]);
 //            ArrayList<double[]> uniformWeights = uniformWeightsManager.getUniformWeights();
 //            for(int i=0;i<uniformWeights.size();i++){
@@ -242,14 +298,14 @@ public abstract class AbstractMOEAD<S extends Solution<?>> implements Algorithm<
 
     protected NeighborType chooseNeighborType() {
         double rnd = randomGenerator.nextDouble();
-        NeighborType neighborType ;
+        NeighborType neighborType;
 
         if (rnd < neighborhoodSelectionProbability) {
             neighborType = NeighborType.NEIGHBOR;
         } else {
             neighborType = NeighborType.POPULATION;
         }
-        return neighborType ;
+        return neighborType;
     }
 
     protected List<S> parentSelection(int subProblemId, NeighborType neighborType) {
@@ -261,19 +317,20 @@ public abstract class AbstractMOEAD<S extends Solution<?>> implements Algorithm<
         parents.add(population.get(matingPool.get(2)));
         parents.add(population.get(matingPool.get(0)));
 
-        return parents ;
+        return parents;
     }
 
     /**
-     *
-     * @param subproblemId the id of current subproblem
+     * @param subproblemId  the id of current subproblem
      * @param neighbourType neighbour type
      */
     protected List<Integer> matingSelection(int subproblemId, int numberOfSolutionsToSelect, NeighborType neighbourType) {
         int neighbourSize;
         int selectedSolution;
 
-        List<Integer> listOfSolutions = new ArrayList<>(numberOfSolutionsToSelect) ;
+        neighbourType = NeighborType.POPULATION;
+
+        List<Integer> listOfSolutions = new ArrayList<>(numberOfSolutionsToSelect);
         listOfSolutions.add(subproblemId);
 
         neighbourSize = neighborhood[subproblemId].length;
@@ -298,19 +355,20 @@ public abstract class AbstractMOEAD<S extends Solution<?>> implements Algorithm<
             }
         }
 
-        return listOfSolutions ;
+        return listOfSolutions;
     }
 
 
     /**
      * Update neighborhood method
+     *
      * @param individual
      * @param subProblemId
      * @param neighborType
      * @throws JMetalException
      */
     @SuppressWarnings("unchecked")
-    protected  void updateNeighborhood(S individual, int subProblemId, NeighborType neighborType) throws JMetalException {
+    protected void updateNeighborhood(S individual, int subProblemId, NeighborType neighborType) throws JMetalException {
         int size;
         int time;
 
@@ -338,7 +396,7 @@ public abstract class AbstractMOEAD<S extends Solution<?>> implements Algorithm<
             f2 = fitnessFunction(individual, lambda[k]);
 
             if (f2 < f1) {
-                population.set(k, (S)individual.copy());
+                population.set(k, (S) individual.copy());
                 time++;
             }
 
@@ -347,6 +405,7 @@ public abstract class AbstractMOEAD<S extends Solution<?>> implements Algorithm<
             }
         }
     }
+
     double fitnessFunction(S individual, double[] lambda) throws JMetalException {
         double fitness;
 
@@ -389,7 +448,7 @@ public abstract class AbstractMOEAD<S extends Solution<?>> implements Algorithm<
                 nl += Math.pow(lambda[i], 2.0);
             }
             nl = Math.sqrt(nl);
-            if(nl < 1e-10)
+            if (nl < 1e-10)
                 nl = 1e-10;
             d1 = Math.abs(d1) / nl;
 
@@ -399,7 +458,7 @@ public abstract class AbstractMOEAD<S extends Solution<?>> implements Algorithm<
             d2 = Math.sqrt(d2);
 
             fitness = (d1 + theta * d2);
-        }  else {
+        } else {
             throw new JMetalException(" MOEAD.fitnessFunction: unknown type " + functionType);
         }
         return fitness;
@@ -410,7 +469,7 @@ public abstract class AbstractMOEAD<S extends Solution<?>> implements Algorithm<
     }
 
     public List<S> getMeasurePopulation() {
-        if(problem instanceof  ConstrainedProblem) {
+        if (problem instanceof ConstrainedProblem) {
             List<S> feasibleSet = new ArrayList<>(population.size());
             for (int i = 0; i < population.size(); i++) {
                 if (!isFeasible(population.get(i)))
@@ -418,17 +477,17 @@ public abstract class AbstractMOEAD<S extends Solution<?>> implements Algorithm<
                 feasibleSet.add(population.get(i));
             }
             return feasibleSet;
-        }
-        else
+        } else
             return population;
     }
 
-    protected boolean isFeasible(S indiv){
+    protected boolean isFeasible(S indiv) {
         return overallConstraintViolationDegree.getAttribute(indiv) >= 0.0;
     }
 
-    @Override public List<S> getResult() {
-        if(problem instanceof ConstrainedProblem)
+    @Override
+    public List<S> getResult() {
+        if (problem instanceof ConstrainedProblem)
             return SolutionListUtils.getNondominatedSolutions(getMeasurePopulation());
         else
             return SolutionListUtils.getNondominatedSolutions(getPopulation());

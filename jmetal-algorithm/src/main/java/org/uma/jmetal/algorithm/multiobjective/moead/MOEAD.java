@@ -60,7 +60,7 @@ public class MOEAD extends AbstractMOEAD<DoubleSolution>  {
 
                 List<DoubleSolution> children = crossoverOperator.execute(parents);
 
-                DoubleSolution child = children.get(0) ;
+                DoubleSolution child = children.get(0);
                 mutationOperator.execute(child);
                 problem.evaluate(child);
 

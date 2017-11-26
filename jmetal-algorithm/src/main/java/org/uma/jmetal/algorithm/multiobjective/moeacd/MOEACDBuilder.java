@@ -86,6 +86,7 @@ public class MOEACDBuilder implements AlgorithmBuilder<AbstractMOEACD> {
     protected int neighborhoodSize;
 
     protected int maxEvaluations;
+    protected int maxGen;
 
     protected int numberOfThreads;
 
@@ -110,18 +111,18 @@ public class MOEACDBuilder implements AlgorithmBuilder<AbstractMOEACD> {
         constraintLayerSize = 5;
         neighborhoodSize = 20;
         maxEvaluations = 150000;
+        maxGen = 500;
         pbi_theta = 5.0;
         sbxCrossover = new SBXCrossover(1.0, 30.0);
-        deCrossover = new DifferentialEvolutionCrossover(1.0, 0.5, "rand/1/bin");
+//        deCrossover = new DifferentialEvolutionCrossover(1.0, 0.5, "rand/1/bin");
+        deCrossover = new DifferentialEvolutionCrossover();
         mutation = new PolynomialMutation(1.0 / problem.getNumberOfVariables(), 20.0);
         numberOfThreads = 1;
         moeacdVariant = variant;
         c_uneven = 1.04;
         measureManager = new MyAlgorithmMeasures<>();
         this.functionType = AbstractMOEAD.FunctionType.TCH;
-
         this.delta = new double[]{0.8, 0.1, 0.05, 0.05};
-
     }
 
     public AbstractMOEAD.FunctionType getFunctionType() {
@@ -139,6 +140,15 @@ public class MOEACDBuilder implements AlgorithmBuilder<AbstractMOEACD> {
 
     public MOEACDBuilder setDelta(double[] delta) {
         this.delta = delta;
+        return this;
+    }
+
+    public int getMaxGen() {
+        return maxGen;
+    }
+
+    public MOEACDBuilder setMaxGen(int maxGen) {
+        this.maxGen = maxGen;
         return this;
     }
 
@@ -310,7 +320,7 @@ public class MOEACDBuilder implements AlgorithmBuilder<AbstractMOEACD> {
         AbstractMOEACD algorithm = null;
         if (moeacdVariant.equals(Variant.MOEACD)) {
             algorithm = new MOEACD(measureManager, problem, numOfDivision, integratedTaus,
-                    populationSize, constraintLayerSize, maxEvaluations, neighborhoodSize,
+                    populationSize, constraintLayerSize, maxEvaluations,maxGen, neighborhoodSize,
                     neighborhoodSelectionProbability, functionType,
                     sbxCrossover, deCrossover, mutation, delta);
         }
