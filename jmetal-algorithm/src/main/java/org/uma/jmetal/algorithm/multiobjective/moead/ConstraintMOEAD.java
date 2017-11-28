@@ -100,7 +100,7 @@ public class ConstraintMOEAD extends AbstractMOEAD<DoubleSolution> {
         int gen = 0;
 
         do {
-            monitor(gen);
+//            monitor(gen);
             int[] permutation = new int[populationSize];
             MOEADUtils.randomPermutation(permutation, populationSize);
 

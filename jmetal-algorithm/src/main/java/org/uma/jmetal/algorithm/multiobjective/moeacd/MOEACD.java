@@ -52,9 +52,7 @@ public class MOEACD extends AbstractMOEACD {
     protected enum ComparisonMethod {
         CDP,
         CORE_AREA
-    }
-
-    ;
+    };
 
     public MOEACD(Problem<DoubleSolution> problem,
                   int[] arrayH,
@@ -133,7 +131,7 @@ public class MOEACD extends AbstractMOEACD {
         //calculate measure
         measureManager.updateMeasureProgress(getMeasurePopulation());
         do {
-            monitor(gen);
+//            monitor(gen);
             calcEvolvingSubproblemList();
             for (int i = 0; i < populationSize; i++) {
 
