@@ -52,7 +52,9 @@ public class MOEACD extends AbstractMOEACD {
     protected enum ComparisonMethod {
         CDP,
         CORE_AREA
-    };
+    }
+
+    ;
 
     public MOEACD(Problem<DoubleSolution> problem,
                   int[] arrayH,
@@ -411,31 +413,6 @@ public class MOEACD extends AbstractMOEACD {
         return index;
     }
 
-//    protected void initIdealSubproblemIndex() {
-//        for (int i = 0; i < population.size(); ++i) {
-//            DoubleSolution solution = population.get(i);
-//            ConeSubRegion subproblem = locateConeSubRegion(solution, utopianPoint, normIntercepts);
-//            int subproblemIndex = subproblem.getIdxConeSubRegion();
-//            solution.setAttribute("idealSubproblemIndex", subproblemIndex);
-//        }
-//    }
-//
-//    protected void initIdealFitness() {
-//        for (int i = 0; i < population.size(); ++i) {
-//            DoubleSolution solution = population.get(i);
-//            ConeSubRegion subproblem = locateConeSubRegion(solution, utopianPoint, normIntercepts);
-//            solution.setAttribute("idealFitness", fitnessFunction(solution, subproblem.getRefDirection()));
-//        }
-//    }
-//
-//    protected void initIdealConstraintLayerIndex() {
-//        for (int i = 0; i < population.size(); ++i) {
-//            DoubleSolution solution = population.get(i);
-//            ConeSubRegion subproblem = locateConeSubRegion(solution, utopianPoint, normIntercepts);
-//            solution.setAttribute("idealConstraintLayerIndex", queryConstraitLayer(solution));
-//        }
-//    }
-
     protected List<List<Integer>> classifyPopulation() {
         List<List<Integer>> classifiedPopulation = new ArrayList<>(populationSize);
         for (int i = 0; i < populationSize; ++i) {
@@ -453,9 +430,10 @@ public class MOEACD extends AbstractMOEACD {
     protected void updateSubIdealPoint(List<List<Integer>> classifiedPopulation) {
         for (int i = 0; i < classifiedPopulation.size(); i++) {
             List<Integer> pop = classifiedPopulation.get(i);
-            List<Double> subIdealPoint = new ArrayList<>();
-            double xMin = Double.MAX_VALUE;
-            double yMin = Double.MAX_VALUE;
+            double xMin = Double.POSITIVE_INFINITY;
+            double yMin = Double.POSITIVE_INFINITY;
+            double xMax = Double.NEGATIVE_INFINITY;
+            double yMax = Double.NEGATIVE_INFINITY;
 
             for (int j = 0; j < pop.size(); j++) {
                 int index = pop.get(j);
@@ -464,12 +442,19 @@ public class MOEACD extends AbstractMOEACD {
                 double y = fitnessFunction(solution, subRegionManager.getConeSubRegion(i).getRefDirection());
                 xMin = Math.min(xMin, x);
                 yMin = Math.min(yMin, y);
+                xMax = Math.max(xMax, x);
+                yMax = Math.max(yMax, y);
             }
 
+            List<Double> subIdealPoint = new ArrayList<>();
             subIdealPoint.add(xMin);
             subIdealPoint.add(yMin);
+            this.subPlaneIdealPointList.set(i, subIdealPoint);
 
-            this.subPlaneUtopianPointList.set(i, subIdealPoint);
+            List<Double> subNadirPoint = new ArrayList<>();
+            subNadirPoint.add(xMax);
+            subNadirPoint.add(yMax);
+            this.subPlaneNadirPointList.set(i, subNadirPoint);
         }
     }
 
@@ -478,9 +463,22 @@ public class MOEACD extends AbstractMOEACD {
         int subproblemIndex = subproblem.getIdxConeSubRegion();
         double x = Math.abs((double) solution.getAttribute("overallConstraintViolationDegree"));
         double y = fitnessFunction(solution, subRegionManager.getConeSubRegion(subproblemIndex).getRefDirection());
-        List<Double> subIdealPoint = this.subPlaneUtopianPointList.get(subproblemIndex);
+        List<Double> subIdealPoint = this.subPlaneIdealPointList.get(subproblemIndex);
         subIdealPoint.set(0, Math.min(subIdealPoint.get(0), x));
         subIdealPoint.set(1, Math.min(subIdealPoint.get(1), y));
+    }
+
+    protected void updateSubExtremePoints(DoubleSolution solution) {
+        ConeSubRegion subproblem = locateConeSubRegion(solution, utopianPoint, normIntercepts);
+        int subproblemIndex = subproblem.getIdxConeSubRegion();
+        double x = Math.abs((double) solution.getAttribute("overallConstraintViolationDegree"));
+        double y = fitnessFunction(solution, subRegionManager.getConeSubRegion(subproblemIndex).getRefDirection());
+        List<Double> subIdealPoint = this.subPlaneIdealPointList.get(subproblemIndex);
+        subIdealPoint.set(0, Math.min(subIdealPoint.get(0), x));
+        subIdealPoint.set(1, Math.min(subIdealPoint.get(1), y));
+        List<Double> subNadirPoint = this.subPlaneNadirPointList.get(subproblemIndex);
+        subNadirPoint.set(0, Math.max(subNadirPoint.get(0), x));
+        subNadirPoint.set(1, Math.max(subNadirPoint.get(1), y));
     }
 
 
@@ -498,7 +496,7 @@ public class MOEACD extends AbstractMOEACD {
         int subproblemIndex = subproblem.getIdxConeSubRegion();
         double x = Math.abs((double) solution.getAttribute("overallConstraintViolationDegree"));
         double y = fitnessFunction(solution, subproblem.getRefDirection());
-        List<Double> subUtopianPoint = this.subPlaneUtopianPointList.get(subproblemIndex);
+        List<Double> subUtopianPoint = this.subPlaneIdealPointList.get(subproblemIndex);
         double xTrans = x - subUtopianPoint.get(0);
         double yTrans = y - subUtopianPoint.get(1);
         int k = (int) Math.floor(((constraintLayerSize - 1) * xTrans / (xTrans + yTrans)) + 0.5);

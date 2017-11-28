@@ -27,7 +27,7 @@ public class MOEACDStudy {
     public static void main(String[] args) throws IOException {
         String experimentBaseDirectory = "jmetal-data";
 
-        int[] objectiveNumber = {3, 5, 8, 10, 15};
+        int[] objectiveNumber = {3};
 
         Map<Integer, int[]> numOfDivisionMap = new HashMap<>();
         numOfDivisionMap.put(3, new int[]{12});
@@ -54,18 +54,18 @@ public class MOEACDStudy {
 
         List<Problem<DoubleSolution>> problemList = new ArrayList<>();
         List<String> referenceFrontFileNames = new ArrayList<>();
-//        for (int i = 0; i < objectiveNumber.length; i++) {
-//            Problem p = new C1_DTLZ1(objectiveNumber[i] + 4, objectiveNumber[i]);
-//            p.setName(String.format("%s_%dD", p.getName(), objectiveNumber[i]));
-//            problemList.add(p);
-//            referenceFrontFileNames.add(String.format("DTLZ1.%dD.pf", objectiveNumber[i]));
-//        }
-//        for (int i = 0; i < objectiveNumber.length; i++) {
-//            Problem p = new C1_DTLZ3(objectiveNumber[i] + 9, objectiveNumber[i]);
-//            p.setName(String.format("%s_%dD", p.getName(), objectiveNumber[i]));
-//            problemList.add(p);
-//            referenceFrontFileNames.add(String.format("DTLZ3.%dD.pf", objectiveNumber[i]));
-//        }
+        for (int i = 0; i < objectiveNumber.length; i++) {
+            Problem p = new C1_DTLZ1(objectiveNumber[i] + 4, objectiveNumber[i]);
+            p.setName(String.format("%s_%dD", p.getName(), objectiveNumber[i]));
+            problemList.add(p);
+            referenceFrontFileNames.add(String.format("DTLZ1.%dD.pf", objectiveNumber[i]));
+        }
+        for (int i = 0; i < objectiveNumber.length; i++) {
+            Problem p = new C1_DTLZ3(objectiveNumber[i] + 9, objectiveNumber[i]);
+            p.setName(String.format("%s_%dD", p.getName(), objectiveNumber[i]));
+            problemList.add(p);
+            referenceFrontFileNames.add(String.format("DTLZ3.%dD.pf", objectiveNumber[i]));
+        }
 
         for (int i = 0; i < objectiveNumber.length; i++) {
             Problem p = new C2_DTLZ2(objectiveNumber[i] + 9, objectiveNumber[i]);

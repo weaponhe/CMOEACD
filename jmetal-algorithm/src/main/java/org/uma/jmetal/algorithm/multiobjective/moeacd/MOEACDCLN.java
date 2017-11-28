@@ -39,7 +39,7 @@ public class MOEACDCLN extends MOEACD {
         int subproblemIndex = subproblem.getIdxConeSubRegion();
         double x = Math.abs((double) solution.getAttribute("overallConstraintViolationDegree"));
         double y = fitnessFunction(solution, subproblem.getRefDirection());
-        List<Double> subUtopianPoint = this.subPlaneUtopianPointList.get(subproblemIndex);
+        List<Double> subUtopianPoint = this.subPlaneIdealPointList.get(subproblemIndex);
         double xTrans = x - subUtopianPoint.get(0);
         double yTrans = y - subUtopianPoint.get(1);
         int k = (int) Math.floor(((constraintLayerSize - 1) * xTrans / (xTrans + yTrans)) + 0.5);

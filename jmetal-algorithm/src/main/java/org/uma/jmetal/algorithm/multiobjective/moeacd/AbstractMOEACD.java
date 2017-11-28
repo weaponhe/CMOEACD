@@ -40,7 +40,9 @@ public abstract class AbstractMOEACD implements Algorithm<List<DoubleSolution>> 
     //Ideal Point
     protected double[] idealPoint;
     protected double[] utopianPoint;
-    protected List<List<Double>> subPlaneUtopianPointList;
+    protected List<List<Double>> subPlaneIdealPointList;
+    protected List<List<Double>> subPlaneNadirPointList;
+
 
     //maximum value of each objective in the seached objective space
     protected double[] nadirPoint;
@@ -132,9 +134,13 @@ public abstract class AbstractMOEACD implements Algorithm<List<DoubleSolution>> 
         overallConstraintViolationDegree = new OverallConstraintViolation<>();
 
         //modified by heweipeng
-        subPlaneUtopianPointList = new ArrayList<>(populationSize);
+        subPlaneIdealPointList = new ArrayList<>(populationSize);
         for (int i = 0; i < populationSize; i++) {
-            subPlaneUtopianPointList.add(new ArrayList<Double>(constraintLayerSize));
+            subPlaneIdealPointList.add(new ArrayList<Double>(2));
+        }
+        subPlaneNadirPointList = new ArrayList<>(populationSize);
+        for (int i = 0; i < populationSize; i++) {
+            subPlaneNadirPointList.add(new ArrayList<Double>(2));
         }
     }
 
