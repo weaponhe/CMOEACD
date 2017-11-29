@@ -42,6 +42,9 @@ public abstract class AbstractMOEACD implements Algorithm<List<DoubleSolution>> 
     protected double[] utopianPoint;
     protected List<List<Double>> subPlaneIdealPointList;
     protected List<List<Double>> subPlaneNadirPointList;
+    protected List<List<Integer>> classifiedPopulation;
+    protected double FR;
+    protected double firstLayerFR;
 
 
     //maximum value of each objective in the seached objective space
@@ -142,6 +145,8 @@ public abstract class AbstractMOEACD implements Algorithm<List<DoubleSolution>> 
         for (int i = 0; i < populationSize; i++) {
             subPlaneNadirPointList.add(new ArrayList<Double>(2));
         }
+        FR = 0.0;
+        firstLayerFR = 0.0;
     }
 
     public AbstractMOEACD(Measurable measureManager,

@@ -22,12 +22,13 @@ import java.util.*;
  * Created by weaponhe on 2017/11/17.
  */
 public class MOEACDStudy {
-    private static final int INDEPENDENT_RUNS = 5;
+    private static final int INDEPENDENT_RUNS = 20;
 
     public static void main(String[] args) throws IOException {
         String experimentBaseDirectory = "jmetal-data";
 
         int[] objectiveNumber = {3};
+//        int[] objectiveNumber = {3, 5, 8, 10, 15};
 
         Map<Integer, int[]> numOfDivisionMap = new HashMap<>();
         numOfDivisionMap.put(3, new int[]{12});
@@ -60,25 +61,25 @@ public class MOEACDStudy {
             problemList.add(p);
             referenceFrontFileNames.add(String.format("DTLZ1.%dD.pf", objectiveNumber[i]));
         }
-        for (int i = 0; i < objectiveNumber.length; i++) {
-            Problem p = new C1_DTLZ3(objectiveNumber[i] + 9, objectiveNumber[i]);
-            p.setName(String.format("%s_%dD", p.getName(), objectiveNumber[i]));
-            problemList.add(p);
-            referenceFrontFileNames.add(String.format("DTLZ3.%dD.pf", objectiveNumber[i]));
-        }
+//        for (int i = 0; i < objectiveNumber.length; i++) {
+//            Problem p = new C1_DTLZ3(objectiveNumber[i] + 9, objectiveNumber[i]);
+//            p.setName(String.format("%s_%dD", p.getName(), objectiveNumber[i]));
+//            problemList.add(p);
+//            referenceFrontFileNames.add(String.format("DTLZ3.%dD.pf", objectiveNumber[i]));
+//        }
 
-        for (int i = 0; i < objectiveNumber.length; i++) {
-            Problem p = new C2_DTLZ2(objectiveNumber[i] + 9, objectiveNumber[i]);
-            p.setName(String.format("%s_%dD", p.getName(), objectiveNumber[i]));
-            problemList.add(p);
-            referenceFrontFileNames.add(String.format("C2_DTLZ2.%dD.pf", objectiveNumber[i]));
-        }
-        for (int i = 0; i < objectiveNumber.length; i++) {
-            Problem p = new ConvexC2_DTLZ2(objectiveNumber[i] + 9, objectiveNumber[i]);
-            p.setName(String.format("%s_%dD", p.getName(), objectiveNumber[i]));
-            problemList.add(p);
-            referenceFrontFileNames.add(String.format("C2_Convex_DTLZ2.%dD.pf", objectiveNumber[i]));
-        }
+//        for (int i = 0; i < objectiveNumber.length; i++) {
+//            Problem p = new C2_DTLZ2(objectiveNumber[i] + 9, objectiveNumber[i]);
+//            p.setName(String.format("%s_%dD", p.getName(), objectiveNumber[i]));
+//            problemList.add(p);
+//            referenceFrontFileNames.add(String.format("C2_DTLZ2.%dD.pf", objectiveNumber[i]));
+//        }
+//        for (int i = 0; i < objectiveNumber.length; i++) {
+//            Problem p = new ConvexC2_DTLZ2(objectiveNumber[i] + 9, objectiveNumber[i]);
+//            p.setName(String.format("%s_%dD", p.getName(), objectiveNumber[i]));
+//            problemList.add(p);
+//            referenceFrontFileNames.add(String.format("C2_Convex_DTLZ2.%dD.pf", objectiveNumber[i]));
+//        }
 
         List<TaggedAlgorithm<List<DoubleSolution>>> algorithmList =
                 configureAlgorithmList(
@@ -106,9 +107,15 @@ public class MOEACDStudy {
                         .setIndependentRuns(INDEPENDENT_RUNS)
                         .setNumberOfCores(8)
                         .build();
+
+        long startTime = System.currentTimeMillis();    //获取开始时间
+
         new ExecuteAlgorithms<>(experiment).run();
-        new ComputeQualityIndicators<>(experiment).run();
-        new GenerateLatexTablesWithStatistics(experiment).run();
+
+        long endTime = System.currentTimeMillis();    //获取结束时间
+        System.out.println("程序运行时间：" + (endTime - startTime)/1000 + "s");    //输出程序运行时间
+//        new ComputeQualityIndicators<>(experiment).run();
+//        new GenerateLatexTablesWithStatistics(experiment).run();
     }
 
     static List<TaggedAlgorithm<List<DoubleSolution>>> configureAlgorithmList(List<Problem<DoubleSolution>> problemList,
@@ -133,17 +140,17 @@ public class MOEACDStudy {
             }
         }
 
-        for (int run = 0; run < independentRuns; run++) {
-            for (int i = 0; i < problemList.size(); i++) {
-                Algorithm<List<DoubleSolution>> algorithm = (new MOEADBuilder(problemList.get(i), MOEADBuilder.Variant.ConstraintMOEAD))
-                        .setNumofDivision(numOfDivisionMap.get(problemList.get(i).getNumberOfObjectives()))
-                        .setIntegratedTau(integratedTausMap.get(problemList.get(i).getNumberOfObjectives()))
-                        .setPopulationSize(populationSizeMap.get(problemList.get(i).getNumberOfObjectives()))
-                        .setMaxGen(1000)
-                        .build();
-                algorithms.add(new TaggedAlgorithm<List<DoubleSolution>>(algorithm, "CMOEAD", problemList.get(i), run));
-            }
-        }
+//        for (int run = 0; run < independentRuns; run++) {
+//            for (int i = 0; i < problemList.size(); i++) {
+//                Algorithm<List<DoubleSolution>> algorithm = (new MOEADBuilder(problemList.get(i), MOEADBuilder.Variant.ConstraintMOEAD))
+//                        .setNumofDivision(numOfDivisionMap.get(problemList.get(i).getNumberOfObjectives()))
+//                        .setIntegratedTau(integratedTausMap.get(problemList.get(i).getNumberOfObjectives()))
+//                        .setPopulationSize(populationSizeMap.get(problemList.get(i).getNumberOfObjectives()))
+//                        .setMaxGen(1000)
+//                        .build();
+//                algorithms.add(new TaggedAlgorithm<List<DoubleSolution>>(algorithm, "CMOEAD", problemList.get(i), run));
+//            }
+//        }
         return algorithms;
     }
 }
