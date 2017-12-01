@@ -18,7 +18,9 @@ import java.util.List;
  */
 public class MOEACDBuilder implements AlgorithmBuilder<AbstractMOEACD> {
     public enum Variant {
-        MOEACD, MOEACDMeasure,
+        MOEACD,
+        MOEACDUP2,
+        MOEACDMeasure,
         MOEACDP, MOEACDPMeasure,
         MOEACDN, MOEACDNMeasure,
         CMOEACD, CMOEACDMeasure,
@@ -320,7 +322,12 @@ public class MOEACDBuilder implements AlgorithmBuilder<AbstractMOEACD> {
         AbstractMOEACD algorithm = null;
         if (moeacdVariant.equals(Variant.MOEACD)) {
             algorithm = new MOEACD(measureManager, problem, numOfDivision, integratedTaus,
-                    populationSize, constraintLayerSize, maxEvaluations,maxGen, neighborhoodSize,
+                    populationSize, constraintLayerSize, maxEvaluations, maxGen, neighborhoodSize,
+                    neighborhoodSelectionProbability, functionType,
+                    sbxCrossover, deCrossover, mutation, delta);
+        } else if (moeacdVariant.equals(Variant.MOEACDUP2)) {
+            algorithm = new MOEACDUP2(problem, numOfDivision, integratedTaus,
+                    populationSize, constraintLayerSize, maxEvaluations, maxGen, neighborhoodSize,
                     neighborhoodSelectionProbability, functionType,
                     sbxCrossover, deCrossover, mutation, delta);
         }
