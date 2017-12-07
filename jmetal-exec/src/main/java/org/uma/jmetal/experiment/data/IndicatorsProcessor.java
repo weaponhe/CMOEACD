@@ -17,7 +17,7 @@ public class IndicatorsProcessor {
         File file = new File(basrDir);
         File[] algorithmList = file.listFiles();
 
-        String[] indicators = {"GD", "IGD"};
+        String[] indicators = {"IGD", "IGDPlus"};
         Map<String, Boolean> algorithms = new HashMap<>();
         Map<String, Boolean> problems = new HashMap<>();
         Map<Integer, Boolean> dimentions = new HashMap<>();
@@ -71,6 +71,11 @@ public class IndicatorsProcessor {
                 System.out.print(String.format("%s\t", algorithm));
             }
             System.out.print("\n");
+
+            Map<String, Integer> bestCountMap = new HashMap<>();
+            for (String algorithm : algorithms.keySet()) {
+                bestCountMap.put(algorithm, 0);
+            }
             for (String problem : problems.keySet()) {
                 boolean newProblem = true;
                 for (Integer dimention : dimentions.keySet()) {
@@ -86,6 +91,9 @@ public class IndicatorsProcessor {
                         } else {
                             System.out.print("\t");
                         }
+
+                        String bestKey = "";
+                        Double bestValue = Double.MAX_VALUE;
                         for (String algorithm : algorithms.keySet()) {
                             List<Double> array = data.get(indicators[indicator]).get(algorithm).get(problem).get(dimention);
                             Double value = 0.0;
@@ -96,12 +104,22 @@ public class IndicatorsProcessor {
                             } else if (count == 2) {
                                 value = getWorst(array);
                             }
+                            if (value < bestValue) {
+                                bestValue = value;
+                                bestKey = algorithm;
+                            }
                             System.out.print(value + "\t");
                         }
+
+                        bestCountMap.put(bestKey, bestCountMap.get(bestKey) + 1);
                         System.out.print("\n");
                     }
 
                 }
+            }
+            System.out.print("\t\t");
+            for (String algorithm : algorithms.keySet()) {
+                System.out.print(bestCountMap.get(algorithm) + "\t");
             }
             System.out.print("\n");
         }

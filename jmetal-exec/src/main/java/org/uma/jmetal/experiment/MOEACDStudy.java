@@ -1,5 +1,6 @@
 package org.uma.jmetal.experiment;
 
+import com.sun.scenario.effect.impl.sw.sse.SSEBlend_SRC_OUTPeer;
 import org.uma.jmetal.algorithm.Algorithm;
 import org.uma.jmetal.algorithm.multiobjective.moeacd.MOEACDBuilder;
 import org.uma.jmetal.algorithm.multiobjective.moead.ConstraintMOEAD;
@@ -22,75 +23,31 @@ import java.util.*;
  * Created by weaponhe on 2017/11/17.
  */
 public class MOEACDStudy {
-    private static final int INDEPENDENT_RUNS = 5;
+    private static String experimentBaseDirectory = "jmetal-data";
+    private static final int INDEPENDENT_RUNS = 20;
+
+    private static Integer[] objectiveNumberConfig;
+    private static int[][] numOfDivisionConfig;
+    private static double[][] integratedTausConfig;
+    private static int[] populationSizeConfig;
+    private static Map<String, int[]> maxGenConfig;
+
+    private static List<Problem<DoubleSolution>> problemList;
+    private static List<String> referenceFrontFileNames = new ArrayList<>();
+
 
     public static void main(String[] args) throws IOException {
-        String experimentBaseDirectory = "jmetal-data";
-
-//        int[] objectiveNumber = {3};
-        int[] objectiveNumber = {3, 5, 8, 10, 15};
-
-        Map<Integer, int[]> numOfDivisionMap = new HashMap<>();
-        numOfDivisionMap.put(3, new int[]{12});
-        numOfDivisionMap.put(5, new int[]{6});
-        numOfDivisionMap.put(8, new int[]{3, 2});
-        numOfDivisionMap.put(10, new int[]{3, 2});
-        numOfDivisionMap.put(15, new int[]{2, 1});
-        Map<Integer, double[]> integratedTausMap = new HashMap<>();
-        integratedTausMap.put(3, new double[]{1.0});
-        integratedTausMap.put(5, new double[]{1.0});
-        integratedTausMap.put(8, new double[]{1.0, 0.5});
-        integratedTausMap.put(10, new double[]{1.0, 0.5});
-        integratedTausMap.put(15, new double[]{1.0, 0.5});
-        Map<Integer, Integer> populationSizeMap = new HashMap<>();
-        for (int j = 0; j < objectiveNumber.length; j++) {
-            int _nObj = objectiveNumber[j];
-            int[] _arrayH = numOfDivisionMap.get(_nObj);
-            int nums = 0;
-            for (int i = 0; i < _arrayH.length; ++i)
-                nums += CombinationUtils.compute(_arrayH[i] + _nObj - 1, _nObj - 1);
-            populationSizeMap.put(_nObj, nums);
-        }
-
-
-        List<Problem<DoubleSolution>> problemList = new ArrayList<>();
-        List<String> referenceFrontFileNames = new ArrayList<>();
-        for (int i = 0; i < objectiveNumber.length; i++) {
-            Problem p = new C1_DTLZ1(objectiveNumber[i] + 4, objectiveNumber[i]);
-            p.setName(String.format("%s_%dD", p.getName(), objectiveNumber[i]));
-            problemList.add(p);
-            referenceFrontFileNames.add(String.format("DTLZ1.%dD.pf", objectiveNumber[i]));
-        }
-        for (int i = 0; i < objectiveNumber.length; i++) {
-            Problem p = new C1_DTLZ3(objectiveNumber[i] + 9, objectiveNumber[i]);
-            p.setName(String.format("%s_%dD", p.getName(), objectiveNumber[i]));
-            problemList.add(p);
-            referenceFrontFileNames.add(String.format("DTLZ3.%dD.pf", objectiveNumber[i]));
-        }
-
-        for (int i = 0; i < objectiveNumber.length; i++) {
-            Problem p = new C2_DTLZ2(objectiveNumber[i] + 9, objectiveNumber[i]);
-            p.setName(String.format("%s_%dD", p.getName(), objectiveNumber[i]));
-            problemList.add(p);
-            referenceFrontFileNames.add(String.format("C2_DTLZ2.%dD.pf", objectiveNumber[i]));
-        }
-        for (int i = 0; i < objectiveNumber.length; i++) {
-            Problem p = new ConvexC2_DTLZ2(objectiveNumber[i] + 9, objectiveNumber[i]);
-            p.setName(String.format("%s_%dD", p.getName(), objectiveNumber[i]));
-            problemList.add(p);
-            referenceFrontFileNames.add(String.format("C2_Convex_DTLZ2.%dD.pf", objectiveNumber[i]));
-        }
-
-        List<TaggedAlgorithm<List<DoubleSolution>>> algorithmList =
-                configureAlgorithmList(
-                        problemList,
-                        INDEPENDENT_RUNS,
-                        numOfDivisionMap,
-                        integratedTausMap,
-                        populationSizeMap
-                );
-
-
+        initConfiguration();
+        initProblems();
+        List<TaggedAlgorithm<List<DoubleSolution>>> algorithmList = configureAlgorithmList(
+                problemList,
+                INDEPENDENT_RUNS,
+                objectiveNumberConfig,
+                numOfDivisionConfig,
+                integratedTausConfig,
+                populationSizeConfig,
+                maxGenConfig
+        );
         Experiment<DoubleSolution, List<DoubleSolution>> experiment =
                 new ExperimentBuilder<DoubleSolution, List<DoubleSolution>>("MOEACDStudy")
                         .setAlgorithmList(algorithmList)
@@ -102,67 +59,146 @@ public class MOEACDStudy {
                         .setReferenceFrontDirectory("/pareto_fronts")
                         .setReferenceFrontFileNames(referenceFrontFileNames)
                         .setIndicatorList(Arrays.asList(
-                                new GenerationalDistance<DoubleSolution>(),
-                                new InvertedGenerationalDistance<DoubleSolution>()))
+                                new InvertedGenerationalDistance<DoubleSolution>(),
+                                new InvertedGenerationalDistancePlus<DoubleSolution>()))
                         .setIndependentRuns(INDEPENDENT_RUNS)
                         .setNumberOfCores(8)
                         .build();
 
-        long startTime = System.currentTimeMillis();    //获取开始时间
-
+        long startTime = System.currentTimeMillis();
         new ExecuteAlgorithms<>(experiment).run();
-
-        long endTime = System.currentTimeMillis();    //获取结束时间
-        System.out.println("程序运行时间：" + (endTime - startTime) / 1000 + "s");    //输出程序运行时间
+        long endTime = System.currentTimeMillis();
+        System.out.println("程序运行时间：" + (endTime - startTime) / 1000 + "s");
         new ComputeQualityIndicators<>(experiment).run();
-//        new GenerateLatexTablesWithStatistics(experiment).run();
+    }
+
+    static public void initConfiguration() {
+        objectiveNumberConfig = new Integer[]{
+                3,
+                5,
+                8,
+                10,
+                15
+        };
+        numOfDivisionConfig = new int[][]{
+                {12},
+                {6},
+                {3, 2},
+                {3, 2},
+                {2, 1}
+        };
+        integratedTausConfig = new double[][]{
+                {1.0},
+                {1.0},
+                {1.0, 0.5},
+                {1.0, 0.5},
+                {1.0, 0.5}
+        };
+        populationSizeConfig = new int[objectiveNumberConfig.length];
+        for (int j = 0; j < objectiveNumberConfig.length; j++) {
+            int nObj = objectiveNumberConfig[j];
+            int[] arrayH = numOfDivisionConfig[j];
+            int nums = 0;
+            for (int i = 0; i < arrayH.length; ++i)
+                nums += CombinationUtils.compute(arrayH[i] + nObj - 1, nObj - 1);
+            populationSizeConfig[j] = nums;
+        }
+
+        maxGenConfig = new HashMap<>();
+
+        maxGenConfig.put("C1_DTLZ1", new int[]{500, 600, 800, 1000, 1500});
+        maxGenConfig.put("C1_DTLZ3", new int[]{1000, 1500, 2500, 3500, 5000});
+        maxGenConfig.put("C2_DTLZ2", new int[]{250, 350, 500, 750, 1000});
+        maxGenConfig.put("ConvexC2_DTLZ2", new int[]{250, 750, 1500, 2500, 3500});
+        maxGenConfig.put("C3_DTLZ1", new int[]{750, 1250, 2000, 3000, 4000});
+        maxGenConfig.put("C3_DTLZ4", new int[]{750, 1250, 2000, 3000, 4000});
+    }
+
+    static public void initProblems() {
+        problemList = new ArrayList<>();
+        referenceFrontFileNames = new ArrayList<>();
+
+        for (int i = 0; i < objectiveNumberConfig.length; i++) {
+            Problem p = new C1_DTLZ1(objectiveNumberConfig[i] + 4, objectiveNumberConfig[i]);
+            p.setName(String.format("%s_%dD", p.getName(), objectiveNumberConfig[i]));
+            problemList.add(p);
+            referenceFrontFileNames.add(String.format("DTLZ1.%dD.pf", objectiveNumberConfig[i]));
+        }
+        for (int i = 0; i < objectiveNumberConfig.length; i++) {
+            Problem p = new C1_DTLZ3(objectiveNumberConfig[i] + 9, objectiveNumberConfig[i]);
+            p.setName(String.format("%s_%dD", p.getName(), objectiveNumberConfig[i]));
+            problemList.add(p);
+            referenceFrontFileNames.add(String.format("DTLZ3.%dD.pf", objectiveNumberConfig[i]));
+        }
+
+        for (int i = 0; i < objectiveNumberConfig.length; i++) {
+            Problem p = new C2_DTLZ2(objectiveNumberConfig[i] + 9, objectiveNumberConfig[i]);
+            p.setName(String.format("%s_%dD", p.getName(), objectiveNumberConfig[i]));
+            problemList.add(p);
+            referenceFrontFileNames.add(String.format("C2_DTLZ2.%dD.pf", objectiveNumberConfig[i]));
+        }
+        for (int i = 0; i < objectiveNumberConfig.length; i++) {
+            Problem p = new ConvexC2_DTLZ2(objectiveNumberConfig[i] + 9, objectiveNumberConfig[i]);
+            p.setName(String.format("%s_%dD", p.getName(), objectiveNumberConfig[i]));
+            problemList.add(p);
+            referenceFrontFileNames.add(String.format("C2_Convex_DTLZ2.%dD.pf", objectiveNumberConfig[i]));
+        }
+
+        for (int i = 0; i < objectiveNumberConfig.length; i++) {
+            Problem p = new C3_DTLZ1(objectiveNumberConfig[i] + 4, objectiveNumberConfig[i], objectiveNumberConfig[i]);
+            p.setName(String.format("%s_%dD", p.getName(), objectiveNumberConfig[i]));
+            problemList.add(p);
+            referenceFrontFileNames.add(String.format("C3_DTLZ1.%dD.pf", objectiveNumberConfig[i]));
+        }
+        for (int i = 0; i < objectiveNumberConfig.length; i++) {
+            Problem p = new C3_DTLZ4(objectiveNumberConfig[i] + 4, objectiveNumberConfig[i], objectiveNumberConfig[i]);
+            p.setName(String.format("%s_%dD", p.getName(), objectiveNumberConfig[i]));
+            problemList.add(p);
+            referenceFrontFileNames.add(String.format("C3_DTLZ4.%dD.pf", objectiveNumberConfig[i]));
+        }
     }
 
     static List<TaggedAlgorithm<List<DoubleSolution>>> configureAlgorithmList(List<Problem<DoubleSolution>> problemList,
                                                                               int independentRuns,
-                                                                              Map<Integer, int[]> numOfDivisionMap,
-                                                                              Map<Integer, double[]> integratedTausMap,
-                                                                              Map<Integer, Integer> populationSizeMap) {
+                                                                              Integer[] objectiveNumberConfig,
+                                                                              int[][] numOfDivisionConfig,
+                                                                              double[][] integratedTausConfig,
+                                                                              int[] populationSizeConfig,
+                                                                              Map<String, int[]> maxGenConfig) {
         List<TaggedAlgorithm<List<DoubleSolution>>> algorithms = new ArrayList<>();
-
+        List<Integer> objectiveNumberList = Arrays.asList(objectiveNumberConfig);
 
         for (int run = 0; run < independentRuns; run++) {
             for (int i = 0; i < problemList.size(); i++) {
+                int configIndex = objectiveNumberList.indexOf(problemList.get(i).getNumberOfObjectives());
+                String problemName = problemList.get(i).getName();
+                String problemSeriesName = problemName.substring(0,problemName.lastIndexOf("_"));
+                int maxGen = maxGenConfig.get(problemSeriesName)[configIndex];
                 Algorithm<List<DoubleSolution>> algorithm = (new MOEACDBuilder(problemList.get(i), MOEACDBuilder.Variant.MOEACD))
-                        .setNumOfDivision(numOfDivisionMap.get(problemList.get(i).getNumberOfObjectives()))
-                        .setIntegratedTaus(integratedTausMap.get(problemList.get(i).getNumberOfObjectives()))
-                        .setPopulationSize(populationSizeMap.get(problemList.get(i).getNumberOfObjectives()))
+                        .setNumOfDivision(numOfDivisionConfig[configIndex])
+                        .setIntegratedTaus(integratedTausConfig[configIndex])
+                        .setPopulationSize(populationSizeConfig[configIndex])
                         .setConstraintLayerSize(5)
-                        .setMaxGen(1000)
+                        .setMaxGen(maxGen)
                         .setDelta(new double[]{0.81, 0.09, 0.09, 0.01})
                         .build();
-                algorithms.add(new TaggedAlgorithm<List<DoubleSolution>>(algorithm, "CMOEACD", problemList.get(i), run));
+                algorithms.add(new TaggedAlgorithm<>(algorithm, "CMOEACD", problemList.get(i), run));
             }
         }
 
         for (int run = 0; run < independentRuns; run++) {
             for (int i = 0; i < problemList.size(); i++) {
-                Algorithm<List<DoubleSolution>> algorithm = (new MOEACDBuilder(problemList.get(i), MOEACDBuilder.Variant.MOEACDUP2))
-                        .setNumOfDivision(numOfDivisionMap.get(problemList.get(i).getNumberOfObjectives()))
-                        .setIntegratedTaus(integratedTausMap.get(problemList.get(i).getNumberOfObjectives()))
-                        .setPopulationSize(populationSizeMap.get(problemList.get(i).getNumberOfObjectives()))
-                        .setConstraintLayerSize(5)
-                        .setMaxGen(1000)
-                        .setDelta(new double[]{0.81, 0.09, 0.09, 0.01})
-                        .build();
-                algorithms.add(new TaggedAlgorithm<List<DoubleSolution>>(algorithm, "CMOEACDUP2", problemList.get(i), run));
-            }
-        }
-
-        for (int run = 0; run < independentRuns; run++) {
-            for (int i = 0; i < problemList.size(); i++) {
+                int configIndex = objectiveNumberList.indexOf(problemList.get(i).getNumberOfObjectives());
+                String problemName = problemList.get(i).getName();
+                String problemSeriesName = problemName.substring(0,problemName.lastIndexOf("_"));
+                int maxGen = maxGenConfig.get(problemSeriesName)[configIndex];
                 Algorithm<List<DoubleSolution>> algorithm = (new MOEADBuilder(problemList.get(i), MOEADBuilder.Variant.ConstraintMOEAD))
-                        .setNumofDivision(numOfDivisionMap.get(problemList.get(i).getNumberOfObjectives()))
-                        .setIntegratedTau(integratedTausMap.get(problemList.get(i).getNumberOfObjectives()))
-                        .setPopulationSize(populationSizeMap.get(problemList.get(i).getNumberOfObjectives()))
-                        .setMaxGen(1000)
+                        .setNumofDivision(numOfDivisionConfig[configIndex])
+                        .setIntegratedTau(integratedTausConfig[configIndex])
+                        .setPopulationSize(populationSizeConfig[configIndex])
+                        .setMaxGen(maxGen)
                         .build();
-                algorithms.add(new TaggedAlgorithm<List<DoubleSolution>>(algorithm, "CMOEAD", problemList.get(i), run));
+                algorithms.add(new TaggedAlgorithm<>(algorithm, "CMOEAD", problemList.get(i), run));
             }
         }
         return algorithms;

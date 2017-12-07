@@ -22,15 +22,15 @@ public class DataProcessor {
     public static void main(String[] args) throws IOException {
         int[] dimentions = {3, 5, 8, 10, 15};
 
-//        for (int i = 0; i < dimentions.length; i++) {
-//            String fileName = String.format("/pareto_fronts/DTLZ2.%dD.pf", dimentions[i]);
-//            String outputFileName = String.format("jmetal-core/src/main/resources/pareto_fronts/C2_DTLZ2.%dD.pf", dimentions[i]);
-//            ArrayFront front = new ArrayFront(fileName);
-//            C2_DTLZ2 problem = new C2_DTLZ2(dimentions[i] + 9, dimentions[i]);
-//            List<Point> res = getFessibleFront(front, problem);
-//            writeFile(outputFileName, res);
-//            System.out.println((double) res.size() / front.getNumberOfPoints());
-//        }
+        for (int i = 0; i < dimentions.length; i++) {
+            String fileName = String.format("/pareto_fronts/DTLZ2.%dD.pf", dimentions[i]);
+            String outputFileName = String.format("jmetal-core/src/main/resources/pareto_fronts/C2_DTLZ2.%dD.pf", dimentions[i]);
+            ArrayFront front = new ArrayFront(fileName);
+            C2_DTLZ2 problem = new C2_DTLZ2(dimentions[i] + 9, dimentions[i]);
+            List<Point> res = getFessibleFront(front, problem);
+            writeFile(outputFileName, res);
+            System.out.println((double) res.size() / front.getNumberOfPoints());
+        }
 
 //        for (int i = 0; i < dimentions.length; i++) {
 //            String fileName = String.format("/pareto_fronts/Convex_DTLZ2.%dD.pf", dimentions[i]);
@@ -41,21 +41,6 @@ public class DataProcessor {
 //            writeFile(outputFileName, res);
 //            System.out.println((double) res.size() / front.getNumberOfPoints());
 //        }
-
-        int M = 3;
-        String fileName = "/pareto_fronts/DTLZ1.3D.pf";
-        ArrayFront front = new ArrayFront(fileName);
-        for (int i = 0; i < front.getNumberOfPoints(); i++) {
-            Point point = front.getPoint(i);
-            double sum = 0.0;
-            for (int j = 0; j < point.getNumberOfDimensions() - 1; j++) {
-                sum += point.getDimensionValue(j);
-            }
-            double lastValue = Double.MIN_VALUE;
-            for (int k = 0; k < M; k++) {
-
-            }
-        }
     }
 
     static public List<Point> getFessibleFront(ArrayFront front, DoubleProblem problem) {

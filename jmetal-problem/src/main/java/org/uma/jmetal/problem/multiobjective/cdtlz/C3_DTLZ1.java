@@ -29,29 +29,30 @@ import org.uma.jmetal.util.solutionattribute.impl.OverallConstraintViolation;
  * @author Antonio J. Nebro <antonio@lcc.uma.es>
  */
 public class C3_DTLZ1 extends DTLZ1 implements ConstrainedProblem<DoubleSolution> {
-  public OverallConstraintViolation<DoubleSolution> overallConstraintViolationDegree ;
-  public NumberOfViolatedConstraints<DoubleSolution> numberOfViolatedConstraints ;
-  public MaximumConstraintViolation<DoubleSolution> maximumConstraintViolationDegree;
+    public OverallConstraintViolation<DoubleSolution> overallConstraintViolationDegree;
+    public NumberOfViolatedConstraints<DoubleSolution> numberOfViolatedConstraints;
+    public MaximumConstraintViolation<DoubleSolution> maximumConstraintViolationDegree;
 
-  /**
-   * Constructor
-   * @param numberOfVariables
-   * @param numberOfObjectives
-   */
-  public C3_DTLZ1(int numberOfVariables, int numberOfObjectives, int numberOfConstraints) {
-    super(numberOfVariables, numberOfObjectives) ;
+    /**
+     * Constructor
+     *
+     * @param numberOfVariables
+     * @param numberOfObjectives
+     */
+    public C3_DTLZ1(int numberOfVariables, int numberOfObjectives, int numberOfConstraints) {
+        super(numberOfVariables, numberOfObjectives);
 
-    setNumberOfConstraints(numberOfConstraints);
-    setName("C3_DTLZ1");
+        setNumberOfConstraints(numberOfConstraints);
+        setName("C3_DTLZ1");
 
-    overallConstraintViolationDegree = new OverallConstraintViolation<DoubleSolution>() ;
-    numberOfViolatedConstraints = new NumberOfViolatedConstraints<DoubleSolution>() ;
-    maximumConstraintViolationDegree = new MaximumConstraintViolation<>();
-  }
+        overallConstraintViolationDegree = new OverallConstraintViolation<DoubleSolution>();
+        numberOfViolatedConstraints = new NumberOfViolatedConstraints<DoubleSolution>();
+        maximumConstraintViolationDegree = new MaximumConstraintViolation<>();
+    }
 
-  @Override
-  public void evaluateConstraints(DoubleSolution solution) {
-    double[] constraint = new double[this.getNumberOfConstraints()];
+    @Override
+    public void evaluateConstraints(DoubleSolution solution) {
+        double[] constraint = new double[this.getNumberOfConstraints()];
 
 //    for (int j = 0; j < getNumberOfConstraints(); j++) {
 //      double sum = 0 ;
@@ -63,33 +64,33 @@ public class C3_DTLZ1 extends DTLZ1 implements ConstrainedProblem<DoubleSolution
 //        constraint[j]+= sum + solution.getObjective(i)/0.5 - 1.0 ;
 //      }
 //    }
-    double sum = 0 ;
-    for (int i = 0; i < getNumberOfObjectives(); i++) {
-        sum += solution.getObjective(i) ;
-      }
+        double sum = 0;
+        for (int i = 0; i < getNumberOfObjectives(); i++) {
+            sum += solution.getObjective(i);
+        }
 
-    for (int j = 0; j < getNumberOfConstraints(); j++) {
-      constraint[j] = sum - solution.getObjective(j) + solution.getObjective(j)/0.5 - 1.0 ;
+        for (int j = 0; j < getNumberOfConstraints(); j++) {
+            constraint[j] = sum - solution.getObjective(j) + solution.getObjective(j) / 0.5 - 1.0;
+        }
+
+        for (int j = 0; j < getNumberOfConstraints(); j++) {
+            solution.setConstraintViolation(j, constraint[j]);
+        }
+
+        double overallConstraintViolation = 0.0;
+        int violatedConstraints = 0;
+        double maximumConstraintViolation = 0.0;
+        for (int i = 0; i < getNumberOfConstraints(); i++) {
+            if (constraint[i] < 0.0) {
+                overallConstraintViolation += constraint[i];
+                violatedConstraints++;
+                maximumConstraintViolation = Math.min(maximumConstraintViolation, constraint[i]);
+            }
+        }
+
+        solution.setAttribute("overallConstraintViolationDegree", overallConstraintViolation);
+        overallConstraintViolationDegree.setAttribute(solution, overallConstraintViolation);
+        numberOfViolatedConstraints.setAttribute(solution, violatedConstraints);
+        maximumConstraintViolationDegree.setAttribute(solution, maximumConstraintViolation);
     }
-
-    for (int j=0;j<getNumberOfConstraints();j++){
-      solution.setConstraintViolation(j,constraint[j]);
-    }
-
-    double overallConstraintViolation = 0.0;
-    int violatedConstraints = 0;
-    double maximumConstraintViolation = 0.0;
-    for (int i = 0; i < getNumberOfConstraints(); i++) {
-      if (constraint[i]<0.0){
-        overallConstraintViolation+=constraint[i];
-        violatedConstraints++;
-        maximumConstraintViolation = Math.min(maximumConstraintViolation,constraint[i]);
-      }
-    }
-
-    solution.setAttribute("overallConstraintViolationDegree", overallConstraintViolation);
-    overallConstraintViolationDegree.setAttribute(solution, overallConstraintViolation);
-    numberOfViolatedConstraints.setAttribute(solution, violatedConstraints);
-    maximumConstraintViolationDegree.setAttribute(solution,maximumConstraintViolation);
-  }
 }

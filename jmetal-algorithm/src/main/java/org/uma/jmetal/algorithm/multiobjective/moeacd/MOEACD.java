@@ -135,7 +135,7 @@ public class MOEACD extends AbstractMOEACD {
         do {
             updateFR();
             calcEvolvingSubproblemList();
-            monitor(gen);
+//            monitor(gen);
             for (int i = 0; i < populationSize; i++) {
                 List<DoubleSolution> children = reproduction(evolvingIdxList.get(i));
                 DoubleSolution child = children.get(0);

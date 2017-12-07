@@ -1,6 +1,0 @@
-filepath = '../jmetal-data/MOEACDStudy/data/MOEACD-531/C2_DTLZ2/BEST_HV_FUN.tsv';
-[f1,f2,f3] = textread(filepath,'%f %f %f');
-scatter3(f1,f2,f3,'ro');
-
-
-
