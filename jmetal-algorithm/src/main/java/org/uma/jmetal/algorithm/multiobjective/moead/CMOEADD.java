@@ -3,6 +3,7 @@ package org.uma.jmetal.algorithm.multiobjective.moead;
 import org.uma.jmetal.algorithm.multiobjective.moead.util.MOEADUtils;
 import org.uma.jmetal.operator.CrossoverOperator;
 import org.uma.jmetal.operator.MutationOperator;
+import org.uma.jmetal.operator.impl.crossover.DifferentialEvolutionCrossover;
 import org.uma.jmetal.problem.ConstrainedProblem;
 import org.uma.jmetal.problem.Problem;
 import org.uma.jmetal.solution.DoubleSolution;
@@ -38,6 +39,8 @@ public class CMOEADD extends MOEADD{
         super(problem, populationSize, resultPopulationSize, maxEvaluations, crossover, mutation, functionType,
                 dataDirectory, neighborhoodSelectionProbability, maximumNumberOfReplacedSolutions,
                 neighborSize);
+
+        differentialEvolutionCrossover = (DifferentialEvolutionCrossover) crossoverOperator;
         numberOfViolatedConstraints = new NumberOfViolatedConstraints<DoubleSolution>() ;
     }
 
@@ -56,6 +59,8 @@ public class CMOEADD extends MOEADD{
         super(problem, populationSize, resultPopulationSize, maxEvaluations, crossover, mutation, functionType,
                 arrayH,integratedTau, neighborhoodSelectionProbability, maximumNumberOfReplacedSolutions,
                 neighborSize);
+
+        differentialEvolutionCrossover = (DifferentialEvolutionCrossover) crossoverOperator;
         numberOfViolatedConstraints = new NumberOfViolatedConstraints<DoubleSolution>() ;
 
     }
@@ -95,31 +100,32 @@ public class CMOEADD extends MOEADD{
                 NeighborType neighborType = chooseNeighborType() ;
                 List<DoubleSolution> parents = parentSelection(subProblemId, neighborType) ;
 
-                List<DoubleSolution> children = crossoverOperator.execute(parents);
+                differentialEvolutionCrossover.setCurrentSolution(population.get(subProblemId));
+                List<DoubleSolution> children = differentialEvolutionCrossover.execute(parents);
 
                 DoubleSolution child1 = children.get(0);
-                DoubleSolution child2 = children.get(1);
+//                DoubleSolution child2 = children.get(1);
 
                 mutationOperator.execute(child1);
-                mutationOperator.execute(child2);
+//                mutationOperator.execute(child2);
 
                 problem.evaluate(child1);
                 ((ConstrainedProblem<DoubleSolution>) problem).evaluateConstraints(child1);
 
-                problem.evaluate(child2);
-                ((ConstrainedProblem<DoubleSolution>) problem).evaluateConstraints(child2);
+//                problem.evaluate(child2);
+//                ((ConstrainedProblem<DoubleSolution>) problem).evaluateConstraints(child2);
 
 
-                evaluations+=2;
+                evaluations+=1;
 
                 updateIdealPoint(child1);
-                updateIdealPoint(child2);
+//                updateIdealPoint(child2);
 
                 updateNadirPoint(child1);
-                updateNadirPoint(child2);
+//                updateNadirPoint(child2);
 
                 updateArchive(child1);
-                updateArchive(child2);
+//                updateArchive(child2);
             }
         } while (evaluations < maxEvaluations);
     }

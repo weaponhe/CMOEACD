@@ -203,20 +203,22 @@ public class MOEACDStudy {
 //                algorithms.add(new TaggedAlgorithm<>(algorithm, "CMOEADD", problemList.get(i), run));
 //            }
 //        }
-//            for (int i = 0; i < problemList.size(); i++) {
-//                int configIndex = objectiveNumberList.indexOf(problemList.get(i).getNumberOfObjectives());
-//                String problemName = problemList.get(i).getName();
-//                String problemSeriesName = problemName.substring(0, problemName.lastIndexOf("_"));
-//                int maxGen = maxGenConfig.get(problemSeriesName)[configIndex];
-//                Algorithm<List<DoubleSolution>> algorithm = (new MOEADBuilder(problemList.get(i), MOEADBuilder.Variant.ConstraintMOEAD))
-//                        .setNumofDivision(numOfDivisionConfig[configIndex])
-//                        .setIntegratedTau(integratedTausConfig[configIndex])
-//                        .setPopulationSize(populationSizeConfig[configIndex])
-//                        .setMaxGen(maxGen)
-//                        .build();
-//                algorithms.add(new TaggedAlgorithm<>(algorithm, "CMOEAD", problemList.get(i), run));
-//            }
-//        }
+
+        for (int run = 0; run < independentRuns; run++) {
+            for (int i = 0; i < problemList.size(); i++) {
+                int configIndex = objectiveNumberList.indexOf(problemList.get(i).getNumberOfObjectives());
+                String problemName = problemList.get(i).getName();
+                String problemSeriesName = problemName.substring(0, problemName.lastIndexOf("_"));
+                int maxGen = maxGenConfig.get(problemSeriesName)[configIndex];
+                Algorithm<List<DoubleSolution>> algorithm = (new MOEADBuilder(problemList.get(i), MOEADBuilder.Variant.ConstraintMOEAD))
+                        .setNumofDivision(numOfDivisionConfig[configIndex])
+                        .setIntegratedTau(integratedTausConfig[configIndex])
+                        .setPopulationSize(populationSizeConfig[configIndex])
+                        .setMaxGen(maxGen)
+                        .build();
+                algorithms.add(new TaggedAlgorithm<>(algorithm, "CMOEAD", problemList.get(i), run));
+            }
+        }
         return algorithms;
     }
 }

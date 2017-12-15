@@ -13,6 +13,7 @@ import java.util.*;
  */
 public class IndicatorsProcessor {
     public static void main(String[] args) throws IOException {
+        int runs = 5;
         String basrDir = "jmetal-data/MOEACDStudy/data";
         File file = new File(basrDir);
         File[] algorithmList = file.listFiles();
@@ -55,6 +56,12 @@ public class IndicatorsProcessor {
                     data.get(indicators[indicator]).get(algorithm).put(problem, new HashMap<Integer, List<Double>>());
                     for (Integer dimention : dimentions.keySet()) {
                         ArrayList<Double> array = readFileData(indicators[indicator], algorithm, problem, dimention);
+                        if (array.size() == 0) {
+                            System.out.println("all run no result");
+                        } else if (array.size() < runs) {
+                            System.out.println(algorithm + " " + problem + " " + dimention);
+                            System.out.println("some run no result");
+                        }
                         data.get(indicators[indicator]).get(algorithm).get(problem).put(dimention, array);
                     }
                 }

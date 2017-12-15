@@ -114,6 +114,7 @@ public class Water extends AbstractDoubleProblem implements ConstrainedProblem<D
       }
     }
 
+    solution.setAttribute("overallConstraintViolationDegree", overallConstraintViolation);
     overallConstraintViolationDegree.setAttribute(solution, overallConstraintViolation);
     numberOfViolatedConstraints.setAttribute(solution, violatedConstraints);
   }
