@@ -889,58 +889,58 @@ public class MOEACD extends AbstractMOEACD {
         return parents;
     }
 
-    protected List<DoubleSolution> parentSelection(int idxSubRegion, int parentPoolSize) {
-        List<DoubleSolution> parents = new ArrayList<>(parentPoolSize);
-
-        ConeSubRegion coneSubRegion = subRegionManager.getConeSubRegion(idxSubRegion);
-        DoubleSolution solution = population.get(coneSubRegion.getIdxSolution());
-        ConeSubRegion targetSubRegion = locateConeSubRegion(solution, utopianPoint, normIntercepts);
-        if (targetSubRegion == coneSubRegion)
-            parents.add(solution);
-
-        List<Integer> neighbors = coneSubRegion.getNeighbors();
-        if (neighbors.size() < parentPoolSize + 1)
-            matingType = MatingType.GLOBAL;
-
-        while (parents.size() < parentPoolSize) {
-
-            int idxSubRegion1;
-            int idxSubRegion2;
-            if (matingType == MatingType.NEIGHBOR) {
-                int idx1 = randomGenerator.nextInt(0, neighbors.size() - 1);
-                idxSubRegion1 = neighbors.get(idx1);
-
-                int idx2 = randomGenerator.nextInt(0, neighbors.size() - 1);
-                idxSubRegion2 = neighbors.get(idx2);
-
-                while (idxSubRegion1 == idxSubRegion2) {
-                    idx2 = randomGenerator.nextInt(0, neighbors.size() - 1);
-                    idxSubRegion2 = neighbors.get(idx2);
-                }
-            } else {
-                idxSubRegion1 = randomGenerator.nextInt(0, subRegionManager.getConeSubRegionsNum() - 1);
-                idxSubRegion2 = randomGenerator.nextInt(0, subRegionManager.getConeSubRegionsNum() - 1);
-
-                while (idxSubRegion1 == idxSubRegion2) {
-                    idxSubRegion2 = randomGenerator.nextInt(0, subRegionManager.getConeSubRegionsNum() - 1);
-                }
-            }
-
-            DoubleSolution selectedSolution = tourmentSelection(idxSubRegion1, idxSubRegion2);
-
-            boolean flag = true;
-            for (DoubleSolution s : parents) {
-                if (s == selectedSolution) {
-                    flag = false;
-                    break;
-                }
-            }
-            if (flag) {
-                parents.add(selectedSolution);
-            }
-        }
-        return parents;
-    }
+//    protected List<DoubleSolution> parentSelection(int idxSubRegion, int parentPoolSize) {
+//        List<DoubleSolution> parents = new ArrayList<>(parentPoolSize);
+//
+//        ConeSubRegion coneSubRegion = subRegionManager.getConeSubRegion(idxSubRegion);
+//        DoubleSolution solution = population.get(coneSubRegion.getIdxSolution());
+//        ConeSubRegion targetSubRegion = locateConeSubRegion(solution, utopianPoint, normIntercepts);
+//        if (targetSubRegion == coneSubRegion)
+//            parents.add(solution);
+//
+//        List<Integer> neighbors = coneSubRegion.getNeighbors();
+//        if (neighbors.size() < parentPoolSize + 1)
+//            matingType = MatingType.GLOBAL;
+//
+//        while (parents.size() < parentPoolSize) {
+//
+//            int idxSubRegion1;
+//            int idxSubRegion2;
+//            if (matingType == MatingType.NEIGHBOR) {
+//                int idx1 = randomGenerator.nextInt(0, neighbors.size() - 1);
+//                idxSubRegion1 = neighbors.get(idx1);
+//
+//                int idx2 = randomGenerator.nextInt(0, neighbors.size() - 1);
+//                idxSubRegion2 = neighbors.get(idx2);
+//
+//                while (idxSubRegion1 == idxSubRegion2) {
+//                    idx2 = randomGenerator.nextInt(0, neighbors.size() - 1);
+//                    idxSubRegion2 = neighbors.get(idx2);
+//                }
+//            } else {
+//                idxSubRegion1 = randomGenerator.nextInt(0, subRegionManager.getConeSubRegionsNum() - 1);
+//                idxSubRegion2 = randomGenerator.nextInt(0, subRegionManager.getConeSubRegionsNum() - 1);
+//
+//                while (idxSubRegion1 == idxSubRegion2) {
+//                    idxSubRegion2 = randomGenerator.nextInt(0, subRegionManager.getConeSubRegionsNum() - 1);
+//                }
+//            }
+//
+//            DoubleSolution selectedSolution = tourmentSelection(idxSubRegion1, idxSubRegion2);
+//
+//            boolean flag = true;
+//            for (DoubleSolution s : parents) {
+//                if (s == selectedSolution) {
+//                    flag = false;
+//                    break;
+//                }
+//            }
+//            if (flag) {
+//                parents.add(selectedSolution);
+//            }
+//        }
+//        return parents;
+//    }
 
     protected double[] computeDelta() {
         double[] ret = new double[3];
