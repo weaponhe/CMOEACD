@@ -70,7 +70,7 @@ public class MOEACDStudy {
         new ExecuteAlgorithms<>(experiment).run();
         long endTime = System.currentTimeMillis();
         System.out.println("程序运行时间：" + (endTime - startTime) / 1000 + "s");
-//        new ComputeQualityIndicators<>(experiment).run();
+        new ComputeQualityIndicators<>(experiment).run();
     }
 
     static public void initConfiguration() {
@@ -204,21 +204,21 @@ public class MOEACDStudy {
 //            }
 //        }
 
-        for (int run = 0; run < independentRuns; run++) {
-            for (int i = 0; i < problemList.size(); i++) {
-                int configIndex = objectiveNumberList.indexOf(problemList.get(i).getNumberOfObjectives());
-                String problemName = problemList.get(i).getName();
-                String problemSeriesName = problemName.substring(0, problemName.lastIndexOf("_"));
-                int maxGen = maxGenConfig.get(problemSeriesName)[configIndex];
-                Algorithm<List<DoubleSolution>> algorithm = (new MOEADBuilder(problemList.get(i), MOEADBuilder.Variant.ConstraintMOEAD))
-                        .setNumofDivision(numOfDivisionConfig[configIndex])
-                        .setIntegratedTau(integratedTausConfig[configIndex])
-                        .setPopulationSize(populationSizeConfig[configIndex])
-                        .setMaxGen(maxGen)
-                        .build();
-                algorithms.add(new TaggedAlgorithm<>(algorithm, "CMOEAD", problemList.get(i), run));
-            }
-        }
+//        for (int run = 0; run < independentRuns; run++) {
+//            for (int i = 0; i < problemList.size(); i++) {
+//                int configIndex = objectiveNumberList.indexOf(problemList.get(i).getNumberOfObjectives());
+//                String problemName = problemList.get(i).getName();
+//                String problemSeriesName = problemName.substring(0, problemName.lastIndexOf("_"));
+//                int maxGen = maxGenConfig.get(problemSeriesName)[configIndex];
+//                Algorithm<List<DoubleSolution>> algorithm = (new MOEADBuilder(problemList.get(i), MOEADBuilder.Variant.ConstraintMOEAD))
+//                        .setNumofDivision(numOfDivisionConfig[configIndex])
+//                        .setIntegratedTau(integratedTausConfig[configIndex])
+//                        .setPopulationSize(populationSizeConfig[configIndex])
+//                        .setMaxGen(maxGen)
+//                        .build();
+//                algorithms.add(new TaggedAlgorithm<>(algorithm, "CMOEAD", problemList.get(i), run));
+//            }
+//        }
         return algorithms;
     }
 }
