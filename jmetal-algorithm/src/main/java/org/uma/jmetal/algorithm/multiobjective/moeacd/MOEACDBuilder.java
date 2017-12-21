@@ -19,7 +19,9 @@ import java.util.List;
 public class MOEACDBuilder implements AlgorithmBuilder<AbstractMOEACD> {
     public enum Variant {
         MOEACD,
-        MOEACDUP2,
+        CMOEACD_CDP,
+        CMOEACD_SR,
+        CMOEACD_PF,
         MOEACDMeasure,
         MOEACDP, MOEACDPMeasure,
         MOEACDN, MOEACDNMeasure,
@@ -89,6 +91,7 @@ public class MOEACDBuilder implements AlgorithmBuilder<AbstractMOEACD> {
 
     protected int maxEvaluations;
     protected int maxGen;
+    protected double penaltyFactor;
 
     protected int numberOfThreads;
 
@@ -125,6 +128,7 @@ public class MOEACDBuilder implements AlgorithmBuilder<AbstractMOEACD> {
         measureManager = new MyAlgorithmMeasures<>();
         this.functionType = AbstractMOEAD.FunctionType.TCH;
         this.delta = new double[]{0.8, 0.1, 0.05, 0.05};
+        this.penaltyFactor = 0;
     }
 
     public AbstractMOEAD.FunctionType getFunctionType() {
@@ -151,6 +155,11 @@ public class MOEACDBuilder implements AlgorithmBuilder<AbstractMOEACD> {
 
     public MOEACDBuilder setMaxGen(int maxGen) {
         this.maxGen = maxGen;
+        return this;
+    }
+
+    public MOEACDBuilder setPenaltyFactor(double penaltyFactor) {
+        this.penaltyFactor = penaltyFactor;
         return this;
     }
 
@@ -321,10 +330,30 @@ public class MOEACDBuilder implements AlgorithmBuilder<AbstractMOEACD> {
     public AbstractMOEACD build() {
         AbstractMOEACD algorithm = null;
         if (moeacdVariant.equals(Variant.MOEACD)) {
+            algorithm = new MOEACD(measureManager, problem, numOfDivision, integratedTaus,
+                    populationSize, maxEvaluations, maxGen, neighborhoodSize,
+                    neighborhoodSelectionProbability,
+                    sbxCrossover, deCrossover, mutation, functionType);
+        } else if (moeacdVariant.equals(Variant.CMOEACD)) {
             algorithm = new CMOEACD(measureManager, problem, numOfDivision, integratedTaus,
                     populationSize, constraintLayerSize, maxEvaluations, maxGen, neighborhoodSize,
-                    neighborhoodSelectionProbability, functionType,
-                    sbxCrossover, deCrossover, mutation, delta);
+                    neighborhoodSelectionProbability,
+                    sbxCrossover, deCrossover, mutation, functionType, delta);
+        } else if (moeacdVariant.equals(Variant.CMOEACD_CDP)) {
+            algorithm = new CMOEACD_CDP(problem, numOfDivision, integratedTaus,
+                    populationSize, maxEvaluations, maxGen, neighborhoodSize,
+                    neighborhoodSelectionProbability,
+                    sbxCrossover, deCrossover, mutation, functionType);
+        } else if (moeacdVariant.equals(Variant.CMOEACD_SR)) {
+            algorithm = new CMOEACD_SR(problem, numOfDivision, integratedTaus,
+                    populationSize, maxEvaluations, maxGen, neighborhoodSize,
+                    neighborhoodSelectionProbability,
+                    sbxCrossover, deCrossover, mutation, functionType);
+        } else if (moeacdVariant.equals(Variant.CMOEACD_PF)) {
+            algorithm = new CMOEACD_PF(problem, numOfDivision, integratedTaus,
+                    populationSize, maxEvaluations, maxGen, neighborhoodSize,
+                    neighborhoodSelectionProbability,
+                    sbxCrossover, deCrossover, mutation, functionType, penaltyFactor);
         }
 //        else if(moeacdVariant.equals(Variant.MOEACDMeasure)) {
 //            algorithm = new MOEACD(measureManager,problem, numOfDivision, integratedTaus,

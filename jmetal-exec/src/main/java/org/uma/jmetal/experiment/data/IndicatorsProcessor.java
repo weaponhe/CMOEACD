@@ -2,10 +2,7 @@ package org.uma.jmetal.experiment.data;
 
 import org.uma.jmetal.solution.DoubleSolution;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 
 /**
@@ -22,6 +19,7 @@ public class IndicatorsProcessor {
         Map<String, Boolean> algorithms = new HashMap<>();
         Map<String, Boolean> problems = new HashMap<>();
         Map<Integer, Boolean> dimentions = new HashMap<>();
+
 
         //数据预处理
         for (int indicator = 0; indicator < indicators.length; indicator++) {
@@ -46,6 +44,14 @@ public class IndicatorsProcessor {
             break;
         }
 
+        //自定义算法列表
+        algorithms = new HashMap<>();
+        String[] algorithmNames = {"CMOEACD", "MOEACD-CDP", "MOEACD-SR"};
+        for (int i = 0; i < algorithmNames.length; i++) {
+            algorithms.put(algorithmNames[i], true);
+        }
+
+
         //数据读取
         Map<String, Map<String, Map<String, Map<Integer, List<Double>>>>> data = new HashMap<>();
         for (int indicator = 0; indicator < indicators.length; indicator++) {
@@ -55,12 +61,14 @@ public class IndicatorsProcessor {
                 for (String problem : problems.keySet()) {
                     data.get(indicators[indicator]).get(algorithm).put(problem, new HashMap<Integer, List<Double>>());
                     for (Integer dimention : dimentions.keySet()) {
-                        ArrayList<Double> array = readFileData(indicators[indicator], algorithm, problem, dimention);
-                        if (array.size() == 0) {
-                            System.out.println("all run no result");
-                        } else if (array.size() < runs) {
-                            System.out.println(algorithm + " " + problem + " " + dimention);
-                            System.out.println("some run no result");
+                        ArrayList<Double> array = new ArrayList<>();
+                        try {
+                            array = readFileData(indicators[indicator], algorithm, problem, dimention);
+                        } catch (FileNotFoundException e) {
+                            System.out.println("[" + algorithm + " " + problem + " " + dimention + "]: all run no result");
+                        }
+                        if (array.size() < runs && array.size() > 0) {
+                            System.out.println("[" + algorithm + " " + problem + " " + dimention + "]: some run no result");
                         }
                         data.get(indicators[indicator]).get(algorithm).get(problem).put(dimention, array);
                     }
@@ -103,6 +111,18 @@ public class IndicatorsProcessor {
                         Double bestValue = Double.MAX_VALUE;
                         for (String algorithm : algorithms.keySet()) {
                             List<Double> array = data.get(indicators[indicator]).get(algorithm).get(problem).get(dimention);
+
+                            //处理不完整数据
+                            if (array.size() == 0) {
+                                //Best/Median/Worst都是—
+                                System.out.print("-" + "\t");
+                                continue;
+                            } else if (array.size() < runs && count == 2) {
+                                //Worst为-
+                                System.out.print("-" + "\t");
+                                continue;
+                            }
+
                             Double value = 0.0;
                             if (count == 0) {
                                 value = getBest(array);

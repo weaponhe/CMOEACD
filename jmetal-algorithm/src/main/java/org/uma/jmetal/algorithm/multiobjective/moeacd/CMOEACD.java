@@ -24,7 +24,6 @@ public class CMOEACD extends MOEACD {
     protected double firstLayerFR;
     protected double[] delta;
     protected int constraintLayerSize;
-    protected int maxGen;
 
     protected enum ComparisonMethod {
         CDP,
@@ -32,7 +31,6 @@ public class CMOEACD extends MOEACD {
     }
 
     ;
-    protected AbstractMOEAD.FunctionType functionType;
 
     public CMOEACD(Problem<DoubleSolution> problem,
                    int[] arrayH,
@@ -43,20 +41,18 @@ public class CMOEACD extends MOEACD {
                    int maxGen,
                    int neighborhoodSize,
                    double neighborhoodSelectionProbability,
-                   AbstractMOEAD.FunctionType functionType,
                    SBXCrossover sbxCrossoverOperator,
                    DifferentialEvolutionCrossover deCrossoverOperator,
                    MutationOperator<DoubleSolution> mutation,
+                   AbstractMOEAD.FunctionType functionType,
                    double[] delta
     ) {
         super(problem, arrayH, integratedTaus,
-                populationSize, maxEvaluations, neighborhoodSize,
+                populationSize, maxEvaluations, maxGen, neighborhoodSize,
                 neighborhoodSelectionProbability,
-                sbxCrossoverOperator, deCrossoverOperator, mutation);
+                sbxCrossoverOperator, deCrossoverOperator, mutation, functionType);
         evolvingIdxList = new ArrayList<>(2 * populationSize);
-        this.maxGen = maxGen;
         this.constraintLayerSize = constraintLayerSize;
-        this.functionType = functionType;
         this.delta = delta;
         subPlaneIdealPointList = new ArrayList<>(populationSize);
         for (int i = 0; i < populationSize; i++) {
@@ -79,20 +75,19 @@ public class CMOEACD extends MOEACD {
                    int maxGen,
                    int neighborhoodSize,
                    double neighborhoodSelectionProbability,
-                   AbstractMOEAD.FunctionType functionType,
                    SBXCrossover sbxCrossoverOperator,
                    DifferentialEvolutionCrossover deCrossoverOperator,
                    MutationOperator<DoubleSolution> mutation,
+                   AbstractMOEAD.FunctionType functionType,
                    double[] delta
     ) {
         super(measureManager, problem, arrayH, integratedTaus,
-                populationSize, maxEvaluations, neighborhoodSize,
+                populationSize, maxEvaluations, maxGen, neighborhoodSize,
                 neighborhoodSelectionProbability,
-                sbxCrossoverOperator, deCrossoverOperator, mutation);
+                sbxCrossoverOperator, deCrossoverOperator, mutation, functionType);
         evolvingIdxList = new ArrayList<>(2 * populationSize);
         this.maxGen = maxGen;
         this.constraintLayerSize = constraintLayerSize;
-        this.functionType = functionType;
         this.delta = delta;
         subPlaneIdealPointList = new ArrayList<>(populationSize);
         for (int i = 0; i < populationSize; i++) {
@@ -135,10 +130,10 @@ public class CMOEACD extends MOEACD {
                 boolean isUpdated = updatePopulation(child, idealPoint, utopianPoint, normIntercepts);
                 collectForAdaptiveCrossover(isUpdated);
             }
-//            initializeNadirPoint(population, nadirPoint);
-//            if (gen % updateInterval == 0)
-//                updateIntercepts(population, intercepts, utopianPoint, nadirPoint);
-//            updateNormIntercepts(normIntercepts, utopianPoint, intercepts);
+            initializeNadirPoint(population, nadirPoint);
+            if (gen % updateInterval == 0)
+                updateIntercepts(population, intercepts, utopianPoint, nadirPoint);
+            updateNormIntercepts(normIntercepts, utopianPoint, intercepts);
             updateAdaptiveCrossover();
 
             gen++;
@@ -413,19 +408,15 @@ public class CMOEACD extends MOEACD {
         return isUpdated;
     }
 
-
-    protected boolean isFessible(DoubleSolution solution) {
-        return (double) solution.getAttribute("overallConstraintViolationDegree") >= 0;
-    }
-
     protected DoubleSolution getBetterSolution(DoubleSolution newSolution, DoubleSolution storedSolution, ConeSubRegion targetSubRegion, ComparisonMethod method) {
         if (method == ComparisonMethod.CDP) {
-            int domination = MOEACDUtils.constraintDominateCompare(newSolution, storedSolution);
-            if (domination == -1) {
-                return newSolution;
-            } else {
-                return storedSolution;
-            }
+            return getBetterSolutionByIndicatorUnConstraint(newSolution, storedSolution, targetSubRegion.getRefDirection(), utopianPoint, normIntercepts, beta_ConeUpdate);
+//            int domination = MOEACDUtils.constraintDominateCompare(newSolution, storedSolution);
+//            if (domination == -1) {
+//                return newSolution;
+//            } else {
+//                return storedSolution;
+//            }
         } else {
             double newArea = calcConicalArea(constraintLayerSize, newSolution, targetSubRegion.getRefDirection());
             double oldArea = calcConicalArea(constraintLayerSize, storedSolution, targetSubRegion.getRefDirection());
@@ -480,64 +471,6 @@ public class CMOEACD extends MOEACD {
         ret[1] = this.delta[0] + delta[1];
         ret[2] = this.delta[0] + delta[1] + delta[2];
         return ret;
-    }
-
-    double fitnessFunction(Solution individual, double[] lambda) throws JMetalException {
-        double fitness;
-
-
-        if (MOEAD.FunctionType.TCH.equals(functionType)) {
-            double maxFun = -1.0e+30;
-
-            for (int n = 0; n < problem.getNumberOfObjectives(); n++) {
-                double diff = Math.abs(individual.getObjective(n) - idealPoint[n]);
-
-                double feval;
-                if (Math.abs(lambda[n]) < Constant.TOLERATION) {
-                    feval = 0.0001 * diff;
-                } else {
-                    feval = diff * lambda[n];
-                }
-
-                if (feval > maxFun) {
-                    maxFun = feval;
-                }
-            }
-
-            fitness = maxFun;
-        } else if (MOEAD.FunctionType.AGG.equals(functionType)) {
-            double sum = 0.0;
-            for (int n = 0; n < problem.getNumberOfObjectives(); n++) {
-                sum += (lambda[n]) * (individual.getObjective(n) - idealPoint[n]);
-            }
-
-            fitness = sum;
-
-        } else if (MOEAD.FunctionType.PBI.equals(functionType)) {
-            double d1, d2, nl;
-            double theta = 5.0;
-
-            d1 = d2 = nl = 0.0;
-
-            for (int i = 0; i < problem.getNumberOfObjectives(); i++) {
-                d1 += (individual.getObjective(i) - idealPoint[i]) * lambda[i];
-                nl += Math.pow(lambda[i], 2.0);
-            }
-            nl = Math.sqrt(nl);
-            if (nl < 1e-10)
-                nl = 1e-10;
-            d1 = Math.abs(d1) / nl;
-
-            for (int i = 0; i < problem.getNumberOfObjectives(); i++) {
-                d2 += Math.pow((individual.getObjective(i) - idealPoint[i]) - d1 * (lambda[i] / nl), 2.0);
-            }
-            d2 = Math.sqrt(d2);
-
-            fitness = (d1 + theta * d2);
-        } else {
-            throw new JMetalException(" MOEAD.fitnessFunction: unknown type " + functionType);
-        }
-        return fitness;
     }
 
 

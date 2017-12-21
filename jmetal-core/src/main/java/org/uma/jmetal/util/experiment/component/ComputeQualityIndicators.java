@@ -101,12 +101,16 @@ public class ComputeQualityIndicators<Result> implements ExperimentComponent {
                         } catch (IOException e) {
                             continue;
                         }
-                        Front normalizedFront = frontNormalizer.normalize(front);
-                        List<DoubleSolution> normalizedPopulation = FrontUtils.convertFrontToSolutionList(normalizedFront);
-                        Double indicatorValue = (Double) indicator.evaluate(normalizedPopulation);
-                        JMetalLogger.logger.info(indicator.getName() + ": " + indicatorValue);
+                        try {
+                            Front normalizedFront = frontNormalizer.normalize(front);
+                            List<DoubleSolution> normalizedPopulation = FrontUtils.convertFrontToSolutionList(normalizedFront);
+                            Double indicatorValue = (Double) indicator.evaluate(normalizedPopulation);
+                            JMetalLogger.logger.info(indicator.getName() + ": " + indicatorValue);
+                            writeQualityIndicatorValueToFile(indicatorValue, qualityIndicatorFile);
+                        } catch (Exception e) {
+                            continue;
+                        }
 
-                        writeQualityIndicatorValueToFile(indicatorValue, qualityIndicatorFile);
                     }
                 }
             }
