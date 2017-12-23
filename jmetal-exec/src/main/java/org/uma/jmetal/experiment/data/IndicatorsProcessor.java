@@ -46,7 +46,30 @@ public class IndicatorsProcessor {
 
         //自定义算法列表
         algorithms = new HashMap<>();
-        String[] algorithmNames = {"CMOEACD", "MOEACD-CDP", "MOEACD-SR"};
+        String[] algorithmNames = {
+                "CMOEACD",
+                "CMOEACD-CDP",
+                "CMOEACD-SR"
+//                "CMOEACD-PF(1)",
+//                "CMOEACD-PF(2)",
+//                "CMOEACD-PF(3)",
+//                "CMOEACD-PF(4)",
+//                "CMOEACD-PF(5)",
+//                "CMOEACD-PF(6)",
+//                "CMOEACD-PF(7)",
+//                "CMOEACD-PF(8)",
+//                "CMOEACD-PF(9)",
+//                "CMOEACD-PF(10)",
+//                "CMOEACD(3)",
+//                "CMOEACD(4)",
+//                "CMOEACD(5)",
+//                "CMOEACD(6)",
+//                "CMOEACD(7)",
+//                "CMOEACD(8)",
+//                "CMOEACD(9)",
+//                "CMOEACD(10)",
+//                "CMOEACD(11)"
+        };
         for (int i = 0; i < algorithmNames.length; i++) {
             algorithms.put(algorithmNames[i], true);
         }
@@ -82,13 +105,15 @@ public class IndicatorsProcessor {
             System.out.println(indicators[indicator]);
             System.out.print("Test Instance\t");
             System.out.print("m\t");
-            for (String algorithm : algorithms.keySet()) {
+//            for (String algorithm : algorithms.keySet()) {
+            for (String algorithm : algorithmNames) {
                 System.out.print(String.format("%s\t", algorithm));
             }
             System.out.print("\n");
 
             Map<String, Integer> bestCountMap = new HashMap<>();
-            for (String algorithm : algorithms.keySet()) {
+//            for (String algorithm : algorithms.keySet()) {
+            for (String algorithm : algorithmNames) {
                 bestCountMap.put(algorithm, 0);
             }
             for (String problem : problems.keySet()) {
@@ -145,7 +170,8 @@ public class IndicatorsProcessor {
                 }
             }
             System.out.print("\t\t");
-            for (String algorithm : algorithms.keySet()) {
+//            for (String algorithm : algorithms.keySet()) {
+            for (String algorithm : algorithmNames) {
                 System.out.print(bestCountMap.get(algorithm) + "\t");
             }
             System.out.print("\n");

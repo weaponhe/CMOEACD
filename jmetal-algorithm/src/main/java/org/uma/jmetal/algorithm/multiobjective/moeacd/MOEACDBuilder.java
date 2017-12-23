@@ -19,7 +19,9 @@ import java.util.List;
 public class MOEACDBuilder implements AlgorithmBuilder<AbstractMOEACD> {
     public enum Variant {
         MOEACD,
+        CMOEACD_CL_CDP,
         CMOEACD_CDP,
+        CMOEACD_CDP2,
         CMOEACD_SR,
         CMOEACD_PF,
         MOEACDMeasure,
@@ -339,8 +341,18 @@ public class MOEACDBuilder implements AlgorithmBuilder<AbstractMOEACD> {
                     populationSize, constraintLayerSize, maxEvaluations, maxGen, neighborhoodSize,
                     neighborhoodSelectionProbability,
                     sbxCrossover, deCrossover, mutation, functionType, delta);
+        } else if (moeacdVariant.equals(Variant.CMOEACD_CL_CDP)) {
+            algorithm = new CMOEACD_CL_CDP(problem, numOfDivision, integratedTaus,
+                    populationSize, constraintLayerSize, maxEvaluations, maxGen, neighborhoodSize,
+                    neighborhoodSelectionProbability,
+                    sbxCrossover, deCrossover, mutation, functionType, delta);
         } else if (moeacdVariant.equals(Variant.CMOEACD_CDP)) {
             algorithm = new CMOEACD_CDP(problem, numOfDivision, integratedTaus,
+                    populationSize, maxEvaluations, maxGen, neighborhoodSize,
+                    neighborhoodSelectionProbability,
+                    sbxCrossover, deCrossover, mutation, functionType);
+        } else if (moeacdVariant.equals(Variant.CMOEACD_CDP2)) {
+            algorithm = new CMOEACD_CDP2(problem, numOfDivision, integratedTaus,
                     populationSize, maxEvaluations, maxGen, neighborhoodSize,
                     neighborhoodSelectionProbability,
                     sbxCrossover, deCrossover, mutation, functionType);

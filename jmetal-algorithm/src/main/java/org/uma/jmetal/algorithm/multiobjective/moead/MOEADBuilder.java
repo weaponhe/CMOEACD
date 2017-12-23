@@ -457,7 +457,9 @@ public class MOEADBuilder implements AlgorithmBuilder<AbstractMOEAD<DoubleSoluti
                 algorithm = new MOEADAGRNMeasure(problem, populationSize, resultPopulationSize, maxEvaluations, crossover, mutation,
                         functionType, numOfDivision, integratedTau, neighborhoodSelectionProbability,
                         maximumNumberOfReplacedSolutions, neighborSize);
-            } else if (moeadVariant.equals(Variant.CMOEADD)) {
+            }
+            //CMOEADD
+            else if (moeadVariant.equals(Variant.CMOEADD)) {
                 algorithm = new CMOEADD(problem, populationSize, resultPopulationSize, maxEvaluations, crossover, mutation,
                         functionType, numOfDivision, integratedTau, neighborhoodSelectionProbability,
                         maximumNumberOfReplacedSolutions, neighborSize);

@@ -33,34 +33,30 @@ public class CMOEACD_CDP extends MOEACD {
 
     @Override
     protected DoubleSolution getBetterSolutionByIndicator(DoubleSolution newSolution, DoubleSolution storedSolution, ConeSubRegion coneSubRegion, double[] utopianPoint, double[] normIntercepts) {
-        return this.getBetterSolutionByIndicatorConstraint(newSolution, storedSolution, coneSubRegion.getRefDirection(), utopianPoint, normIntercepts, beta_ConeUpdate);
+        return getBetterSolutionByIndicator(newSolution, storedSolution, coneSubRegion);
     }
 
-    protected DoubleSolution getBetterSolutionByIndicatorConstraint(DoubleSolution newSolution, DoubleSolution storedSolution, double[] refDirection, double[] utopianPoint, double[] normIntercepts, double beta) {
-        if (isFessible(newSolution) && isFessible(storedSolution)) {
-            if (fitnessFunction(newSolution, refDirection) < fitnessFunction(storedSolution, refDirection)) {
-                return newSolution;
-            } else {
-                return storedSolution;
-            }
-        } else if (isFessible(newSolution) && !isFessible(storedSolution)) {
+    protected DoubleSolution getBetterSolutionByIndicator(DoubleSolution newSolution, DoubleSolution storedSolution, ConeSubRegion coneSubRegion) {
+        boolean newFessible = isFessible(newSolution);
+        boolean storeFessible = isFessible(storedSolution);
+        if (newFessible && storeFessible) {
+            double newFun = fitnessFunction(newSolution, coneSubRegion.getRefDirection());
+            double storeFun = fitnessFunction(newSolution, coneSubRegion.getRefDirection());
+            return newFun < storeFun ? newSolution : storedSolution;
+        } else if (newFessible) {
             return newSolution;
-        } else if (!isFessible(newSolution) && isFessible(storedSolution)) {
+        } else if (storeFessible) {
             return storedSolution;
         } else {
-            double newCV = Math.abs((double) newSolution.getAttribute("overallConstraintViolationDegree"));
-            double storeCV = Math.abs((double) storedSolution.getAttribute("overallConstraintViolationDegree"));
-            return newCV < storeCV ? newSolution : storedSolution;
+            double newCV = getOverallConstraintViolationDegree(newSolution);
+            double storedCV = getOverallConstraintViolationDegree(storedSolution);
+            return newCV < storedCV ? newSolution : storedSolution;
         }
-    }
-
-    protected boolean isFessible(DoubleSolution solution) {
-        return (double) solution.getAttribute("overallConstraintViolationDegree") >= 0;
     }
 
     @Override
     public String getName() {
-        return "MOEA/CD-CDP";
+        return "CMOEA/CD-CDP";
     }
 
     @Override

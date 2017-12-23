@@ -22,8 +22,8 @@ import java.util.Vector;
 /**
  * Created by X250 on 2016/9/4.
  */
-public class CMOEADD extends MOEADD{
-    public NumberOfViolatedConstraints<DoubleSolution> numberOfViolatedConstraints ;
+public class CMOEADD extends MOEADD {
+    public NumberOfViolatedConstraints<DoubleSolution> numberOfViolatedConstraints;
 
     public CMOEADD(Problem<DoubleSolution> problem,
                    int populationSize,
@@ -41,7 +41,7 @@ public class CMOEADD extends MOEADD{
                 neighborSize);
 
         differentialEvolutionCrossover = (DifferentialEvolutionCrossover) crossoverOperator;
-        numberOfViolatedConstraints = new NumberOfViolatedConstraints<DoubleSolution>() ;
+        numberOfViolatedConstraints = new NumberOfViolatedConstraints<DoubleSolution>();
     }
 
     public CMOEADD(Problem<DoubleSolution> problem,
@@ -57,23 +57,24 @@ public class CMOEADD extends MOEADD{
                    int maximumNumberOfReplacedSolutions,
                    int neighborSize) {
         super(problem, populationSize, resultPopulationSize, maxEvaluations, crossover, mutation, functionType,
-                arrayH,integratedTau, neighborhoodSelectionProbability, maximumNumberOfReplacedSolutions,
+                arrayH, integratedTau, neighborhoodSelectionProbability, maximumNumberOfReplacedSolutions,
                 neighborSize);
 
         differentialEvolutionCrossover = (DifferentialEvolutionCrossover) crossoverOperator;
-        numberOfViolatedConstraints = new NumberOfViolatedConstraints<DoubleSolution>() ;
+        numberOfViolatedConstraints = new NumberOfViolatedConstraints<DoubleSolution>();
 
     }
 
-    @Override public void run() {
-        initializePopulation() ;
+    @Override
+    public void run() {
+        initializePopulation();
         initializeUniformWeight();
         initializeNeighborhood();
-        initializeIdealPoint() ;
+        initializeIdealPoint();
         initializeNadirPoint();
 
 
-             // initialize the distance
+        // initialize the distance
         for (int i = 0; i < populationSize; i++) {
             double distance = calculateDistance2(population.get(i), lambda[i]);
             subregionDist[i][i] = distance;
@@ -88,8 +89,8 @@ public class CMOEADD extends MOEADD{
             rankIdx[curRank][i] = 1;
         }
 
-        evaluations = populationSize ;
-
+        evaluations = populationSize;
+        int gen = 0;
         do {
             int[] permutation = new int[populationSize];
             MOEADUtils.randomPermutation(permutation, populationSize);
@@ -97,8 +98,8 @@ public class CMOEADD extends MOEADD{
             for (int i = 0; i < populationSize && evaluations < maxEvaluations; i++) {
                 int subProblemId = permutation[i];
 
-                NeighborType neighborType = chooseNeighborType() ;
-                List<DoubleSolution> parents = parentSelection(subProblemId, neighborType) ;
+                NeighborType neighborType = chooseNeighborType();
+                List<DoubleSolution> parents = parentSelection(subProblemId, neighborType);
 
                 differentialEvolutionCrossover.setCurrentSolution(population.get(subProblemId));
                 List<DoubleSolution> children = differentialEvolutionCrossover.execute(parents);
@@ -116,7 +117,7 @@ public class CMOEADD extends MOEADD{
 //                ((ConstrainedProblem<DoubleSolution>) problem).evaluateConstraints(child2);
 
 
-                evaluations+=1;
+                evaluations += 1;
 
                 updateIdealPoint(child1);
 //                updateIdealPoint(child2);
@@ -127,12 +128,13 @@ public class CMOEADD extends MOEADD{
                 updateArchive(child1);
 //                updateArchive(child2);
             }
-        } while (evaluations < maxEvaluations);
+            gen++;
+        } while (gen < maxGen);
     }
 
     protected void initializePopulation() {
         for (int i = 0; i < populationSize; i++) {
-            DoubleSolution newSolution = (DoubleSolution)problem.createSolution();
+            DoubleSolution newSolution = (DoubleSolution) problem.createSolution();
 
             problem.evaluate(newSolution);
             ((ConstrainedProblem<DoubleSolution>) problem).evaluateConstraints(newSolution);
@@ -157,7 +159,7 @@ public class CMOEADD extends MOEADD{
         } else {
             List<DoubleSolution> lastFront = new ArrayList<DoubleSolution>(populationSize);
             int frontSize = countRankOnes(numRanks - 1);
-            if (frontSize == 0)	{	// the last non-domination level only contains 'indiv'
+            if (frontSize == 0) {    // the last non-domination level only contains 'indiv'
                 frontSize++;
                 lastFront.add(indiv);
             } else {
@@ -171,35 +173,35 @@ public class CMOEADD extends MOEADD{
                 }
             }
 
-            if (frontSize == 1 && lastFront.get(0).equals(indiv)) {	// the last non-domination level only has 'indiv'
+            if (frontSize == 1 && lastFront.get(0).equals(indiv)) {    // the last non-domination level only has 'indiv'
                 int curNC = countOnes(location);
-                if (curNC > 0) {	// if the subregion of 'indiv' has other solution, drop 'indiv'
+                if (curNC > 0) {    // if the subregion of 'indiv' has other solution, drop 'indiv'
                     nondominated_sorting_delete(indiv);
                     return;
-                } else {	// if the subregion of 'indiv' has no solution, keep 'indiv'
+                } else {    // if the subregion of 'indiv' has no solution, keep 'indiv'
                     deleteCrowdRegion1(indiv, location);
                 }
             } else if (frontSize == 1 && !lastFront.get(0).equals(indiv)) { // the last non-domination level only has one solution, but not 'indiv'
-                int targetIdx 	   = findPosition(lastFront.get(0));
+                int targetIdx = findPosition(lastFront.get(0));
                 int parentLocation = findRegion(targetIdx);
-                int curNC		   = countOnes(parentLocation);
+                int curNC = countOnes(parentLocation);
                 if (parentLocation == location)
                     curNC++;
 
-                if (curNC == 1) {	// the subregion only has the solution 'targetIdx', keep solution 'targetIdx'
+                if (curNC == 1) {    // the subregion only has the solution 'targetIdx', keep solution 'targetIdx'
                     deleteCrowdRegion2(indiv, location);
-                } else {	// the subregion contains some other solutions, drop solution 'targetIdx'
-                    int indivRank  = ranking.getAttribute(indiv);
+                } else {    // the subregion contains some other solutions, drop solution 'targetIdx'
+                    int indivRank = ranking.getAttribute(indiv);
                     int targetRank = ranking.getAttribute(population.get(targetIdx));
                     rankIdx[targetRank][targetIdx] = 0;
-                    rankIdx[indivRank][targetIdx]  = 1;
+                    rankIdx[indivRank][targetIdx] = 1;
 
                     DoubleSolution targetSol = (DoubleSolution) population.get(targetIdx).copy();
 
 //                    population.set(targetIdx, indiv);
-                    replace(targetIdx,indiv);
+                    replace(targetIdx, indiv);
                     subregionIdx[parentLocation][targetIdx] = 0;
-                    subregionIdx[location][targetIdx]  	    = 1;
+                    subregionIdx[location][targetIdx] = 1;
 
                     // update the non-domination level structure
                     nondominated_sorting_delete(targetSol);
@@ -208,7 +210,7 @@ public class CMOEADD extends MOEADD{
                 double indivFitness = fitnessFunction(indiv, lambda[location]);
 
                 // find the index of the solution in the last non-domination level, and its corresponding subregion
-                int[] idxArray    = new int[frontSize];
+                int[] idxArray = new int[frontSize];
                 int[] regionArray = new int[frontSize];
 
                 for (int i = 0; i < frontSize; i++) {
@@ -255,7 +257,7 @@ public class CMOEADD extends MOEADD{
                         if (curIdx == location)
                             curFitness = curFitness + indivFitness;
                         if (curFitness > sumFitness) {
-                            crowdIdx   = curIdx;
+                            crowdIdx = curIdx;
                             sumFitness = curFitness;
                         }
                     }
@@ -287,7 +289,7 @@ public class CMOEADD extends MOEADD{
                             else
                                 curFitness = fitnessFunction(population.get(idxArray[curIdx]), lambda[crowdIdx]);
                             if (curFitness > maxFitness) {
-                                targetIdx  = curIdx;
+                                targetIdx = curIdx;
                                 maxFitness = curFitness;
                             }
                         }
@@ -295,15 +297,15 @@ public class CMOEADD extends MOEADD{
                             nondominated_sorting_delete(indiv);
                             return;
                         } else {
-                            int indivRank  = ranking.getAttribute(indiv);
+                            int indivRank = ranking.getAttribute(indiv);
                             int targetRank = ranking.getAttribute(population.get(idxArray[targetIdx]));
                             rankIdx[targetRank][idxArray[targetIdx]] = 0;
-                            rankIdx[indivRank][idxArray[targetIdx]]  = 1;
+                            rankIdx[indivRank][idxArray[targetIdx]] = 1;
 
                             DoubleSolution targetSol = (DoubleSolution) population.get(idxArray[targetIdx]).copy();
 
 //                            population.set(idxArray[targetIdx], indiv);
-                            replace(idxArray[targetIdx],indiv);
+                            replace(idxArray[targetIdx], indiv);
                             subregionIdx[crowdIdx][idxArray[targetIdx]] = 0;
                             subregionIdx[location][idxArray[targetIdx]] = 1;
 
@@ -319,7 +321,7 @@ public class CMOEADD extends MOEADD{
 
     }
 
-//
+    //
     public void updateArchive(DoubleSolution indiv) {
 
         // find the location of 'indiv'
@@ -336,7 +338,7 @@ public class CMOEADD extends MOEADD{
             }
         }
 
-        if (Math.abs(overallConstraintViolationDegree.getAttribute(indiv)) <= 0.0) {	// indiv is feasible
+        if (Math.abs(overallConstraintViolationDegree.getAttribute(indiv)) <= 0.0) {    // indiv is feasible
             if (num_infeasible == 0) { // all solutions are feasible
                 originalUpdate(indiv, location);
             } else {
@@ -344,31 +346,31 @@ public class CMOEADD extends MOEADD{
                 // get indiv's non-domination level
                 nondominated_sorting_add(indiv);
 
-                int singleTargetIdx   = infeasibleList.get(0);
+                int singleTargetIdx = infeasibleList.get(0);
                 int multipleTargetIdx = singleTargetIdx;
-                int targetRegion 	  = findRegion(singleTargetIdx);
+                int targetRegion = findRegion(singleTargetIdx);
 
                 int flag = 0;
                 if (countOnes(targetRegion) > 1)
                     flag = 1;
 
                 double multipleMax = Math.abs(overallConstraintViolationDegree.getAttribute(population.get(multipleTargetIdx)));
-                double singleMax   = multipleMax;
+                double singleMax = multipleMax;
                 for (int i = 1; i < num_infeasible; i++) {
-                    int curIdx    = infeasibleList.get(i);
+                    int curIdx = infeasibleList.get(i);
                     int curRegion = findRegion(curIdx);
                     double curCV;
                     if (countOnes(curRegion) > 1) {
                         flag = 1;
                         curCV = Math.abs(overallConstraintViolationDegree.getAttribute(population.get(curIdx)));
                         if (curCV > multipleMax) {
-                            multipleMax       = curCV;
+                            multipleMax = curCV;
                             multipleTargetIdx = curIdx;
                         }
                     } else {
                         curCV = Math.abs(overallConstraintViolationDegree.getAttribute(population.get(curIdx)));
                         if (curCV > singleMax) {
-                            singleMax       = curCV;
+                            singleMax = curCV;
                             singleTargetIdx = curIdx;
                         }
                     }
@@ -376,18 +378,18 @@ public class CMOEADD extends MOEADD{
                 if (flag == 1) {
                     targetRegion = findRegion(multipleTargetIdx);
 //                    population.set(multipleTargetIdx, indiv);
-                    replace(multipleTargetIdx,indiv);
+                    replace(multipleTargetIdx, indiv);
                     subregionIdx[targetRegion][multipleTargetIdx] = 0;
-                    subregionIdx[location][multipleTargetIdx]  	  = 1;
+                    subregionIdx[location][multipleTargetIdx] = 1;
 //
 
                 } else {
                     targetRegion = findRegion(singleTargetIdx);
 
 //                    population.set(singleTargetIdx, indiv);
-                    replace(singleTargetIdx,indiv);
+                    replace(singleTargetIdx, indiv);
                     subregionIdx[targetRegion][singleTargetIdx] = 0;
-                    subregionIdx[location][singleTargetIdx]  	= 1;
+                    subregionIdx[location][singleTargetIdx] = 1;
 
                 }
             }
@@ -439,7 +441,7 @@ public class CMOEADD extends MOEADD{
 
                         targetRegion = findRegion(multipleTargetIdx);
 //                        population.set(multipleTargetIdx, indiv);
-                        replace(multipleTargetIdx,indiv);
+                        replace(multipleTargetIdx, indiv);
                         subregionIdx[targetRegion][multipleTargetIdx] = 0;
                         subregionIdx[location][multipleTargetIdx] = 1;
 //
@@ -451,7 +453,7 @@ public class CMOEADD extends MOEADD{
 
                         targetRegion = findRegion(singleTargetIdx);
 //                        population.set(singleTargetIdx, indiv);
-                        replace(singleTargetIdx,indiv);
+                        replace(singleTargetIdx, indiv);
                         subregionIdx[targetRegion][singleTargetIdx] = 0;
                         subregionIdx[location][singleTargetIdx] = 1;
 
@@ -562,48 +564,48 @@ public class CMOEADD extends MOEADD{
      * @param neighbourType
      * @return
      */
-    public  List<Integer> matingSelection(int subproblemId, NeighborType neighbourType) {
-        List<Integer> listOfSolutions = new ArrayList<>(2) ;
+    public List<Integer> matingSelection(int subproblemId, NeighborType neighbourType) {
+        List<Integer> listOfSolutions = new ArrayList<>(2);
 
         int nLength = neighborhood[subproblemId].length;
 
-        if (neighbourType ==  NeighborType.NEIGHBOR) {
-            int idx1 = neighborhood[subproblemId][randomGenerator.nextInt(0,nLength-1)];
-            int idx2 = neighborhood[subproblemId][randomGenerator.nextInt(0,nLength - 1)];
-            while (idx1 == idx2){
-                idx2 = neighborhood[subproblemId][randomGenerator.nextInt(0,nLength - 1)];
+        if (neighbourType == NeighborType.NEIGHBOR) {
+            int idx1 = neighborhood[subproblemId][randomGenerator.nextInt(0, nLength - 1)];
+            int idx2 = neighborhood[subproblemId][randomGenerator.nextInt(0, nLength - 1)];
+            while (idx1 == idx2) {
+                idx2 = neighborhood[subproblemId][randomGenerator.nextInt(0, nLength - 1)];
             }
-            int p1 = tournamentSelection(idx1,idx2);
+            int p1 = tournamentSelection(idx1, idx2);
 
-            int p2 =0;
+            int p2 = 0;
             do {
                 idx1 = neighborhood[subproblemId][randomGenerator.nextInt(0, nLength - 1)];
                 idx2 = neighborhood[subproblemId][randomGenerator.nextInt(0, nLength - 1)];
                 while (idx1 == idx2) {
                     idx2 = neighborhood[subproblemId][randomGenerator.nextInt(0, nLength - 1)];
                 }
-                p2 = tournamentSelection(idx1,idx2);
-            }while (p1==p2);
+                p2 = tournamentSelection(idx1, idx2);
+            } while (p1 == p2);
 
             listOfSolutions.add(p1);
             listOfSolutions.add(p2);
         } else {
-            int idx1 = randomGenerator.nextInt(0,populationSize-1);
-            int idx2 = randomGenerator.nextInt(0,populationSize-1);
-            while (idx1 == idx2){
-                idx2 = randomGenerator.nextInt(0,populationSize-1);
+            int idx1 = randomGenerator.nextInt(0, populationSize - 1);
+            int idx2 = randomGenerator.nextInt(0, populationSize - 1);
+            while (idx1 == idx2) {
+                idx2 = randomGenerator.nextInt(0, populationSize - 1);
             }
-            int p1 = tournamentSelection(idx1,idx2);
+            int p1 = tournamentSelection(idx1, idx2);
 
-            int p2 =0;
+            int p2 = 0;
             do {
-                idx1 = randomGenerator.nextInt(0,populationSize-1);
-                idx2 = randomGenerator.nextInt(0,populationSize-1);
+                idx1 = randomGenerator.nextInt(0, populationSize - 1);
+                idx2 = randomGenerator.nextInt(0, populationSize - 1);
                 while (idx1 == idx2) {
-                    idx2 = randomGenerator.nextInt(0,populationSize-1);
+                    idx2 = randomGenerator.nextInt(0, populationSize - 1);
                 }
-                p2 = tournamentSelection(idx1,idx2);
-            }while (p1==p2);
+                p2 = tournamentSelection(idx1, idx2);
+            } while (p1 == p2);
 
             listOfSolutions.add(p1);
             listOfSolutions.add(p2);
@@ -624,12 +626,12 @@ public class CMOEADD extends MOEADD{
         return listOfSolutions;
     } // matingSelection
 
-    public int tournamentSelection(int idx1,int idx2){
+    public int tournamentSelection(int idx1, int idx2) {
         DoubleSolution ind1 = population.get(idx1);
         DoubleSolution ind2 = population.get(idx2);
         double cv1 = Math.abs(overallConstraintViolationDegree.getAttribute(ind1));
         double cv2 = Math.abs(overallConstraintViolationDegree.getAttribute(ind2));
-        if(cv1 <= 0.0 && cv2 <= 0.0) {
+        if (cv1 <= 0.0 && cv2 <= 0.0) {
             switch (checkDominance(ind1, ind2)) {
                 case 1:
                     return idx1;
@@ -642,10 +644,9 @@ public class CMOEADD extends MOEADD{
                         return idx2;
                 }
             }
-        }
-        else if(cv1 < cv2)
+        } else if (cv1 < cv2)
             return idx1;
-        else if(cv1 > cv2)
+        else if (cv1 > cv2)
             return idx2;
 
         if (randomGenerator.nextDouble() < 0.5)
@@ -654,12 +655,14 @@ public class CMOEADD extends MOEADD{
     }
 
 
-    @Override public String getName() {
-        return "CMOEADD" ;
+    @Override
+    public String getName() {
+        return "CMOEADD";
     }
 
-    @Override public String getDescription() {
-        return "Multi-Objective Evolutionary Algorithm based on Decomposition,  Version with Dominance Concept" ;
+    @Override
+    public String getDescription() {
+        return "Multi-Objective Evolutionary Algorithm based on Decomposition,  Version with Dominance Concept";
     }
 }
 

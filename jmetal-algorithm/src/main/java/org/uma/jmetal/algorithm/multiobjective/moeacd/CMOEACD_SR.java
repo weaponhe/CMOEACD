@@ -35,25 +35,30 @@ public class CMOEACD_SR extends MOEACD {
 
     @Override
     protected DoubleSolution getBetterSolutionByIndicator(DoubleSolution newSolution, DoubleSolution storedSolution, ConeSubRegion coneSubRegion, double[] utopianPoint, double[] normIntercepts) {
-        return this.getBetterSolutionByIndicatorConstraint(newSolution, storedSolution, coneSubRegion.getRefDirection(), utopianPoint, normIntercepts, beta_ConeUpdate);
+        return getBetterSolutionByIndicator(newSolution, storedSolution, coneSubRegion);
     }
 
-    protected DoubleSolution getBetterSolutionByIndicatorConstraint(DoubleSolution newSolution, DoubleSolution storedSolution, double[] refDirection, double[] utopianPoint, double[] normIntercepts, double beta) {
-        double rand = randomGenerator.nextDouble(0, 1);
-        if (isFessible(newSolution) && isFessible(storedSolution) || rand < 0.05) {
-            if (fitnessFunction(newSolution, refDirection) < fitnessFunction(storedSolution, refDirection)) {
-                return newSolution;
-            } else {
-                return storedSolution;
-            }
+    protected DoubleSolution getBetterSolutionByIndicator(DoubleSolution newSolution, DoubleSolution storedSolution, ConeSubRegion coneSubRegion) {
+        boolean newFessible = isFessible(newSolution);
+        boolean storeFessible = isFessible(storedSolution);
+        if (newFessible && storeFessible) {
+            double newFun = fitnessFunction(newSolution, coneSubRegion.getRefDirection());
+            double storeFun = fitnessFunction(newSolution, coneSubRegion.getRefDirection());
+            return newFun < storeFun ? newSolution : storedSolution;
+        } else if (newFessible) {
+            return newSolution;
+        } else if (storeFessible) {
+            return storedSolution;
         } else {
-            return getOverallConstraintViolationDegree(newSolution) < getOverallConstraintViolationDegree(storedSolution) ? newSolution : storedSolution;
+            double newCV = getOverallConstraintViolationDegree(newSolution);
+            double storedCV = getOverallConstraintViolationDegree(storedSolution);
+            return newCV < storedCV ? newSolution : storedSolution;
         }
     }
 
     @Override
     public String getName() {
-        return "MOEA/CD-SR";
+        return "CMOEA/CD-SR";
     }
 
     @Override

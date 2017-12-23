@@ -393,6 +393,7 @@ public class MOEACD extends AbstractMOEACD {
         if (targetSubRegion == storedSubRegion) {
             DoubleSolution worseS = _solution;
             DoubleSolution betterS = getBetterSolutionByIndicator(_solution, storedSolution, targetSubRegion, utopianPoint, normIntercepts);
+//            DoubleSolution betterS = getBetterSolutionByIndicator(_solution, storedSolution, targetSubRegion);
             if (betterS == _solution) {
                 //has updated
                 isUpdated = true;
@@ -436,6 +437,24 @@ public class MOEACD extends AbstractMOEACD {
 
     protected DoubleSolution getBetterSolutionByIndicator(DoubleSolution newSolution, DoubleSolution storedSolution, ConeSubRegion coneSubRegion, double[] utopianPoint, double[] normIntercepts) {
         return this.getBetterSolutionByIndicatorUnConstraint(newSolution, storedSolution, coneSubRegion.getRefDirection(), utopianPoint, normIntercepts, beta_ConeUpdate);
+    }
+
+    protected DoubleSolution getBetterSolutionByIndicator(DoubleSolution newSolution, DoubleSolution storedSolution, ConeSubRegion coneSubRegion) {
+        boolean newFessible = isFessible(newSolution);
+        boolean storeFessible = isFessible(storedSolution);
+        if (newFessible && storeFessible) {
+            double newFun = fitnessFunction(newSolution, coneSubRegion.getRefDirection());
+            double storeFun = fitnessFunction(newSolution, coneSubRegion.getRefDirection());
+            return newFun < storeFun ? newSolution : storedSolution;
+        } else if (newFessible) {
+            return newSolution;
+        } else if (storeFessible) {
+            return storedSolution;
+        } else {
+            double newCV = getOverallConstraintViolationDegree(newSolution);
+            double storedCV = getOverallConstraintViolationDegree(storedSolution);
+            return newCV < storedCV ? newSolution : storedSolution;
+        }
     }
 
     protected DoubleSolution getBetterSolutionByIndicator(DoubleSolution newSolution, DoubleSolution storedSolution, double[] refDirection, double[] utopianPoint, double[] normIntercepts, double beta) {
