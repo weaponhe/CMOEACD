@@ -7,6 +7,11 @@ import org.uma.jmetal.algorithm.multiobjective.moead.ConstraintMOEAD;
 import org.uma.jmetal.algorithm.multiobjective.moead.MOEADBuilder;
 import org.uma.jmetal.algorithm.multiobjective.nsgaiii.NSGAIII;
 import org.uma.jmetal.algorithm.multiobjective.nsgaiii.NSGAIIIBuilder;
+import org.uma.jmetal.operator.MutationOperator;
+import org.uma.jmetal.operator.SelectionOperator;
+import org.uma.jmetal.operator.impl.crossover.SBXCrossover;
+import org.uma.jmetal.operator.impl.mutation.PolynomialMutation;
+import org.uma.jmetal.operator.impl.selection.BinaryTournamentSelection;
 import org.uma.jmetal.problem.Problem;
 import org.uma.jmetal.problem.multiobjective.cdtlz.*;
 import org.uma.jmetal.qualityindicator.impl.*;
@@ -188,23 +193,23 @@ public class MOEACDStudy {
 //                algorithms.add(new TaggedAlgorithm<>(algorithm, "CMOEACD", problemList.get(i), run));
 //            }
 //        }
-        for (int run = 0; run < independentRuns; run++) {
-            for (int i = 0; i < problemList.size(); i++) {
-                int configIndex = objectiveNumberList.indexOf(problemList.get(i).getNumberOfObjectives());
-                String problemName = problemList.get(i).getName();
-                String problemSeriesName = problemName.substring(0, problemName.lastIndexOf("_"));
-                int maxGen = maxGenConfig.get(problemSeriesName)[configIndex];
-                Algorithm<List<DoubleSolution>> algorithm = (new MOEACDBuilder(problemList.get(i), MOEACDBuilder.Variant.CMOEACD_CL_CDP))
-                        .setNumOfDivision(numOfDivisionConfig[configIndex])
-                        .setIntegratedTaus(integratedTausConfig[configIndex])
-                        .setPopulationSize(populationSizeConfig[configIndex])
-                        .setConstraintLayerSize(5)
-                        .setMaxGen(maxGen)
-                        .setDelta(new double[]{0.81, 0.09, 0.09, 0.01})
-                        .build();
-                algorithms.add(new TaggedAlgorithm<>(algorithm, "CMOEACD-CL-CDP", problemList.get(i), run));
-            }
-        }
+//        for (int run = 0; run < independentRuns; run++) {
+//            for (int i = 0; i < problemList.size(); i++) {
+//                int configIndex = objectiveNumberList.indexOf(problemList.get(i).getNumberOfObjectives());
+//                String problemName = problemList.get(i).getName();
+//                String problemSeriesName = problemName.substring(0, problemName.lastIndexOf("_"));
+//                int maxGen = maxGenConfig.get(problemSeriesName)[configIndex];
+//                Algorithm<List<DoubleSolution>> algorithm = (new MOEACDBuilder(problemList.get(i), MOEACDBuilder.Variant.CMOEACD_CL_CDP))
+//                        .setNumOfDivision(numOfDivisionConfig[configIndex])
+//                        .setIntegratedTaus(integratedTausConfig[configIndex])
+//                        .setPopulationSize(populationSizeConfig[configIndex])
+//                        .setConstraintLayerSize(5)
+//                        .setMaxGen(maxGen)
+//                        .setDelta(new double[]{0.81, 0.09, 0.09, 0.01})
+//                        .build();
+//                algorithms.add(new TaggedAlgorithm<>(algorithm, "CMOEACD-CL-CDP", problemList.get(i), run));
+//            }
+//        }
 
 //        for (int run = 0; run < independentRuns; run++) {
 //            for (int i = 0; i < problemList.size(); i++) {
@@ -221,21 +226,21 @@ public class MOEACDStudy {
 //                algorithms.add(new TaggedAlgorithm<>(algorithm, "CMOEACD-CDP", problemList.get(i), run));
 //            }
 //        }
-        for (int run = 0; run < independentRuns; run++) {
-            for (int i = 0; i < problemList.size(); i++) {
-                int configIndex = objectiveNumberList.indexOf(problemList.get(i).getNumberOfObjectives());
-                String problemName = problemList.get(i).getName();
-                String problemSeriesName = problemName.substring(0, problemName.lastIndexOf("_"));
-                int maxGen = maxGenConfig.get(problemSeriesName)[configIndex];
-                Algorithm<List<DoubleSolution>> algorithm = (new MOEACDBuilder(problemList.get(i), MOEACDBuilder.Variant.CMOEACD_CDP2))
-                        .setNumOfDivision(numOfDivisionConfig[configIndex])
-                        .setIntegratedTaus(integratedTausConfig[configIndex])
-                        .setPopulationSize(populationSizeConfig[configIndex])
-                        .setMaxGen(maxGen)
-                        .build();
-                algorithms.add(new TaggedAlgorithm<>(algorithm, "CMOEACD-CDP2", problemList.get(i), run));
-            }
-        }
+//        for (int run = 0; run < independentRuns; run++) {
+//            for (int i = 0; i < problemList.size(); i++) {
+//                int configIndex = objectiveNumberList.indexOf(problemList.get(i).getNumberOfObjectives());
+//                String problemName = problemList.get(i).getName();
+//                String problemSeriesName = problemName.substring(0, problemName.lastIndexOf("_"));
+//                int maxGen = maxGenConfig.get(problemSeriesName)[configIndex];
+//                Algorithm<List<DoubleSolution>> algorithm = (new MOEACDBuilder(problemList.get(i), MOEACDBuilder.Variant.CMOEACD_CDP2))
+//                        .setNumOfDivision(numOfDivisionConfig[configIndex])
+//                        .setIntegratedTaus(integratedTausConfig[configIndex])
+//                        .setPopulationSize(populationSizeConfig[configIndex])
+//                        .setMaxGen(maxGen)
+//                        .build();
+//                algorithms.add(new TaggedAlgorithm<>(algorithm, "CMOEACD-CDP2", problemList.get(i), run));
+//            }
+//        }
 
 //        for (int run = 0; run < independentRuns; run++) {
 //            for (int i = 0; i < problemList.size(); i++) {
@@ -252,6 +257,7 @@ public class MOEACDStudy {
 //                algorithms.add(new TaggedAlgorithm<>(algorithm, "CMOEACD-SR", problemList.get(i), run));
 //            }
 //        }
+
 //        for (int factor = 1; factor <= 10; factor++) {
 //            double penaltyFactor = 0.1 * factor;
 //            for (int run = 0; run < independentRuns; run++) {
@@ -290,6 +296,55 @@ public class MOEACDStudy {
 //                }
 //            }
 //        }
+
+        //CMOEADD
+//        for (int run = 0; run < independentRuns; run++) {
+//            for (int i = 0; i < problemList.size(); i++) {
+//                int configIndex = objectiveNumberList.indexOf(problemList.get(i).getNumberOfObjectives());
+//                String problemName = problemList.get(i).getName();
+//                String problemSeriesName = problemName.substring(0, problemName.lastIndexOf("_"));
+//                int maxGen = maxGenConfig.get(problemSeriesName)[configIndex];
+//                Algorithm<List<DoubleSolution>> algorithm = (new MOEADBuilder(problemList.get(i), MOEADBuilder.Variant.CMOEADD))
+//                        .setNumofDivision(numOfDivisionConfig[configIndex])
+//                        .setIntegratedTau(integratedTausConfig[configIndex])
+//                        .setPopulationSize(populationSizeConfig[configIndex])
+//                        .setMaxGen(maxGen)
+//                        .build();
+//                algorithms.add(new TaggedAlgorithm<>(algorithm, "CMOEADD", problemList.get(i), run));
+//            }
+//        }
+
+
+        //NSGAIII
+        for (int run = 0; run < independentRuns; run++) {
+            for (int i = 0; i < problemList.size(); i++) {
+                int configIndex = objectiveNumberList.indexOf(problemList.get(i).getNumberOfObjectives());
+                String problemName = problemList.get(i).getName();
+                String problemSeriesName = problemName.substring(0, problemName.lastIndexOf("_"));
+                int maxGen = maxGenConfig.get(problemSeriesName)[configIndex];
+
+                double crossoverProbability = 1.0;
+                double crossoverDistributionIndex = 30.0;
+                SBXCrossover sbxCrossover = new SBXCrossover(crossoverProbability, crossoverDistributionIndex);
+
+                double mutationProbability = 1.0 / problemList.get(i).getNumberOfVariables();
+                double mutationDistributionIndex = 20.0;
+                MutationOperator<DoubleSolution> mutation = new PolynomialMutation(mutationProbability, mutationDistributionIndex);
+
+                SelectionOperator<List<DoubleSolution>, DoubleSolution> selection = new BinaryTournamentSelection<>();
+
+                Algorithm<List<DoubleSolution>> algorithm = new NSGAIIIBuilder<>(problemList.get(i), NSGAIIIBuilder.Variant.NSGAIII)
+                        .setCrossoverOperator(sbxCrossover)
+                        .setMutationOperator(mutation)
+                        .setSelectionOperator(selection)
+                        .setMaxIterations(maxGen)
+                        .setNumberOfDivisions(numOfDivisionConfig[configIndex])
+                        .setIntergratedTaus(integratedTausConfig[configIndex])
+                        .build();
+                algorithms.add(new TaggedAlgorithm<>(algorithm, "CNSGAIII", problemList.get(i), run));
+            }
+        }
+
         return algorithms;
     }
 }

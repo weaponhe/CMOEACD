@@ -48,8 +48,12 @@ public class IndicatorsProcessor {
         algorithms = new HashMap<>();
         String[] algorithmNames = {
                 "CMOEACD",
-                "CMOEACD-CDP",
-                "CMOEACD-SR"
+//                "CMOEADD",
+                "CNSGAIII"
+//                "CMOEACD-CL-CDP",
+//                "CMOEACD-CDP",
+//                "CMOEACD-CDP2",
+//                "CMOEACD-SR"
 //                "CMOEACD-PF(1)",
 //                "CMOEACD-PF(2)",
 //                "CMOEACD-PF(3)",
@@ -134,7 +138,7 @@ public class IndicatorsProcessor {
 
                         String bestKey = "";
                         Double bestValue = Double.MAX_VALUE;
-                        for (String algorithm : algorithms.keySet()) {
+                        for (String algorithm : algorithmNames) {
                             List<Double> array = data.get(indicators[indicator]).get(algorithm).get(problem).get(dimention);
 
                             //处理不完整数据
