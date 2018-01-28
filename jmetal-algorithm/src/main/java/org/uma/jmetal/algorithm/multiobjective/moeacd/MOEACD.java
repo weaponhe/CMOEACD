@@ -50,7 +50,18 @@ public class MOEACD extends AbstractMOEACD {
     protected double beta_NeighborUpdate = 3.0;
 
     protected int maxGen;
+
+    protected double LP;
     protected AbstractMOEAD.FunctionType functionType;
+
+    protected enum ComparisonMethod {
+        CDP,
+        CORE_AREA,
+        FEASIBILITY_FIRST,
+        FITNESS_FIRST
+    }
+
+    ;
 
     public MOEACD(Problem<DoubleSolution> problem,
                   int[] arrayH,
@@ -78,6 +89,7 @@ public class MOEACD extends AbstractMOEACD {
         Sde = 0;
         Csbx = 0;
         Ssbx = 0;
+        LP = 2;
 
         this.maxGen = maxGen;
         this.functionType = functionType;
@@ -109,6 +121,7 @@ public class MOEACD extends AbstractMOEACD {
         Sde = 0;
         Csbx = 0;
         Ssbx = 0;
+        LP = 2;
 
         this.maxGen = maxGen;
         this.functionType = functionType;
@@ -116,6 +129,7 @@ public class MOEACD extends AbstractMOEACD {
 
     @Override
     public void run() {
+        measureManager.durationMeasure.start();
         initializeConeSubRegions();
         initializePopulation();
         evaluations = populationSize;
@@ -167,6 +181,8 @@ public class MOEACD extends AbstractMOEACD {
             updateAdaptiveCrossover();
 
         } while (gen < maxGen);
+        measureManager.durationMeasure.stop();
+
     }
 
     public void measureRun() {
@@ -480,8 +496,10 @@ public class MOEACD extends AbstractMOEACD {
         } else if (domination == 1 || domination == 2) {
             return storedSolution;
         } else {
-            double PDDNewSolution = PDD(newSolution, refDirection, utopianPoint, normIntercepts, beta);
-            double PDDStoreSolution = PDD(storedSolution, refDirection, utopianPoint, normIntercepts, beta);
+//            double PDDNewSolution = PDD(newSolution, refDirection, utopianPoint, normIntercepts, beta);
+//            double PDDStoreSolution = PDD(storedSolution, refDirection, utopianPoint, normIntercepts, beta);
+            double PDDNewSolution = fitnessFunction(newSolution, refDirection);
+            double PDDStoreSolution = fitnessFunction(storedSolution, refDirection);
 
             if (PDDNewSolution < PDDStoreSolution)
                 return newSolution;
@@ -490,13 +508,13 @@ public class MOEACD extends AbstractMOEACD {
         }
     }
 
-
     protected double PDD(DoubleSolution solution, double[] direction, double[] utopianPoint, double[] normIntercepts, double beta) {
         double p = 1.0 * evaluations / maxEvaluations;
         double[] normObjectives = MOEACDUtils.normalize(solution, utopianPoint, normIntercepts);
         double Dc = calcConvergence(normObjectives);
         double[] observation = MOEACDUtils.calObservation(normObjectives);
 
+        //
         double directivityCrowdness = directivity(observation, direction);
 
         return Dc * (1.0 + Math.pow(p, beta) * /*problem.getNumberOfObjectives() * */directivityCrowdness);
@@ -506,7 +524,7 @@ public class MOEACD extends AbstractMOEACD {
         double fitness;
 
 
-        if (MOEAD.FunctionType.TCH.equals(functionType)) {
+        if (AbstractMOEAD.FunctionType.TCH.equals(functionType)) {
             double maxFun = -1.0e+30;
 
             for (int n = 0; n < problem.getNumberOfObjectives(); n++) {
@@ -525,7 +543,20 @@ public class MOEACD extends AbstractMOEACD {
             }
 
             fitness = maxFun;
-        } else if (MOEAD.FunctionType.AGG.equals(functionType)) {
+        } else if (AbstractMOEAD.FunctionType.LP.equals(functionType)) {
+            double sum = 0;
+            for (int n = 0; n < problem.getNumberOfObjectives(); n++) {
+                double diff = Math.pow(Math.abs(individual.getObjective(n) - idealPoint[n]), LP);
+                double feval;
+                if (Math.abs(lambda[n]) < Constant.TOLERATION) {
+                    feval = 0;
+                } else {
+                    feval = diff * lambda[n];
+                }
+                sum += feval;
+            }
+            return Math.pow(sum, 1.0 / LP);
+        } else if (AbstractMOEAD.FunctionType.AGG.equals(functionType)) {
             double sum = 0.0;
             for (int n = 0; n < problem.getNumberOfObjectives(); n++) {
                 sum += (lambda[n]) * (individual.getObjective(n) - idealPoint[n]);
@@ -533,7 +564,9 @@ public class MOEACD extends AbstractMOEACD {
 
             fitness = sum;
 
-        } else if (MOEAD.FunctionType.PBI.equals(functionType)) {
+        } else if (AbstractMOEAD.FunctionType.PDD.equals(functionType)) {
+            return PDD((DoubleSolution) individual, lambda, utopianPoint, normIntercepts, beta_ConeUpdate);
+        } else if (AbstractMOEAD.FunctionType.PBI.equals(functionType)) {
             double d1, d2, nl;
             double theta = 5.0;
 
@@ -582,6 +615,8 @@ public class MOEACD extends AbstractMOEACD {
             crowdness += tmp;
 //            crowdness += Math.pow(tmp,2.0);
             weightedCrowdness += (Math.pow(tmp, 2.0) / w);
+//            z
+            weightedCrowdness += (1 / w);
 //            weightedCrowdness += (tmp/w );
             lenLambda += Math.pow(direction[i], 2.0);
         }

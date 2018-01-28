@@ -13,6 +13,7 @@
 
 package org.uma.jmetal.algorithm.multiobjective.moead;
 
+import org.uma.jmetal.measure.impl.MyAlgorithmMeasures;
 import org.uma.jmetal.operator.CrossoverOperator;
 import org.uma.jmetal.operator.MutationOperator;
 import org.uma.jmetal.operator.impl.crossover.DifferentialEvolutionCrossover;
@@ -79,6 +80,7 @@ public class MOEADBuilder implements AlgorithmBuilder<AbstractMOEAD<DoubleSoluti
     protected int numberOfThreads;
 
     protected Variant moeadVariant;
+
 
     /**
      * Constructor
@@ -388,7 +390,7 @@ public class MOEADBuilder implements AlgorithmBuilder<AbstractMOEAD<DoubleSoluti
                         functionType, numOfDivision, integratedTau, neighborhoodSelectionProbability,
                         maximumNumberOfReplacedSolutions, neighborSize);
             } else if (moeadVariant.equals(Variant.MOEADD)) {
-                algorithm = new MOEADD(problem, populationSize, resultPopulationSize, maxEvaluations, crossover, mutation,
+                algorithm = new MOEADD(problem, populationSize, resultPopulationSize, maxEvaluations, maxGen, crossover, mutation,
                         functionType, numOfDivision, integratedTau, neighborhoodSelectionProbability,
                         maximumNumberOfReplacedSolutions, neighborSize);
             } else if (moeadVariant.equals(Variant.MOEADDMeasure)) {
@@ -460,7 +462,7 @@ public class MOEADBuilder implements AlgorithmBuilder<AbstractMOEAD<DoubleSoluti
             }
             //CMOEADD
             else if (moeadVariant.equals(Variant.CMOEADD)) {
-                algorithm = new CMOEADD(problem, populationSize, resultPopulationSize, maxEvaluations, crossover, mutation,
+                algorithm = new CMOEADD(problem, populationSize, resultPopulationSize, maxEvaluations, maxGen, crossover, mutation,
                         functionType, numOfDivision, integratedTau, neighborhoodSelectionProbability,
                         maximumNumberOfReplacedSolutions, neighborSize);
             } else if (moeadVariant.equals(Variant.CMOEADDMeasure)) {

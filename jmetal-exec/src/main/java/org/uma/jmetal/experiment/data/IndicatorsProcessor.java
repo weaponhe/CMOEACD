@@ -47,32 +47,14 @@ public class IndicatorsProcessor {
         //自定义算法列表
         algorithms = new HashMap<>();
         String[] algorithmNames = {
-                "CMOEACD",
-//                "CMOEADD",
-                "CNSGAIII"
-//                "CMOEACD-CL-CDP",
-//                "CMOEACD-CDP",
-//                "CMOEACD-CDP2",
-//                "CMOEACD-SR"
-//                "CMOEACD-PF(1)",
-//                "CMOEACD-PF(2)",
-//                "CMOEACD-PF(3)",
-//                "CMOEACD-PF(4)",
-//                "CMOEACD-PF(5)",
-//                "CMOEACD-PF(6)",
-//                "CMOEACD-PF(7)",
-//                "CMOEACD-PF(8)",
-//                "CMOEACD-PF(9)",
-//                "CMOEACD-PF(10)",
-//                "CMOEACD(3)",
-//                "CMOEACD(4)",
-//                "CMOEACD(5)",
-//                "CMOEACD(6)",
-//                "CMOEACD(7)",
-//                "CMOEACD(8)",
-//                "CMOEACD(9)",
-//                "CMOEACD(10)",
-//                "CMOEACD(11)"
+                "C-MOEACD(PBI)",
+//                "C-MOEACD(TCH)",
+//                "C-MOEACD(LP2)",
+//                "C-MOEAD",
+                "C-NSGAIII",
+//                "C-MOEADD"
+//                "C-MOEACD-CDP",
+//                "C-MOEACD-SR"
         };
         for (int i = 0; i < algorithmNames.length; i++) {
             algorithms.put(algorithmNames[i], true);

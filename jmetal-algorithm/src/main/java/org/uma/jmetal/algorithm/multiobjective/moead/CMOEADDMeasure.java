@@ -33,6 +33,8 @@ public class CMOEADDMeasure extends CMOEADD implements Measurable {
         super(problem, populationSize, resultPopulationSize, maxEvaluations, crossover, mutation, functionType,
                 dataDirectory, neighborhoodSelectionProbability, maximumNumberOfReplacedSolutions,
                 neighborSize);
+        measure = new MyAlgorithmMeasures<>();
+        measure.initMeasures();
     }
 
     public CMOEADDMeasure(Problem<DoubleSolution> problem,
@@ -50,6 +52,8 @@ public class CMOEADDMeasure extends CMOEADD implements Measurable {
         super(problem, populationSize, resultPopulationSize, maxEvaluations, crossover, mutation, functionType,
                 arrayH,integratedTau, neighborhoodSelectionProbability, maximumNumberOfReplacedSolutions,
                 neighborSize);
+        measure = new MyAlgorithmMeasures<>();
+        measure.initMeasures();
     }
 
 

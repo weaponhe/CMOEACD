@@ -20,17 +20,8 @@ public class CMOEACD extends MOEACD {
     protected List<List<Double>> subPlaneIdealPointList;
     protected List<List<Double>> subPlaneNadirPointList;
     protected List<List<Integer>> classifiedPopulation;
-    protected double FR;
-    protected double firstLayerFR;
     protected double[] delta;
     protected int constraintLayerSize;
-
-    protected enum ComparisonMethod {
-        CDP,
-        CORE_AREA
-    }
-
-    ;
 
     public CMOEACD(Problem<DoubleSolution> problem,
                    int[] arrayH,
@@ -54,6 +45,7 @@ public class CMOEACD extends MOEACD {
         evolvingIdxList = new ArrayList<>(2 * populationSize);
         this.constraintLayerSize = constraintLayerSize;
         this.delta = delta;
+
         subPlaneIdealPointList = new ArrayList<>(populationSize);
         for (int i = 0; i < populationSize; i++) {
             subPlaneIdealPointList.add(new ArrayList<Double>(2));
@@ -62,8 +54,6 @@ public class CMOEACD extends MOEACD {
         for (int i = 0; i < populationSize; i++) {
             subPlaneNadirPointList.add(new ArrayList<Double>(2));
         }
-        FR = 0.0;
-        firstLayerFR = 0.0;
     }
 
     public CMOEACD(Measurable measureManager, Problem<DoubleSolution> problem,
@@ -89,6 +79,7 @@ public class CMOEACD extends MOEACD {
         this.maxGen = maxGen;
         this.constraintLayerSize = constraintLayerSize;
         this.delta = delta;
+
         subPlaneIdealPointList = new ArrayList<>(populationSize);
         for (int i = 0; i < populationSize; i++) {
             subPlaneIdealPointList.add(new ArrayList<Double>(2));
@@ -97,8 +88,6 @@ public class CMOEACD extends MOEACD {
         for (int i = 0; i < populationSize; i++) {
             subPlaneNadirPointList.add(new ArrayList<Double>(2));
         }
-        FR = 0.0;
-        firstLayerFR = 0.0;
     }
 
     @Override
@@ -114,7 +103,6 @@ public class CMOEACD extends MOEACD {
         associateSubRegion(population, utopianPoint, normIntercepts);
 
         do {
-            updateFR();
             calcEvolvingSubproblemList();
             for (int i = 0; i < populationSize; i++) {
                 List<DoubleSolution> children = reproduction(evolvingIdxList.get(i));
@@ -248,7 +236,8 @@ public class CMOEACD extends MOEACD {
             DoubleSolution solution = population.get(solutionIndex);
             ConeSubRegion subRegion = locateConeSubRegion(solution, utopianPoint, normIntercepts);
             double y1 = Math.abs((double) solution.getAttribute("overallConstraintViolationDegree"));
-            double y2 = fitnessFunction(solution, subRegion.getRefDirection());
+//            double y2 = fitnessFunction(solution, subRegion.getRefDirection());
+            double y2 = fitnessFunction(solution, subRegion.getNormalizedWeights());
             double v1 = y1 / (y1 + y2);
             double r1 = layerIndex / (constraintLayerSize - 1);
             double dis = Math.pow((r1 - v1), 2);
@@ -286,7 +275,7 @@ public class CMOEACD extends MOEACD {
                 int index = pop.get(j);
                 Solution solution = this.population.get(index);
                 double x = Math.abs((double) solution.getAttribute("overallConstraintViolationDegree"));
-                double y = fitnessFunction(solution, subRegionManager.getConeSubRegion(i).getRefDirection());
+                double y = fitnessFunction(solution, subRegionManager.getConeSubRegion(i).getNormalizedWeights());
                 xMin = Math.min(xMin, x);
                 yMin = Math.min(yMin, y);
                 xMax = Math.max(xMax, x);
@@ -318,7 +307,7 @@ public class CMOEACD extends MOEACD {
         ConeSubRegion subproblem = locateConeSubRegion(solution, utopianPoint, normIntercepts);
         int subproblemIndex = subproblem.getIdxConeSubRegion();
         double x = Math.abs((double) solution.getAttribute("overallConstraintViolationDegree"));
-        double y = fitnessFunction(solution, subproblem.getRefDirection());
+        double y = fitnessFunction(solution, subproblem.getNormalizedWeights());
         List<Double> subIdealPoint = this.subPlaneIdealPointList.get(subproblemIndex);
         List<Double> subNadirPoint = this.subPlaneNadirPointList.get(subproblemIndex);
         double idealX = Math.min(subIdealPoint.get(0), x);
@@ -339,25 +328,6 @@ public class CMOEACD extends MOEACD {
         double a = (k - 0.5) / (N - k - 0.5);
         double b = (k + 0.5) / (N - k - 1.5);
         return 0.5 * (b - a) * Math.pow(y2, 2) + 0.5 * (1 / a) * Math.pow(y1 - a * y2, 2);
-    }
-
-    protected void updateFR() {
-        int count = 0;
-        for (int i = 0; i < population.size(); i++) {
-            if (isFessible(population.get(i))) {
-                count++;
-            }
-        }
-        this.FR = (double) count / population.size();
-
-        count = 0;
-        for (int i = 0; i < populationSize; i++) {
-            int index = subRegionManager.getConeSubRegion(i).getSubPopulation().get(0);
-            if (isFessible(population.get(index))) {
-                count++;
-            }
-        }
-        this.firstLayerFR = (double) count / populationSize;
     }
 
     protected boolean updatePopulation(DoubleSolution solution, double[] idealPoint, double[] utopianPoint, double[] normIntercepts) {
@@ -411,15 +381,9 @@ public class CMOEACD extends MOEACD {
     protected DoubleSolution getBetterSolution(DoubleSolution newSolution, DoubleSolution storedSolution, ConeSubRegion targetSubRegion, ComparisonMethod method) {
         if (method == ComparisonMethod.CDP) {
             return getBetterSolutionByIndicatorUnConstraint(newSolution, storedSolution, targetSubRegion.getRefDirection(), utopianPoint, normIntercepts, beta_ConeUpdate);
-//            int domination = MOEACDUtils.constraintDominateCompare(newSolution, storedSolution);
-//            if (domination == -1) {
-//                return newSolution;
-//            } else {
-//                return storedSolution;
-//            }
         } else {
-            double newArea = calcConicalArea(constraintLayerSize, newSolution, targetSubRegion.getRefDirection());
-            double oldArea = calcConicalArea(constraintLayerSize, storedSolution, targetSubRegion.getRefDirection());
+            double newArea = calcConicalArea(constraintLayerSize, newSolution, targetSubRegion.getNormalizedWeights());
+            double oldArea = calcConicalArea(constraintLayerSize, storedSolution, targetSubRegion.getNormalizedWeights());
             if (newArea < oldArea) {
                 return newSolution;
             } else {
@@ -428,41 +392,88 @@ public class CMOEACD extends MOEACD {
         }
     }
 
+//    protected List<DoubleSolution> parentSelection(int idxSubRegion, int parentPoolSize) {
+//        List<DoubleSolution> parents = new ArrayList<>(parentPoolSize);
+//        ConeSubRegion coneSubRegion = subRegionManager.getConeSubRegion(idxSubRegion);
+//        List<Integer> neighbors = coneSubRegion.getNeighbors();
+//
+//        double[] delta = computeDelta();
+//        double rand = randomGenerator.nextDouble(0, 1);
+//
+//        while (parents.size() < parentPoolSize) {
+//            int idxTargetSubproblem = 0;
+//            int idxTargetLayer = 0;
+//            if (rand < delta[0]) {
+//                //neighbors子问题的第一个约束子层中找
+//                idxTargetSubproblem = randomGenerator.nextInt(0, neighbors.size() - 1);
+//                idxTargetLayer = 0;
+//            } else if (rand < delta[1]) {
+//                //neighbors子问题的所有约束子层中找
+//                idxTargetSubproblem = randomGenerator.nextInt(0, neighbors.size() - 1);
+//                idxTargetLayer = randomGenerator.nextInt(0, constraintLayerSize - 1);
+//            } else if (rand < delta[2]) {
+//                //所有子问题的第一个约束子层中找
+//                idxTargetSubproblem = randomGenerator.nextInt(0, populationSize - 1);
+//                idxTargetLayer = 0;
+//            } else {
+//                //所有子问题的所有约束子层
+//                idxTargetSubproblem = randomGenerator.nextInt(0, populationSize - 1);
+//                idxTargetLayer = randomGenerator.nextInt(0, constraintLayerSize - 1);
+//            }
+//            int idxTargetSolution = subRegionManager.getConeSubRegion(idxTargetSubproblem).getSubPopulation().get(idxTargetLayer);
+//            DoubleSolution targetSolution = population.get(idxTargetSolution);
+//            if (!parents.contains(targetSolution)) {
+//                parents.add(targetSolution);
+//            }
+//        }
+//        return parents;
+//    }
     protected List<DoubleSolution> parentSelection(int idxSubRegion, int parentPoolSize) {
-        List<DoubleSolution> parents = new ArrayList<>(parentPoolSize);
+        List<Integer> selectedIndexes = new ArrayList<>(parentPoolSize);
         ConeSubRegion coneSubRegion = subRegionManager.getConeSubRegion(idxSubRegion);
         List<Integer> neighbors = coneSubRegion.getNeighbors();
 
         double[] delta = computeDelta();
-        double rand = randomGenerator.nextDouble(0, 1);
-
-        while (parents.size() < parentPoolSize) {
-            int idxTargetSubproblem = 0;
+        while (selectedIndexes.size() < parentPoolSize) {
+            double rand = randomGenerator.nextDouble(0, 1);
+            int idxTargetSubRegion = 0;
             int idxTargetLayer = 0;
             if (rand < delta[0]) {
                 //neighbors子问题的第一个约束子层中找
-                idxTargetSubproblem = randomGenerator.nextInt(0, neighbors.size() - 1);
+                idxTargetSubRegion = neighbors.get(randomGenerator.nextInt(0, neighbors.size() - 1));
                 idxTargetLayer = 0;
             } else if (rand < delta[1]) {
                 //neighbors子问题的所有约束子层中找
-                idxTargetSubproblem = randomGenerator.nextInt(0, neighbors.size() - 1);
+                idxTargetSubRegion = neighbors.get(randomGenerator.nextInt(0, neighbors.size() - 1));
                 idxTargetLayer = randomGenerator.nextInt(0, constraintLayerSize - 1);
             } else if (rand < delta[2]) {
                 //所有子问题的第一个约束子层中找
-                idxTargetSubproblem = randomGenerator.nextInt(0, populationSize - 1);
+                idxTargetSubRegion = randomGenerator.nextInt(0, populationSize - 1);
                 idxTargetLayer = 0;
             } else {
                 //所有子问题的所有约束子层
-                idxTargetSubproblem = randomGenerator.nextInt(0, populationSize - 1);
+                idxTargetSubRegion = randomGenerator.nextInt(0, populationSize - 1);
                 idxTargetLayer = randomGenerator.nextInt(0, constraintLayerSize - 1);
             }
-            int idxTargetSolution = subRegionManager.getConeSubRegion(idxTargetSubproblem).getSubPopulation().get(idxTargetLayer);
-            DoubleSolution targetSolution = population.get(idxTargetSolution);
-            if (!parents.contains(targetSolution)) {
-                parents.add(targetSolution);
+            int idxTargetSolution = subRegionManager.getConeSubRegion(idxTargetSubRegion).getSubPopulation().get(idxTargetLayer);
+            boolean flag = true;
+            for (Integer index : selectedIndexes) {
+                if (index == idxTargetSolution) {
+                    flag = false;
+                    break;
+                }
+            }
+            if (flag) {
+                selectedIndexes.add(idxTargetSolution);
             }
         }
-        return parents;
+
+        List<DoubleSolution> selectedSolutions = new ArrayList<>(parentPoolSize);
+        for (int i = 0; i < parentPoolSize; i++) {
+            selectedSolutions.add(population.get(selectedIndexes.get(i)));
+        }
+
+        return selectedSolutions;
     }
 
     protected double[] computeDelta() {

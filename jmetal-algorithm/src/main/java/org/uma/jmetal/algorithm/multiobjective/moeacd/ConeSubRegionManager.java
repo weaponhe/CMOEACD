@@ -22,8 +22,11 @@ public class ConeSubRegionManager {
     protected ArrayList<Integer> extremeConeSRIdxList;
     protected ArrayList<Integer> marginalConeSRIdxList;
     protected KDTree kdTree = null;
-    protected int originalSubRegionsNum  = 0;
-    public ConeSubRegionManager() {}
+    protected int originalSubRegionsNum = 0;
+
+    public ConeSubRegionManager() {
+    }
+
     public ConeSubRegionManager(int _nObj, int[] _arrayH, double[] _integratedTaus) {
         this.nObj = _nObj;
         this.arrayH = _arrayH;
@@ -36,9 +39,13 @@ public class ConeSubRegionManager {
 //        marginalConeSRIdxList = new ArrayList<>();
     }
 
-    public KDTree getKdTree(){return  kdTree;}
+    public KDTree getKdTree() {
+        return kdTree;
+    }
 
-    public List<ConeSubRegion> getConeSubRegionsList(){return coneSubRegions;}
+    public List<ConeSubRegion> getConeSubRegionsList() {
+        return coneSubRegions;
+    }
 
     public void generateConeSubRegionList() {
         List<double[]> uniformDirections = UniformWeightUtils.generateArrayList(arrayH, integratedTaus, nObj);
@@ -77,32 +84,58 @@ public class ConeSubRegionManager {
     public void generateConeSubRegionList(List<double[]> predefinedDirections) {
         coneSubRegions = new ArrayList<>();
 
-        for (int i=0;i<predefinedDirections.size();i++) {
+        for (int i = 0; i < predefinedDirections.size(); i++) {
             ConeSubRegion coneSR = new ConeSubRegion();
             coneSR.setRefDirection(predefinedDirections.get(i));
             coneSR.setIdxConeSubRegion(i);
             coneSubRegions.add(coneSR);
         }
 
-        kdTree =  KDTree.build(predefinedDirections);
+        kdTree = KDTree.build(predefinedDirections);
 
         extremeConeSRIdxList = calcExtremeConeSubRegionIdx();
         marginalConeSRIdxList = calcMarginalConeSubRegionIdx();
 
     }
 
+    public double[] convertDirectionToWeight(double[] refDirection) {
+        int length = refDirection.length;
+        double[] weights = new double[length];
+        double sum = 0;
+        int infinityCount = 0;
+        for (int i = 0; i < length; i++) {
+            weights[i] = 1 / refDirection[i];
+            if (weights[i] == Double.POSITIVE_INFINITY) {
+                infinityCount++;
+            }
+            sum += weights[i];
+        }
+        double[] normlizedWeights = new double[length];
+        for (int i = 0; i < length; i++) {
+            if (weights[i] == Double.POSITIVE_INFINITY) {
+                normlizedWeights[i] = 1.0 / infinityCount;
+            } else {
+                normlizedWeights[i] = weights[i] / sum;
+            }
+
+        }
+        return normlizedWeights;
+    }
+
     public void generateConeSubRegionList(List<double[]> predefinedDirections, int constraintLayerSize) {
         coneSubRegions = new ArrayList<>();
 
-        for (int i=0;i<predefinedDirections.size();i++) {
+        for (int i = 0; i < predefinedDirections.size(); i++) {
             ConeSubRegion coneSR = new ConeSubRegion();
             coneSR.setRefDirection(predefinedDirections.get(i));
+            double[] weights = convertDirectionToWeight(predefinedDirections.get(i));
+            coneSR.setNormalizedWeights(weights);
             coneSR.setSubPopulation(constraintLayerSize);
             coneSR.setIdxConeSubRegion(i);
             coneSubRegions.add(coneSR);
         }
 
-        kdTree =  KDTree.build(predefinedDirections);
+        kdTree = KDTree.build(predefinedDirections);
 
         extremeConeSRIdxList = calcExtremeConeSubRegionIdx();
         marginalConeSRIdxList = calcMarginalConeSubRegionIdx();
@@ -120,7 +153,7 @@ public class ConeSubRegionManager {
         initializingSubRegionsNeighbors(neighborhoodSize);
     }
 
-        //generate subproblems
+    //generate subproblems
     protected ArrayList<ConeSubRegion> genConeSubRegions(int _H, double _tau, int _startIndex) {
         int[][] mIndexes = UniformWeightUtils.generateMIndexesArray(_H, nObj);
 
@@ -138,8 +171,14 @@ public class ConeSubRegionManager {
         return coneSubRegions.get(_indexConeSR);
     }
 
-    public void setOriginalSubRegionsNum(int num){originalSubRegionsNum = num;}
-    public int getOriginalSubRegionsNum(){return originalSubRegionsNum;}
+    public void setOriginalSubRegionsNum(int num) {
+        originalSubRegionsNum = num;
+    }
+
+    public int getOriginalSubRegionsNum() {
+        return originalSubRegionsNum;
+    }
+
     public int getConeSubRegionsNum() {
         return coneSubRegions.size();
     }
@@ -170,9 +209,9 @@ public class ConeSubRegionManager {
     protected ArrayList<Integer> calcExtremeConeSubRegionIdx() {
         ArrayList<Integer> idxList = new ArrayList<>(nObj);
         double[] v = new double[nObj];
-        for (int i=0;i<nObj;i++)
+        for (int i = 0; i < nObj; i++)
             v[i] = 0.0;
-        for (int i=0;i<nObj;i++){
+        for (int i = 0; i < nObj; i++) {
             v[i] = 1.0;
             int index = kdTree.queryIndex(v);
             getConeSubRegion(index).setExtremeConeSubRegion();
@@ -184,10 +223,10 @@ public class ConeSubRegionManager {
 
     protected ArrayList<Integer> calcMarginalConeSubRegionIdx() {
         ArrayList<Integer> idxList = new ArrayList<>(nObj);
-        for (int i=0;i<getConeSubRegionsNum();i++){
+        for (int i = 0; i < getConeSubRegionsNum(); i++) {
             double[] refDirection = getConeSubRegion(i).getRefDirection();
-            for (int j = 0;j<nObj;j++){
-                if(refDirection[j] < Constant.TOLERATION){
+            for (int j = 0; j < nObj; j++) {
+                if (refDirection[j] < Constant.TOLERATION) {
                     idxList.add(i);
                     getConeSubRegion(i).setBoundaryMarginalConeSubRegion();
                     break;
@@ -224,9 +263,9 @@ public class ConeSubRegionManager {
 //            for(int k=0;k<neighborhoodSize;++k)
 //                getConeSubRegion(i).addNeighbor(idx[k]);
 //        }
-        for(int i=0;i<getConeSubRegionsNum();i++){
+        for (int i = 0; i < getConeSubRegionsNum(); i++) {
             ConeSubRegion subRegion = getConeSubRegion(i);
-            List<Integer> neighbors = kdTree.queryKNearestIndexes(subRegion.getRefDirection(),neighborhoodSize);
+            List<Integer> neighbors = kdTree.queryKNearestIndexes(subRegion.getRefDirection(), neighborhoodSize);
             subRegion.setNeighbors(neighbors);
         }
     }
@@ -238,12 +277,12 @@ public class ConeSubRegionManager {
             int c = 0;
             for (int j = startIdxLayers[i]; c < numsOfLayers[i]; j++, c++) {
                 Set<Integer> neighbors;
-                if(nObj == 2)
-                    neighbors = calcNeighbors(arrayH[i], coneSubRegions.get(j).getmIndex(),startIdxLayers[i],j,5);
-                else if(nObj == 3)
-                    neighbors = calcNeighbors(arrayH[i], coneSubRegions.get(j).getmIndex(),startIdxLayers[i],j,2);
+                if (nObj == 2)
+                    neighbors = calcNeighbors(arrayH[i], coneSubRegions.get(j).getmIndex(), startIdxLayers[i], j, 5);
+                else if (nObj == 3)
+                    neighbors = calcNeighbors(arrayH[i], coneSubRegions.get(j).getmIndex(), startIdxLayers[i], j, 2);
                 else
-                    neighbors = calcNeighbors(arrayH[i], coneSubRegions.get(j).getmIndex(),startIdxLayers[i],j,1);
+                    neighbors = calcNeighbors(arrayH[i], coneSubRegions.get(j).getmIndex(), startIdxLayers[i], j, 1);
 
                 srNeighbors.add(neighbors);
             }
@@ -256,18 +295,18 @@ public class ConeSubRegionManager {
             int c = 0;
             for (int j = startIdxLayers[i]; c < numsOfLayers[i]; j++, c++) {
                 ConeSubRegion subregion = coneSubRegions.get(j);
-                int maxNeighborSize = (int)(srNeighbors.get(j).size())+nObj;//(int)(srNeighbors.get(j).size()*1.5);
+                int maxNeighborSize = (int) (srNeighbors.get(j).size()) + nObj;//(int)(srNeighbors.get(j).size()*1.5);
                 Set<Integer> candidate = new HashSet<>();
                 candidate.addAll(srNeighbors.get(j));
                 for (int k = 0; k < arrayH.length; ++k) {
                     if (k == i) continue;
-                    int idxSR = indexing(i,arrayH[k],integratedTaus[k], subregion.getRefDirection());
+                    int idxSR = indexing(i, arrayH[k], integratedTaus[k], subregion.getRefDirection());
                     candidate.add(idxSR);
                     candidate.addAll(srNeighbors.get(idxSR));
                 }
-                if(candidate.size() <= maxNeighborSize){
+                if (candidate.size() <= maxNeighborSize) {
                     subregion.setNeighbors(candidate);
-                }else {
+                } else {
                     Iterator it = candidate.iterator();
                     int p = 0;
                     while (it.hasNext()) {
@@ -276,14 +315,14 @@ public class ConeSubRegionManager {
                         p++;
                     }
                     MOEADUtils.minFastSort(x, idx, p, maxNeighborSize);
-                    for (int k = 0; k < maxNeighborSize ; ++k)
+                    for (int k = 0; k < maxNeighborSize; ++k)
                         subregion.addNeighbor(idx[k]);
                 }
             }
         }
     }
 
-    private Set<Integer> calcNeighbors(int _H, int[] mIndex,int startIdx) {
+    private Set<Integer> calcNeighbors(int _H, int[] mIndex, int startIdx) {
         Set<Integer> neighbors = new HashSet<>();
         int[] tmpIndex = new int[nObj];
         for (int i = 0; i < nObj; ++i) tmpIndex[i] = mIndex[i];
@@ -313,29 +352,29 @@ public class ConeSubRegionManager {
         }
         Set<Integer> result = new HashSet<>();
         Iterator it = neighbors.iterator();
-        while(it.hasNext()){
-            result.add(startIdx+(int)it.next());
+        while (it.hasNext()) {
+            result.add(startIdx + (int) it.next());
         }
         return result;
     }
 
 
-    private Set<Integer> calcNeighbors(int _H, int[] mIndex,int startIdx,int idx,int range) {
-        Set<Integer> neighbors = calcNeighbors(_H, mIndex,startIdx);
-        if(range>1){
+    private Set<Integer> calcNeighbors(int _H, int[] mIndex, int startIdx, int idx, int range) {
+        Set<Integer> neighbors = calcNeighbors(_H, mIndex, startIdx);
+        if (range > 1) {
             neighbors.add(idx);
             Set<Integer> cLayerNeighbors = neighbors;
-            for(int i=1;i<range;++i){
+            for (int i = 1; i < range; ++i) {
                 Set<Integer> tmp = new HashSet<>();
                 Iterator it = cLayerNeighbors.iterator();
-                while(it.hasNext()){
-                    tmp.addAll(calcNeighbors(_H,coneSubRegions.get((int)it.next()).getmIndex(),startIdx));
+                while (it.hasNext()) {
+                    tmp.addAll(calcNeighbors(_H, coneSubRegions.get((int) it.next()).getmIndex(), startIdx));
                 }
                 Iterator itTmp = tmp.iterator();
                 Set<Integer> nLayerNeighbors = new HashSet<>();
-                while(itTmp.hasNext()){
+                while (itTmp.hasNext()) {
                     int idxTmp = (Integer) itTmp.next();
-                    if(!neighbors.contains(idxTmp)) {
+                    if (!neighbors.contains(idxTmp)) {
                         nLayerNeighbors.add(idxTmp);
                         neighbors.add(idxTmp);
                     }
@@ -349,9 +388,10 @@ public class ConeSubRegionManager {
 
     public int indexing(double[] _normObjective) {
 
-        return indexing(_normObjective,kdTree);
+        return indexing(_normObjective, kdTree);
     }
-    public int indexing(double[] _normObjective,KDTree kdTree) {
+
+    public int indexing(double[] _normObjective, KDTree kdTree) {
 
         double[] observationV = Utils.calObservation(_normObjective);
 
@@ -364,9 +404,8 @@ public class ConeSubRegionManager {
     }
 
 
-    protected int indexing(int layer,int _H, double _tau, double[] observationV) {
-        if(Math.abs(_tau - 1.0) > Constant.TOLERATION)
-        {
+    protected int indexing(int layer, int _H, double _tau, double[] observationV) {
+        if (Math.abs(_tau - 1.0) > Constant.TOLERATION) {
             double[] decodedObservationV = MOEACDUtils.decode(_tau, observationV);
             double lowest = Double.POSITIVE_INFINITY;
             int idxLowest = -1;
@@ -383,19 +422,19 @@ public class ConeSubRegionManager {
                 int c = 0;
                 for (int i = startIdxLayers[layer]; c < numsOfLayers[layer]; ++i, ++c) {
                     ConeSubRegion subRegion = getConeSubRegion(i);
-                    if(subRegion.isMarginalConeSubRegion()) {
+                    if (subRegion.isMarginalConeSubRegion()) {
                         double tmpDist = MOEACDUtils.distance2(subRegion.getRefDirection(), observationV);
                         if (tmpDist < selectedDist)
                             selectedIdx = i;
                     }
                 }
-                return selectedIdx ;
+                return selectedIdx;
             }
             observationV = decodedObservationV;
         }
         double[] hPlus = convert2IndexLike(_H, observationV);
-        int[] mIndex = nearestMIndex(_H,hPlus);
-        return startIdxLayers[layer] + calIndexFromMIndex(_H, observationV.length,mIndex );
+        int[] mIndex = nearestMIndex(_H, hPlus);
+        return startIdxLayers[layer] + calIndexFromMIndex(_H, observationV.length, mIndex);
     }
 
     //convert m-1 dimensional index to m-dimensional index
@@ -439,7 +478,7 @@ public class ConeSubRegionManager {
     }
 
     //calculate the nearest m-dimensional index of the normalized objectives
-    protected int[] nearestMIndex(int _H,double[] _hPlus) {
+    protected int[] nearestMIndex(int _H, double[] _hPlus) {
         int nObj = _hPlus.length;
         int[] mIndex = new int[nObj];
 

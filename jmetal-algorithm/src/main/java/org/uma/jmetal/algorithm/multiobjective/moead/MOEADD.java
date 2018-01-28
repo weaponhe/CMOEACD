@@ -59,6 +59,32 @@ public class MOEADD extends AbstractMOEAD<DoubleSolution> {
                   int populationSize,
                   int resultPopulationSize,
                   int maxEvaluations,
+                  int maxGen,
+                  CrossoverOperator<DoubleSolution> crossover,
+                  MutationOperator<DoubleSolution> mutation,
+                  FunctionType functionType,
+                  int[] arrayH,
+                  double[] integratedTau,
+                  double neighborhoodSelectionProbability,
+                  int maximumNumberOfReplacedSolutions,
+                  int neighborSize) {
+        super(problem, populationSize, resultPopulationSize, maxEvaluations, maxGen, crossover, mutation, functionType,
+                arrayH, integratedTau, neighborhoodSelectionProbability, maximumNumberOfReplacedSolutions,
+                neighborSize);
+
+        rankIdx = new int[populationSize][populationSize];
+        subregionIdx = new int[populationSize][populationSize];
+        subregionDist = new double[populationSize][populationSize];
+
+        ranking = new DominanceRanking<DoubleSolution>();
+        region = new LocationAttribute<DoubleSolution>();
+        distToDirct = new DistanceToDirectionAttribute<DoubleSolution>();
+    }
+
+    public MOEADD(Problem<DoubleSolution> problem,
+                  int populationSize,
+                  int resultPopulationSize,
+                  int maxEvaluations,
                   CrossoverOperator<DoubleSolution> crossover,
                   MutationOperator<DoubleSolution> mutation,
                   FunctionType functionType,

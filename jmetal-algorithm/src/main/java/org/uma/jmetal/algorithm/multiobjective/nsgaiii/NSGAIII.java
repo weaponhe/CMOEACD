@@ -21,51 +21,53 @@ import java.util.Vector;
 /**
  * Created by ajnebro on 30/10/14.
  * Modified by Juanjo on 13/11/14
- *
+ * <p>
  * This implementation is based on the code of Tsung-Che Chiang
  * http://web.ntnu.edu.tw/~tcchiang/publications/nsga3cpp/nsga3cpp.htm
  */
 @SuppressWarnings("serial")
 public class NSGAIII<S extends Solution<?>> extends AbstractGeneticAlgorithm<S, List<S>> {
-  protected int iterations ;
-  protected int maxIterations ;
+    protected int iterations;
+    protected int maxIterations;
 
-  protected SolutionListEvaluator<S> evaluator ;
+    protected SolutionListEvaluator<S> evaluator;
 
-  protected int[] numberOfDivisions  ;
-  protected double[] intergratedTaus;
-  protected List<ReferencePoint<S>> referencePoints = new ArrayList<>() ;
+    protected int[] numberOfDivisions;
+    protected double[] intergratedTaus;
+    protected List<ReferencePoint<S>> referencePoints = new ArrayList<>();
 
 
     /// NSGAIII/** Constructor */
     public NSGAIII(NSGAIIIBuilder<S> builder) { // can be created from the NSGAIIIBuilder within the same package
-      super(builder.getProblem()) ;
-      maxIterations = builder.getMaxIterations() ;
+        super(builder.getProblem());
+        maxIterations = builder.getMaxIterations();
 
-      crossoverOperator =  builder.getCrossoverOperator() ;
-      mutationOperator  =  builder.getMutationOperator() ;
-      selectionOperator =  builder.getSelectionOperator() ;
+        crossoverOperator = builder.getCrossoverOperator();
+        mutationOperator = builder.getMutationOperator();
+        selectionOperator = builder.getSelectionOperator();
 
-      evaluator = builder.getEvaluator() ;
+        evaluator = builder.getEvaluator();
 
-      this.numberOfDivisions = builder.getNumberOfDivisions();
-      this.intergratedTaus = builder.getIntergratedTaus();
+        this.numberOfDivisions = builder.getNumberOfDivisions();
+        this.intergratedTaus = builder.getIntergratedTaus();
 
-  }
-  @Override public void run() {
+    }
+
+    @Override
+    public void run() {
 
 //    (new ReferencePoint<S>()).generateReferencePoints(referencePoints,getProblem().getNumberOfObjectives() , numberOfDivisions,intergratedTaus);
-    Vector<Vector<Double>> weights = UniformWeightUtils.generateVector(numberOfDivisions,intergratedTaus,getProblem().getNumberOfObjectives());
+        Vector<Vector<Double>> weights = UniformWeightUtils.generateVector(numberOfDivisions, intergratedTaus, getProblem().getNumberOfObjectives());
 //    UniformSimplexCentroidWeightsUtils uniformWeightsManager = new UniformSimplexCentroidWeightsUtils(getProblem().getNumberOfObjectives(),numberOfDivisions[0]);
 //    Vector<Vector<Double>> weights = uniformWeightsManager.getUniformWeightsVector();
 //    uniformWeightsManager.free();
-    setMaxPopulationSize(weights.size());
+        setMaxPopulationSize(weights.size());
 
-    for(int i=0;i<weights.size();i++){
-        ReferencePoint<S> refPoint = new ReferencePoint<>(getProblem().getNumberOfObjectives()) ;
-        refPoint.position = new ArrayList<>(weights.get(i)) ;
-        referencePoints.add(refPoint);
-    }
+        for (int i = 0; i < weights.size(); i++) {
+            ReferencePoint<S> refPoint = new ReferencePoint<>(getProblem().getNumberOfObjectives());
+            refPoint.position = new ArrayList<>(weights.get(i));
+            referencePoints.add(refPoint);
+        }
 
 //    int populationSize = referencePoints.size();
 ////    while (populationSize%4>0) {
@@ -73,152 +75,154 @@ public class NSGAIII<S extends Solution<?>> extends AbstractGeneticAlgorithm<S, 
 ////    }
 //    setMaxPopulationSize(populationSize);
 
-    List<S> offspringPopulation;
-    List<S> matingPopulation;
+        List<S> offspringPopulation;
+        List<S> matingPopulation;
 
-    setPopulation(createInitialPopulation());
-    setPopulation(evaluatePopulation(getPopulation()));
-    initProgress();
+        setPopulation(createInitialPopulation());
+        setPopulation(evaluatePopulation(getPopulation()));
+        initProgress();
 
 
-    while (!isStoppingConditionReached()) {
-      matingPopulation = selection(getPopulation());
-      offspringPopulation = reproduction(matingPopulation);
-      offspringPopulation = evaluatePopulation(offspringPopulation);
-      setPopulation(replacement(getPopulation(), offspringPopulation));
-      updateProgress();
-    }
-  }
-
-  @Override
-  protected void initProgress() {
-    iterations = 1 ;
-  }
-
-  @Override
-  protected void updateProgress() {
-    iterations++ ;
-  }
-
-  @Override
-  protected boolean isStoppingConditionReached() {
-    return iterations >= maxIterations;
-  }
-
-  @Override
-  protected List<S> evaluatePopulation(List<S> population) {
-    population = evaluator.evaluate(population, getProblem()) ;
-
-    return population ;
-  }
-
-  @Override
-  protected List<S> selection(List<S> population) {
-    List<S> matingPopulation = new ArrayList<>(population.size()) ;
-    for (int i = 0; i < getMaxPopulationSize(); i++) {
-      S solution = selectionOperator.execute(population);
-      matingPopulation.add(solution) ;
+        while (!isStoppingConditionReached()) {
+            matingPopulation = selection(getPopulation());
+            offspringPopulation = reproduction(matingPopulation);
+            offspringPopulation = evaluatePopulation(offspringPopulation);
+            setPopulation(replacement(getPopulation(), offspringPopulation));
+            updateProgress();
+        }
     }
 
-    return matingPopulation;
-  }
-
-  @Override
-  protected List<S> reproduction(List<S> population) {
-    List<S> offspringPopulation = new ArrayList<>(getMaxPopulationSize());
-    for (int i = 0; i < getMaxPopulationSize(); i+=2) {
-      List<S> parents = new ArrayList<>(2);
-      parents.add(population.get(i));
-      parents.add(population.get(Math.min(i + 1, getMaxPopulationSize()-1)));
-
-      List<S> offspring = crossoverOperator.execute(parents);
-
-      mutationOperator.execute(offspring.get(0));
-      mutationOperator.execute(offspring.get(1));
-
-      offspringPopulation.add(offspring.get(0));
-      offspringPopulation.add(offspring.get(1));
+    @Override
+    protected void initProgress() {
+        iterations = 1;
     }
-    return offspringPopulation ;
-  }
 
-  
-  private List<ReferencePoint<S>> getReferencePointsCopy() {
-	  List<ReferencePoint<S>> copy = new ArrayList<>();
-	  for (ReferencePoint<S> r : this.referencePoints) {
-		  copy.add(new ReferencePoint<>(r));
-	  }
-	  return copy;
-  }
-  
-  @Override
-  protected List<S> replacement(List<S> population, List<S> offspringPopulation) {
-   
-	List<S> jointPopulation = new ArrayList<>();
-    jointPopulation.addAll(population) ;
-    jointPopulation.addAll(offspringPopulation) ;
-
-    Ranking<S> ranking = computeRanking(jointPopulation);
-    
-    //List<Solution> pop = crowdingDistanceSelection(ranking);
-    List<S> pop = new ArrayList<>();
-    List<List<S>> fronts = new ArrayList<>();
-    int rankingIndex = 0;
-    int candidateSolutions = 0;
-    while (candidateSolutions < getMaxPopulationSize()) {
-      fronts.add(ranking.getSubfront(rankingIndex));
-      candidateSolutions += ranking.getSubfront(rankingIndex).size();
-      if ((pop.size() + ranking.getSubfront(rankingIndex).size()) <= getMaxPopulationSize())
-        addRankedSolutionsToPopulation(ranking, rankingIndex, pop);
-      rankingIndex++;
+    @Override
+    protected void updateProgress() {
+        iterations++;
     }
-    
-    // A copy of the reference list should be used as parameter of the environmental selection
-    EnvironmentalSelection<S> selection =
-            new EnvironmentalSelection<>(fronts,getMaxPopulationSize(),getReferencePointsCopy(),
-                    getProblem().getNumberOfObjectives());
-    
-    pop = selection.execute(pop);
-     
-    return pop;
-  }
 
-  @Override
-  public List<S> getResult() {
-    return getNonDominatedSolutions(getPopulation()) ;
-  }
-
-  protected Ranking<S> computeRanking(List<S> solutionList) {
-    Ranking<S> ranking = new DominanceRanking<>() ;
-    ranking.computeRanking(solutionList) ;
-
-    return ranking ;
-  }
-
-  protected void addRankedSolutionsToPopulation(Ranking<S> ranking, int rank, List<S> population) {
-    List<S> front ;
-
-    front = ranking.getSubfront(rank);
-
-    for (int i = 0 ; i < front.size(); i++) {
-      population.add(front.get(i));
+    @Override
+    protected boolean isStoppingConditionReached() {
+        return iterations >= maxIterations;
     }
-  }
 
-  protected List<S> getNonDominatedSolutions(List<S> solutionList) {
-    return SolutionListUtils.getNondominatedSolutions(solutionList) ;
-  }
+    @Override
+    protected List<S> evaluatePopulation(List<S> population) {
+        population = evaluator.evaluate(population, getProblem());
 
-  public List<S> getMeasurePopulation() {
-    return getPopulation();
-  }
+        return population;
+    }
 
-  @Override public String getName() {
-    return "NSGAIII" ;
-  }
+    @Override
+    protected List<S> selection(List<S> population) {
+        List<S> matingPopulation = new ArrayList<>(population.size());
+        for (int i = 0; i < getMaxPopulationSize(); i++) {
+            S solution = selectionOperator.execute(population);
+            matingPopulation.add(solution);
+        }
 
-  @Override public String getDescription() {
-    return "Nondominated Sorting Genetic Algorithm version III" ;
-  }
+        return matingPopulation;
+    }
+
+    @Override
+    protected List<S> reproduction(List<S> population) {
+        List<S> offspringPopulation = new ArrayList<>(getMaxPopulationSize());
+        for (int i = 0; i < getMaxPopulationSize(); i += 2) {
+            List<S> parents = new ArrayList<>(2);
+            parents.add(population.get(i));
+            parents.add(population.get(Math.min(i + 1, getMaxPopulationSize() - 1)));
+
+            List<S> offspring = crossoverOperator.execute(parents);
+
+            mutationOperator.execute(offspring.get(0));
+            mutationOperator.execute(offspring.get(1));
+
+            offspringPopulation.add(offspring.get(0));
+            offspringPopulation.add(offspring.get(1));
+        }
+        return offspringPopulation;
+    }
+
+
+    private List<ReferencePoint<S>> getReferencePointsCopy() {
+        List<ReferencePoint<S>> copy = new ArrayList<>();
+        for (ReferencePoint<S> r : this.referencePoints) {
+            copy.add(new ReferencePoint<>(r));
+        }
+        return copy;
+    }
+
+    @Override
+    protected List<S> replacement(List<S> population, List<S> offspringPopulation) {
+
+        List<S> jointPopulation = new ArrayList<>();
+        jointPopulation.addAll(population);
+        jointPopulation.addAll(offspringPopulation);
+
+        Ranking<S> ranking = computeRanking(jointPopulation);
+
+        //List<Solution> pop = crowdingDistanceSelection(ranking);
+        List<S> pop = new ArrayList<>();
+        List<List<S>> fronts = new ArrayList<>();
+        int rankingIndex = 0;
+        int candidateSolutions = 0;
+        while (candidateSolutions < getMaxPopulationSize()) {
+            fronts.add(ranking.getSubfront(rankingIndex));
+            candidateSolutions += ranking.getSubfront(rankingIndex).size();
+            if ((pop.size() + ranking.getSubfront(rankingIndex).size()) <= getMaxPopulationSize())
+                addRankedSolutionsToPopulation(ranking, rankingIndex, pop);
+            rankingIndex++;
+        }
+
+        // A copy of the reference list should be used as parameter of the environmental selection
+        EnvironmentalSelection<S> selection =
+                new EnvironmentalSelection<>(fronts, getMaxPopulationSize(), getReferencePointsCopy(),
+                        getProblem().getNumberOfObjectives());
+
+        pop = selection.execute(pop);
+
+        return pop;
+    }
+
+    @Override
+    public List<S> getResult() {
+        return getNonDominatedSolutions(getPopulation());
+    }
+
+    protected Ranking<S> computeRanking(List<S> solutionList) {
+        Ranking<S> ranking = new DominanceRanking<>();
+        ranking.computeRanking(solutionList);
+
+        return ranking;
+    }
+
+    protected void addRankedSolutionsToPopulation(Ranking<S> ranking, int rank, List<S> population) {
+        List<S> front;
+
+        front = ranking.getSubfront(rank);
+
+        for (int i = 0; i < front.size(); i++) {
+            population.add(front.get(i));
+        }
+    }
+
+    protected List<S> getNonDominatedSolutions(List<S> solutionList) {
+        return SolutionListUtils.getNondominatedSolutions(solutionList);
+    }
+
+    public List<S> getMeasurePopulation() {
+        return getPopulation();
+    }
+
+    @Override
+    public String getName() {
+        return "NSGAIII";
+    }
+
+    @Override
+    public String getDescription() {
+        return "Nondominated Sorting Genetic Algorithm version III";
+    }
 
 }

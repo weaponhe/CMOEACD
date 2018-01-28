@@ -13,8 +13,12 @@
 
 package org.uma.jmetal.util.experiment.component;
 
+import com.sun.org.apache.regexp.internal.RE;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.uma.jmetal.algorithm.Algorithm;
+import org.uma.jmetal.measure.MeasureManager;
+import org.uma.jmetal.measure.impl.DurationMeasure;
 import org.uma.jmetal.problem.Problem;
 import org.uma.jmetal.qualityindicator.QualityIndicator;
 import org.uma.jmetal.qualityindicator.impl.GenericIndicator;

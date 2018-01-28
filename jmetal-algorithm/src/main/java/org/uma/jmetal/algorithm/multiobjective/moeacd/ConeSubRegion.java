@@ -14,6 +14,8 @@ import java.util.Set;
 public class ConeSubRegion {
     //Reference Observation Vector, direction of the cone sub region
     double[] refDirection;
+    double[] normalizedWeights;
+
     //m-dimensional index
     int[] mIndex;
     //the index in all cone subregions
@@ -90,6 +92,14 @@ public class ConeSubRegion {
 
     public double getRefDirection(int _idx) {
         return refDirection[_idx];
+    }
+
+    public void setNormalizedWeights(double[] normalizedWeights) {
+        this.normalizedWeights = normalizedWeights;
+    }
+
+    public double[] getNormalizedWeights() {
+        return this.normalizedWeights;
     }
 
     public void setIdxConeSubRegion(int _idxSR) {

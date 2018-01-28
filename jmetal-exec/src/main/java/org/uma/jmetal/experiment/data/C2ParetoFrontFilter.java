@@ -18,13 +18,14 @@ import java.util.List;
 /**
  * Created by weaponhe on 2017/11/21.
  */
-public class DataProcessor {
+public class C2ParetoFrontFilter {
     public static void main(String[] args) throws IOException {
         int[] dimentions = {3, 5, 8, 10, 15};
+        int[] pointCounts = {91, 210, 156, 275, 135};
 
         for (int i = 0; i < dimentions.length; i++) {
-            String fileName = String.format("/pareto_fronts/DTLZ2.%dD.pf", dimentions[i]);
-            String outputFileName = String.format("jmetal-core/src/main/resources/pareto_fronts/C2_DTLZ2.%dD.pf", dimentions[i]);
+            String fileName = String.format("/pareto_fronts/DTLZ2.%dD.pf[%d]", dimentions[i], pointCounts[i]);
+            String outputFileName = String.format("jmetal-core/src/main/resources/pareto_fronts/C2_DTLZ2.%dD.pf[%d]", dimentions[i], pointCounts[i]);
             ArrayFront front = new ArrayFront(fileName);
             C2_DTLZ2 problem = new C2_DTLZ2(dimentions[i] + 9, dimentions[i]);
             List<Point> res = getFessibleFront(front, problem);
@@ -32,15 +33,15 @@ public class DataProcessor {
             System.out.println((double) res.size() / front.getNumberOfPoints());
         }
 
-//        for (int i = 0; i < dimentions.length; i++) {
-//            String fileName = String.format("/pareto_fronts/Convex_DTLZ2.%dD.pf", dimentions[i]);
-//            String outputFileName = String.format("jmetal-core/src/main/resources/pareto_fronts/C2_Convex_DTLZ2.%dD.pf", dimentions[i]);
-//            ArrayFront front = new ArrayFront(fileName);
-//            ConvexC2_DTLZ2 problem = new ConvexC2_DTLZ2(dimentions[i] + 9, dimentions[i]);
-//            List<Point> res = getFessibleFront(front, problem);
-//            writeFile(outputFileName, res);
-//            System.out.println((double) res.size() / front.getNumberOfPoints());
-//        }
+        for (int i = 0; i < dimentions.length; i++) {
+            String fileName = String.format("/pareto_fronts/Convex_DTLZ2.%dD.pf[%d]", dimentions[i], pointCounts[i]);
+            String outputFileName = String.format("jmetal-core/src/main/resources/pareto_fronts/C2_Convex_DTLZ2.%dD.pf[%d]", dimentions[i], pointCounts[i]);
+            ArrayFront front = new ArrayFront(fileName);
+            ConvexC2_DTLZ2 problem = new ConvexC2_DTLZ2(dimentions[i] + 9, dimentions[i]);
+            List<Point> res = getFessibleFront(front, problem);
+            writeFile(outputFileName, res);
+            System.out.println((double) res.size() / front.getNumberOfPoints());
+        }
     }
 
     static public List<Point> getFessibleFront(ArrayFront front, DoubleProblem problem) {

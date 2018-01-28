@@ -1,6 +1,8 @@
 package org.uma.jmetal.algorithm.multiobjective.moeacd;
 
 import org.uma.jmetal.algorithm.multiobjective.moead.AbstractMOEAD;
+import org.uma.jmetal.measure.Measurable;
+import org.uma.jmetal.measure.MeasureManager;
 import org.uma.jmetal.operator.MutationOperator;
 import org.uma.jmetal.operator.impl.crossover.DifferentialEvolutionCrossover;
 import org.uma.jmetal.operator.impl.crossover.SBXCrossover;
@@ -13,8 +15,9 @@ import java.util.Random;
 /**
  * Created by weaponhe on 2017/11/28.
  */
-public class CMOEACD_SR extends MOEACD {
-    public CMOEACD_SR(Problem<DoubleSolution> problem,
+public class CMOEACD_SR extends MOEACD implements Measurable {
+    public CMOEACD_SR(Measurable measureManager,
+                      Problem<DoubleSolution> problem,
                       int[] arrayH,
                       double[] integratedTaus,
                       int populationSize,
@@ -27,7 +30,7 @@ public class CMOEACD_SR extends MOEACD {
                       MutationOperator<DoubleSolution> mutation,
                       AbstractMOEAD.FunctionType functionType
     ) {
-        super(problem, arrayH, integratedTaus,
+        super(measureManager, problem, arrayH, integratedTaus,
                 populationSize, maxEvaluations, maxGen, neighborhoodSize,
                 neighborhoodSelectionProbability,
                 sbxCrossoverOperator, deCrossoverOperator, mutation, functionType);
@@ -54,6 +57,11 @@ public class CMOEACD_SR extends MOEACD {
             double storedCV = getOverallConstraintViolationDegree(storedSolution);
             return newCV < storedCV ? newSolution : storedSolution;
         }
+    }
+
+    @Override
+    public MeasureManager getMeasureManager() {
+        return measureManager.getMeasureManager();
     }
 
     @Override

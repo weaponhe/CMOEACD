@@ -16,18 +16,19 @@ import java.util.List;
  */
 public class MOEADDMeasure extends MOEADD implements Measurable {
     protected MyAlgorithmMeasures measure;
+
     MOEADDMeasure(Problem<DoubleSolution> problem,
-                 int populationSize,
-                 int resultPopulationSize,
-                 int maxEvaluations,
-                 CrossoverOperator<DoubleSolution> crossover,
-                 MutationOperator<DoubleSolution> mutation,
-                 FunctionType functionType,
-                 String dataDirectory,
-                 double neighborhoodSelectionProbability,
-                 int maximumNumberOfReplacedSolutions,
-                 int neighborSize){
-        super(problem,populationSize,resultPopulationSize, maxEvaluations, crossover,mutation,functionType, dataDirectory, neighborhoodSelectionProbability,maximumNumberOfReplacedSolutions, neighborSize);
+                  int populationSize,
+                  int resultPopulationSize,
+                  int maxEvaluations,
+                  CrossoverOperator<DoubleSolution> crossover,
+                  MutationOperator<DoubleSolution> mutation,
+                  FunctionType functionType,
+                  String dataDirectory,
+                  double neighborhoodSelectionProbability,
+                  int maximumNumberOfReplacedSolutions,
+                  int neighborSize) {
+        super(problem, populationSize, resultPopulationSize, maxEvaluations, crossover, mutation, functionType, dataDirectory, neighborhoodSelectionProbability, maximumNumberOfReplacedSolutions, neighborSize);
         measure = new MyAlgorithmMeasures<DoubleSolution>();
         measure.initMeasures();
     }
@@ -36,30 +37,50 @@ public class MOEADDMeasure extends MOEADD implements Measurable {
                    int populationSize,
                    int resultPopulationSize,
                    int maxEvaluations,
+                   int maxGen,
                    CrossoverOperator<DoubleSolution> crossover,
                    MutationOperator<DoubleSolution> mutation,
                    FunctionType functionType,
                    int[] arrayH,
-                    double[] integratedTau,
+                   double[] integratedTau,
                    double neighborhoodSelectionProbability,
                    int maximumNumberOfReplacedSolutions,
-                   int neighborSize){
-        super(problem,populationSize,resultPopulationSize, maxEvaluations, crossover,mutation,functionType, arrayH,integratedTau, neighborhoodSelectionProbability,maximumNumberOfReplacedSolutions, neighborSize);
+                   int neighborSize) {
+        super(problem, populationSize, resultPopulationSize, maxEvaluations, maxGen, crossover, mutation, functionType, arrayH, integratedTau, neighborhoodSelectionProbability, maximumNumberOfReplacedSolutions, neighborSize);
         measure = new MyAlgorithmMeasures<DoubleSolution>();
         measure.initMeasures();
     }
+
+    MOEADDMeasure(Problem<DoubleSolution> problem,
+                  int populationSize,
+                  int resultPopulationSize,
+                  int maxEvaluations,
+                  CrossoverOperator<DoubleSolution> crossover,
+                  MutationOperator<DoubleSolution> mutation,
+                  FunctionType functionType,
+                  int[] arrayH,
+                  double[] integratedTau,
+                  double neighborhoodSelectionProbability,
+                  int maximumNumberOfReplacedSolutions,
+                  int neighborSize) {
+        super(problem, populationSize, resultPopulationSize, maxEvaluations, crossover, mutation, functionType, arrayH, integratedTau, neighborhoodSelectionProbability, maximumNumberOfReplacedSolutions, neighborSize);
+        measure = new MyAlgorithmMeasures<DoubleSolution>();
+        measure.initMeasures();
+    }
+
     @Override
     public MeasureManager getMeasureManager() {
         return measure.getMeasureManager();
     }
 
-    @Override public void run(){
+    @Override
+    public void run() {
         //Start
         measure.durationMeasure.start();
-        initializePopulation() ;
+        initializePopulation();
         initializeUniformWeight();
         initializeNeighborhood();
-        initializeIdealPoint() ;
+        initializeIdealPoint();
         initializeNadirPoint();
 
 
@@ -78,9 +99,9 @@ public class MOEADDMeasure extends MOEADD implements Measurable {
             rankIdx[curRank][i] = 1;
         }
 
-        evaluations = populationSize ;
+        evaluations = populationSize;
         //calculate measure
-        measure.updateMeasureProgress(getMeasurePopulation());
+//        measure.updateMeasureProgress(getMeasurePopulation());
         int lastEvaluations = evaluations;
         do {
             int[] permutation = new int[populationSize];
@@ -89,12 +110,12 @@ public class MOEADDMeasure extends MOEADD implements Measurable {
             for (int i = 0; i < populationSize && evaluations < maxEvaluations; i++) {
                 int subProblemId = permutation[i];
 
-                NeighborType neighborType = chooseNeighborType() ;
-                List<DoubleSolution> parents = parentSelection(subProblemId, neighborType) ;
+                NeighborType neighborType = chooseNeighborType();
+                List<DoubleSolution> parents = parentSelection(subProblemId, neighborType);
 
                 List<DoubleSolution> children = crossoverOperator.execute(parents);
 
-                DoubleSolution child1 = children.get(0) ;
+                DoubleSolution child1 = children.get(0);
                 DoubleSolution child2 = children.get(1);
                 mutationOperator.execute(child1);
                 mutationOperator.execute(child2);
@@ -111,9 +132,9 @@ public class MOEADDMeasure extends MOEADD implements Measurable {
 
                 updateArchive(child1);
                 updateArchive(child2);
-                if(evaluations >= lastEvaluations + populationSize ){
+                if (evaluations >= lastEvaluations + populationSize) {
                     //calculate measure
-                    measure.updateMeasureProgress(getMeasurePopulation());
+//                    measure.updateMeasureProgress(getMeasurePopulation());
                     lastEvaluations += populationSize;
                 }
             }

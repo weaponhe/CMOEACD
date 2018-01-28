@@ -82,4 +82,12 @@ public class TaggedAlgorithm<Result> implements Algorithm<Result> {
   public void setProblem(Problem<?> problem) {
     this.problem = problem ;
   }
+
+  public Algorithm<Result> getAlgorithm() {
+    return algorithm;
+  }
+
+  public void setAlgorithm(Algorithm<Result> algorithm) {
+    this.algorithm = algorithm;
+  }
 }

@@ -1,6 +1,9 @@
 package org.uma.jmetal.algorithm.multiobjective.moead;
 
 import org.uma.jmetal.algorithm.multiobjective.moead.util.MOEADUtils;
+import org.uma.jmetal.measure.Measurable;
+import org.uma.jmetal.measure.MeasureManager;
+import org.uma.jmetal.measure.impl.MyAlgorithmMeasures;
 import org.uma.jmetal.operator.CrossoverOperator;
 import org.uma.jmetal.operator.MutationOperator;
 import org.uma.jmetal.operator.impl.crossover.DifferentialEvolutionCrossover;
@@ -22,8 +25,10 @@ import java.util.Vector;
 /**
  * Created by X250 on 2016/9/4.
  */
-public class CMOEADD extends MOEADD {
+public class CMOEADD extends MOEADD implements Measurable {
     public NumberOfViolatedConstraints<DoubleSolution> numberOfViolatedConstraints;
+    protected MyAlgorithmMeasures measure;
+
 
     public CMOEADD(Problem<DoubleSolution> problem,
                    int populationSize,
@@ -42,8 +47,9 @@ public class CMOEADD extends MOEADD {
 
         differentialEvolutionCrossover = (DifferentialEvolutionCrossover) crossoverOperator;
         numberOfViolatedConstraints = new NumberOfViolatedConstraints<DoubleSolution>();
+        measure = new MyAlgorithmMeasures<>();
+        measure.initMeasures();
     }
-
     public CMOEADD(Problem<DoubleSolution> problem,
                    int populationSize,
                    int resultPopulationSize,
@@ -62,11 +68,44 @@ public class CMOEADD extends MOEADD {
 
         differentialEvolutionCrossover = (DifferentialEvolutionCrossover) crossoverOperator;
         numberOfViolatedConstraints = new NumberOfViolatedConstraints<DoubleSolution>();
+        measure = new MyAlgorithmMeasures<>();
+        measure.initMeasures();
+
+    }
+    public CMOEADD(Problem<DoubleSolution> problem,
+                   int populationSize,
+                   int resultPopulationSize,
+                   int maxEvaluations,
+                   int maxGen,
+                   CrossoverOperator<DoubleSolution> crossover,
+                   MutationOperator<DoubleSolution> mutation,
+                   FunctionType functionType,
+                   int[] arrayH,
+                   double[] integratedTau,
+                   double neighborhoodSelectionProbability,
+                   int maximumNumberOfReplacedSolutions,
+                   int neighborSize) {
+        super(problem, populationSize, resultPopulationSize, maxEvaluations, maxGen, crossover, mutation, functionType,
+                arrayH, integratedTau, neighborhoodSelectionProbability, maximumNumberOfReplacedSolutions,
+                neighborSize);
+
+        differentialEvolutionCrossover = (DifferentialEvolutionCrossover) crossoverOperator;
+        numberOfViolatedConstraints = new NumberOfViolatedConstraints<DoubleSolution>();
+        measure = new MyAlgorithmMeasures<>();
+        measure.initMeasures();
 
     }
 
     @Override
+    public MeasureManager getMeasureManager() {
+        return measure.getMeasureManager();
+    }
+
+
+    @Override
     public void run() {
+        measure.durationMeasure.start();
+
         initializePopulation();
         initializeUniformWeight();
         initializeNeighborhood();
@@ -130,6 +169,7 @@ public class CMOEADD extends MOEADD {
             }
             gen++;
         } while (gen < maxGen);
+        measure.durationMeasure.stop();
     }
 
     protected void initializePopulation() {

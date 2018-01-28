@@ -45,7 +45,7 @@ public abstract class AbstractMOEAD<S extends Solution<?>> implements Algorithm<
 
     protected enum NeighborType {NEIGHBOR, POPULATION}
 
-    public enum FunctionType {TCH, PBI, AGG}
+    public enum FunctionType {TCH, PBI, PDD, AGG, LP}
 
 
     protected Problem<S> problem;
@@ -99,10 +99,18 @@ public abstract class AbstractMOEAD<S extends Solution<?>> implements Algorithm<
     protected int[] arrayH;
     protected double[] integratedTau;
 
-    public AbstractMOEAD(Problem<S> problem, int populationSize, int resultPopulationSize,
-                         int maxEvaluations, int maxGen, CrossoverOperator<S> crossoverOperator, MutationOperator<S> mutation,
-                         FunctionType functionType, String dataDirectory, double neighborhoodSelectionProbability,
-                         int maximumNumberOfReplacedSolutions, int neighborSize) {
+    public AbstractMOEAD(Problem<S> problem,
+                         int populationSize,
+                         int resultPopulationSize,
+                         int maxEvaluations,
+                         int maxGen,
+                         CrossoverOperator<S> crossoverOperator,
+                         MutationOperator<S> mutation,
+                         FunctionType functionType,
+                         String dataDirectory,
+                         double neighborhoodSelectionProbability,
+                         int maximumNumberOfReplacedSolutions,
+                         int neighborSize) {
         this.problem = problem;
         this.populationSize = populationSize;
         this.resultPopulationSize = resultPopulationSize;
@@ -167,10 +175,18 @@ public abstract class AbstractMOEAD<S extends Solution<?>> implements Algorithm<
         isFromFile = true;
     }
 
-    public AbstractMOEAD(Problem<S> problem, int populationSize, int resultPopulationSize,
-                         int maxEvaluations, CrossoverOperator<S> crossoverOperator, MutationOperator<S> mutation,
-                         FunctionType functionType, int[] arrayH, double[] integratedTau, double neighborhoodSelectionProbability,
-                         int maximumNumberOfReplacedSolutions, int neighborSize) {
+    public AbstractMOEAD(Problem<S> problem,
+                         int populationSize,
+                         int resultPopulationSize,
+                         int maxEvaluations,
+                         CrossoverOperator<S> crossoverOperator,
+                         MutationOperator<S> mutation,
+                         FunctionType functionType,
+                         int[] arrayH,
+                         double[] integratedTau,
+                         double neighborhoodSelectionProbability,
+                         int maximumNumberOfReplacedSolutions,
+                         int neighborSize) {
         this(problem, populationSize, resultPopulationSize,
                 maxEvaluations, crossoverOperator, mutation,
                 functionType, "", neighborhoodSelectionProbability, maximumNumberOfReplacedSolutions, neighborSize);

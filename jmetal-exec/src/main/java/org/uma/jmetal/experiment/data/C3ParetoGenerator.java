@@ -26,16 +26,30 @@ public class C3ParetoGenerator {
         //10 7 11440
         //15 5 11628
 
-//        int[] objectives = {2};
-        int[] objectives = {2, 3, 5, 8, 10, 15};
-        int[][] arrayHs = {{10000}, {140}, {12}, {9}, {7}, {5}};
-        double[] integratedTaus = {1.0};
+        int[] objectives = {3, 5, 8, 10, 15};
+        int[][] arrayHs = new int[][]{
+                {12},
+                {6},
+                {3, 2},
+                {3, 2},
+                {2, 1}
+        };
+//        double[][] integratedTaus = {{1.0},{1.0},{1.0},{1.0}};
+
+        double[][] integratedTaus = new double[][]{
+                {1.0},
+                {1.0},
+                {1.0, 0.5},
+                {1.0, 0.5},
+                {1.0, 0.5}
+        };
 
         for (int idx = 0; idx < objectives.length; idx++) {
             int nObj = objectives[idx];
             int[] arrayH = arrayHs[idx];
-            String outputFileName = String.format("jmetal-core/src/main/resources/pareto_fronts/C3_DTLZ1.%dD.pf", nObj);
-            List<double[]> uniformDirections = UniformWeightUtils.generateArrayList(arrayH, integratedTaus, nObj);
+            double[] tau = integratedTaus[idx];
+            List<double[]> uniformDirections = UniformWeightUtils.generateArrayList(arrayH, tau, nObj);
+            String outputFileName = String.format("jmetal-core/src/main/resources/pareto_fronts/C3_DTLZ1.%dD.pf[%d]", nObj, uniformDirections.size());
             List<Point> front = generateC3DTLZ1(uniformDirections);
             writeFile(outputFileName, front);
         }
@@ -43,8 +57,9 @@ public class C3ParetoGenerator {
         for (int idx = 0; idx < objectives.length; idx++) {
             int nObj = objectives[idx];
             int[] arrayH = arrayHs[idx];
-            String outputFileName = String.format("jmetal-core/src/main/resources/pareto_fronts/C3_DTLZ4.%dD.pf", nObj);
-            List<double[]> uniformDirections = UniformWeightUtils.generateArrayList(arrayH, integratedTaus, nObj);
+            double[] tau = integratedTaus[idx];
+            List<double[]> uniformDirections = UniformWeightUtils.generateArrayList(arrayH, tau, nObj);
+            String outputFileName = String.format("jmetal-core/src/main/resources/pareto_fronts/C3_DTLZ4.%dD.pf[%d]", nObj, uniformDirections.size());
             List<Point> front = generateC3DTLZ4(uniformDirections);
             writeFile(outputFileName, front);
         }

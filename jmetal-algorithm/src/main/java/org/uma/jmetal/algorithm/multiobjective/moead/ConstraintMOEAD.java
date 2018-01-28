@@ -14,6 +14,9 @@
 package org.uma.jmetal.algorithm.multiobjective.moead;
 
 import org.uma.jmetal.algorithm.multiobjective.moead.util.MOEADUtils;
+import org.uma.jmetal.measure.Measurable;
+import org.uma.jmetal.measure.MeasureManager;
+import org.uma.jmetal.measure.impl.MyAlgorithmMeasures;
 import org.uma.jmetal.operator.CrossoverOperator;
 import org.uma.jmetal.operator.MutationOperator;
 import org.uma.jmetal.operator.impl.crossover.DifferentialEvolutionCrossover;
@@ -39,11 +42,12 @@ import java.util.List;
  * @author Juan J. Durillo
  * @version 1.0
  */
-public class ConstraintMOEAD extends AbstractMOEAD<DoubleSolution> {
+public class ConstraintMOEAD extends AbstractMOEAD<DoubleSolution> implements Measurable {
 
     protected DifferentialEvolutionCrossover differentialEvolutionCrossover;
     private ViolationThresholdComparator<DoubleSolution> violationThresholdComparator;
 
+    protected MyAlgorithmMeasures<DoubleSolution> measureManager;
 
     public ConstraintMOEAD(Problem<DoubleSolution> problem,
                            int populationSize,
@@ -63,32 +67,37 @@ public class ConstraintMOEAD extends AbstractMOEAD<DoubleSolution> {
 
         differentialEvolutionCrossover = (DifferentialEvolutionCrossover) crossoverOperator;
         violationThresholdComparator = new ViolationThresholdComparator<DoubleSolution>();
+        measureManager = new MyAlgorithmMeasures<>();
+        measureManager.initMeasures();
     }
 
-    public ConstraintMOEAD(Problem<DoubleSolution> problem,
-                           int populationSize,
-                           int resultPopulationSize,
-                           int maxEvaluations,
-                           int maxGen,
-                           MutationOperator<DoubleSolution> mutation,
-                           CrossoverOperator<DoubleSolution> crossover,
-                           FunctionType functionType,
-                           int[] arrayH,
-                           double[] integratedTau,
-                           double neighborhoodSelectionProbability,
-                           int maximumNumberOfReplacedSolutions,
-                           int neighborSize) {
+    public ConstraintMOEAD(
+            Problem<DoubleSolution> problem,
+            int populationSize,
+            int resultPopulationSize,
+            int maxEvaluations,
+            int maxGen,
+            MutationOperator<DoubleSolution> mutation,
+            CrossoverOperator<DoubleSolution> crossover,
+            FunctionType functionType,
+            int[] arrayH,
+            double[] integratedTau,
+            double neighborhoodSelectionProbability,
+            int maximumNumberOfReplacedSolutions,
+            int neighborSize) {
         super(problem, populationSize, resultPopulationSize, maxEvaluations, maxGen, crossover, mutation, functionType,
                 arrayH, integratedTau, neighborhoodSelectionProbability, maximumNumberOfReplacedSolutions,
                 neighborSize);
 
         differentialEvolutionCrossover = (DifferentialEvolutionCrossover) crossoverOperator;
         violationThresholdComparator = new ViolationThresholdComparator<DoubleSolution>();
-
+        measureManager = new MyAlgorithmMeasures<>();
+        measureManager.initMeasures();
     }
 
     @Override
     public void run() {
+        measureManager.durationMeasure.start();
         initializeUniformWeight();
         initializeNeighborhood();
         initializePopulation();
@@ -128,6 +137,7 @@ public class ConstraintMOEAD extends AbstractMOEAD<DoubleSolution> {
             violationThresholdComparator.updateThreshold(population);
             gen++;
         } while (gen < maxGen);
+        measureManager.durationMeasure.stop();
     }
 
     public void monitor(int gen) {
@@ -227,6 +237,9 @@ public class ConstraintMOEAD extends AbstractMOEAD<DoubleSolution> {
         }
     }
 
+    public MeasureManager getMeasureManager() {
+        return measureManager.getMeasureManager();
+    }
 
     @Override
     public String getName() {

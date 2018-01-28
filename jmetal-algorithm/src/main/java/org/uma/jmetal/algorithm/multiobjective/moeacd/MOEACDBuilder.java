@@ -1,6 +1,7 @@
 package org.uma.jmetal.algorithm.multiobjective.moeacd;
 
 import org.uma.jmetal.algorithm.multiobjective.moead.AbstractMOEAD;
+import org.uma.jmetal.measure.Measurable;
 import org.uma.jmetal.measure.impl.MyAlgorithmMeasures;
 import org.uma.jmetal.operator.MutationOperator;
 import org.uma.jmetal.operator.impl.crossover.DifferentialEvolutionCrossover;
@@ -19,7 +20,10 @@ import java.util.List;
 public class MOEACDBuilder implements AlgorithmBuilder<AbstractMOEACD> {
     public enum Variant {
         MOEACD,
+        CMOEACD, CMOEACDMeasure,
+        CMOEACD2, CMOEACD2Measure,
         CMOEACD_CL_CDP,
+        CMOEACD_UN,
         CMOEACD_CDP,
         CMOEACD_CDP2,
         CMOEACD_SR,
@@ -27,7 +31,6 @@ public class MOEACDBuilder implements AlgorithmBuilder<AbstractMOEACD> {
         MOEACDMeasure,
         MOEACDP, MOEACDPMeasure,
         MOEACDN, MOEACDNMeasure,
-        CMOEACD, CMOEACDMeasure,
         CMOEACDN, CMOEACDNMeasure,
         MOEACDD, MOEACDDMeasure,
         MOEACDND, MOEACDNDMeasure,
@@ -94,6 +97,7 @@ public class MOEACDBuilder implements AlgorithmBuilder<AbstractMOEACD> {
     protected int maxEvaluations;
     protected int maxGen;
     protected double penaltyFactor;
+    protected int maximumNumberOfReplacedSolutions;
 
     protected int numberOfThreads;
 
@@ -128,9 +132,10 @@ public class MOEACDBuilder implements AlgorithmBuilder<AbstractMOEACD> {
         moeacdVariant = variant;
         c_uneven = 1.04;
         measureManager = new MyAlgorithmMeasures<>();
-        this.functionType = AbstractMOEAD.FunctionType.TCH;
+        this.functionType = AbstractMOEAD.FunctionType.PBI;
         this.delta = new double[]{0.8, 0.1, 0.05, 0.05};
         this.penaltyFactor = 0;
+        this.maximumNumberOfReplacedSolutions = 2;
     }
 
     public AbstractMOEAD.FunctionType getFunctionType() {
@@ -329,6 +334,15 @@ public class MOEACDBuilder implements AlgorithmBuilder<AbstractMOEACD> {
         return this;
     }
 
+    public int getMaximumNumberOfReplacedSolutions() {
+        return maximumNumberOfReplacedSolutions;
+    }
+
+    public MOEACDBuilder setMaximumNumberOfReplacedSolutions(int maximumNumberOfReplacedSolutions) {
+        this.maximumNumberOfReplacedSolutions = maximumNumberOfReplacedSolutions;
+        return this;
+    }
+
     public AbstractMOEACD build() {
         AbstractMOEACD algorithm = null;
         if (moeacdVariant.equals(Variant.MOEACD)) {
@@ -337,17 +351,37 @@ public class MOEACDBuilder implements AlgorithmBuilder<AbstractMOEACD> {
                     neighborhoodSelectionProbability,
                     sbxCrossover, deCrossover, mutation, functionType);
         } else if (moeacdVariant.equals(Variant.CMOEACD)) {
-            algorithm = new CMOEACD(measureManager, problem, numOfDivision, integratedTaus,
+            algorithm = new CMOEACD(problem, numOfDivision, integratedTaus,
                     populationSize, constraintLayerSize, maxEvaluations, maxGen, neighborhoodSize,
                     neighborhoodSelectionProbability,
                     sbxCrossover, deCrossover, mutation, functionType, delta);
+        } else if (moeacdVariant.equals(Variant.CMOEACDMeasure)) {
+            algorithm = new CMOEACDMeasure(measureManager, problem, numOfDivision, integratedTaus,
+                    populationSize, constraintLayerSize, maxEvaluations, maxGen, neighborhoodSize,
+                    neighborhoodSelectionProbability,
+                    sbxCrossover, deCrossover, mutation, functionType, delta);
+        } else if (moeacdVariant.equals(Variant.CMOEACD2)) {
+            algorithm = new CMOEACD2(problem, numOfDivision, integratedTaus,
+                    populationSize, constraintLayerSize, maxEvaluations, maxGen, neighborhoodSize,
+                    neighborhoodSelectionProbability,
+                    sbxCrossover, deCrossover, mutation, functionType, delta, maximumNumberOfReplacedSolutions);
+        } else if (moeacdVariant.equals(Variant.CMOEACD2Measure)) {
+            algorithm = new CMOEACD2Measure(measureManager, problem, numOfDivision, integratedTaus,
+                    populationSize, constraintLayerSize, maxEvaluations, maxGen, neighborhoodSize,
+                    neighborhoodSelectionProbability,
+                    sbxCrossover, deCrossover, mutation, functionType, delta, maximumNumberOfReplacedSolutions);
         } else if (moeacdVariant.equals(Variant.CMOEACD_CL_CDP)) {
             algorithm = new CMOEACD_CL_CDP(problem, numOfDivision, integratedTaus,
                     populationSize, constraintLayerSize, maxEvaluations, maxGen, neighborhoodSize,
                     neighborhoodSelectionProbability,
                     sbxCrossover, deCrossover, mutation, functionType, delta);
+        } else if (moeacdVariant.equals(Variant.CMOEACD_UN)) {
+            algorithm = new CMOEACD_UN(problem, numOfDivision, integratedTaus,
+                    populationSize, constraintLayerSize, maxEvaluations, maxGen, neighborhoodSize,
+                    neighborhoodSelectionProbability,
+                    sbxCrossover, deCrossover, mutation, functionType, delta);
         } else if (moeacdVariant.equals(Variant.CMOEACD_CDP)) {
-            algorithm = new CMOEACD_CDP(problem, numOfDivision, integratedTaus,
+            algorithm = new CMOEACD_CDP(measureManager, problem, numOfDivision, integratedTaus,
                     populationSize, maxEvaluations, maxGen, neighborhoodSize,
                     neighborhoodSelectionProbability,
                     sbxCrossover, deCrossover, mutation, functionType);
@@ -357,7 +391,7 @@ public class MOEACDBuilder implements AlgorithmBuilder<AbstractMOEACD> {
                     neighborhoodSelectionProbability,
                     sbxCrossover, deCrossover, mutation, functionType);
         } else if (moeacdVariant.equals(Variant.CMOEACD_SR)) {
-            algorithm = new CMOEACD_SR(problem, numOfDivision, integratedTaus,
+            algorithm = new CMOEACD_SR(measureManager, problem, numOfDivision, integratedTaus,
                     populationSize, maxEvaluations, maxGen, neighborhoodSize,
                     neighborhoodSelectionProbability,
                     sbxCrossover, deCrossover, mutation, functionType);
