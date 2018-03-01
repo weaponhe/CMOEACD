@@ -1,5 +1,6 @@
 package org.uma.jmetal.experiment.data;
 
+import org.uma.jmetal.problem.multiobjective.cdtlz.C3_DTLZ1;
 import org.uma.jmetal.solution.DoubleSolution;
 
 import java.io.*;
@@ -8,12 +9,16 @@ import java.util.*;
 /**
  * Created by weaponhe on 2017/11/27.
  */
-public class IndicatorsProcessor {
+public class DTLZIndicatorsProcessor {
+    static String basrDir = "../jmetal-data/MOEACDStudy/data";
+
     public static void main(String[] args) throws IOException {
         int runs = 5;
-        String basrDir = "jmetal-data/MOEACDStudy/data";
         File file = new File(basrDir);
+        System.out.println(file.getCanonicalPath());//获取标准的路径
+        System.out.println(file.getAbsolutePath());//获取绝对路径
         File[] algorithmList = file.listFiles();
+
 
         String[] indicators = {"IGD", "IGDPlus"};
         Map<String, Boolean> algorithms = new HashMap<>();
@@ -47,17 +52,54 @@ public class IndicatorsProcessor {
         //自定义算法列表
         algorithms = new HashMap<>();
         String[] algorithmNames = {
-                "C-MOEACD(PBI)",
+//                "C-MOEACD(PBI)",
+//                "CMOEACD4Selection_randout",
+//                "CMOEACD4Selection_randin",
+//                "CMOEACD4Selection_randout_tour",
+//                "CMOEACD4Selection_randin_tour",
+//                "CMOEACD4C1DTLZ3_randout",
+//                "CMOEACD4C1DTLZ3_randin",
+//                "CMOEACD4C1DTLZ3_randout_tour",
+//                "CMOEACD4C1DTLZ3(1)",
+//                "CMOEACD4C1DTLZ3(2)",
+//                "CMOEACD4C1DTLZ3(3)",
+//                "CMOEACD4C1DTLZ3(4)",
+//                "CMOEACD4C1DTLZ3(5)",
+//                "CMOEACD4C1DTLZ3(6)",
+//                "CMOEACD4C1DTLZ3(7)",
+                "CMOEACD",
+//                "CMOEACD4C1DTLZ3(9)",
+//                "CMOEACD4C1DTLZ3(10)",
+//                "CMOEACD4C1DTLZ3(Adaptive)",
+//                "CMOEACD4C1DTLZ3_randin_tour",
+//                "CMOEACD4C1DTLZ3_randout_noelite",
+//                "CMOEACD4C1DTLZ3_randin_noelite",
+//                "CMOEACD4C1DTLZ3_randout_tour_noelite",
+//                "CMOEACD4C1DTLZ3_randin_tour_noelite",
+//                "C-MOEACD-C1DTLZ3",
 //                "C-MOEACD(TCH)",
 //                "C-MOEACD(LP2)",
 //                "C-MOEAD",
-                "C-NSGAIII",
+                "CNSGAIII",
 //                "C-MOEADD"
 //                "C-MOEACD-CDP",
 //                "C-MOEACD-SR"
         };
         for (int i = 0; i < algorithmNames.length; i++) {
             algorithms.put(algorithmNames[i], true);
+        }
+//
+        problems = new HashMap<>();
+        String[] problemNames = {
+                "C1_DTLZ1",
+                "C1_DTLZ3",
+                "C2_DTLZ2",
+                "ConvexC2_DTLZ2",
+                "C3_DTLZ1",
+                "C3_DTLZ4"
+        };
+        for (int i = 0; i < problemNames.length; i++) {
+            problems.put(problemNames[i], true);
         }
 
 
@@ -72,14 +114,14 @@ public class IndicatorsProcessor {
                     for (Integer dimention : dimentions.keySet()) {
                         ArrayList<Double> array = new ArrayList<>();
                         try {
-                            array = readFileData(indicators[indicator], algorithm, problem, dimention);
+                            array = readFileData(indicators[indicator], algorithm, problem, dimention, runs);
+                            data.get(indicators[indicator]).get(algorithm).get(problem).put(dimention, array);
+                            if (array.size() < runs && array.size() > 0) {
+                                System.out.println("[" + algorithm + " " + problem + " " + dimention + "]: some run no result");
+                            }
                         } catch (FileNotFoundException e) {
                             System.out.println("[" + algorithm + " " + problem + " " + dimention + "]: all run no result");
                         }
-                        if (array.size() < runs && array.size() > 0) {
-                            System.out.println("[" + algorithm + " " + problem + " " + dimention + "]: some run no result");
-                        }
-                        data.get(indicators[indicator]).get(algorithm).get(problem).put(dimention, array);
                     }
                 }
             }
@@ -188,15 +230,17 @@ public class IndicatorsProcessor {
     }
 
 
-    static ArrayList<Double> readFileData(String indicator, String algorithm, String problem, Integer dimention) throws IOException {
+    static ArrayList<Double> readFileData(String indicator, String algorithm, String problem, Integer dimention, int runs) throws IOException {
         ArrayList<Double> data = new ArrayList<>();
-        String path = "jmetal-data/MOEACDStudy/data/" + algorithm + "/" + problem + "_" + dimention + "D" + "/" + indicator;
+        String path = basrDir + "/" + algorithm + "/" + problem + "_" + dimention + "D" + "/" + indicator;
         File file = new File(path);
         BufferedReader reader = null;
         reader = new BufferedReader(new FileReader(file));
         String tempString = null;
-        while ((tempString = reader.readLine()) != null) {
+        int i = 0;
+        while ((tempString = reader.readLine()) != null && i < runs) {
             data.add(Double.parseDouble(tempString));
+            i++;
         }
         reader.close();
         return data;

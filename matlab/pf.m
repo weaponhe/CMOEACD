@@ -14,16 +14,21 @@
 % [f1,f2,f3] = textread(filepath,'%f %f %f');
 % scatter3(f1,f2,f3,'c+');
 % hold on;
-ins = 'C1_DTLZ1_3D';
+ins = 'CarSideImpact';
 for i = 0:4
     figure;
-    filepath = sprintf('../jmetal-data/MOEACDStudy/data/C-MOEACD(PBI)/%s/FUN%d.tsv', ins,i);
+    filepath = sprintf('../../jmetal-data/MOEACDStudy/data/CMOEACD/%s/FUN%d.tsv', ins,i);
+    %filepath = sprintf('../../jmetal-data/MOEACDStudy/data/C-NSGAIII/%s/FUN%d.tsv', ins,i);
     [f1,f2,f3] = textread(filepath,'%f %f %f');
     scatter3(f1,f2,f3,'r^');
-    hold on;
-    filepath = '../jmetal-core/src/main/resources/pareto_fronts/DTLZ1.3D.pf[91]';
-    [f1,f2,f3] = textread(filepath,'%f %f %f');
-    scatter3(f1,f2,f3,'bo');
+%      hold on;
+%     filepath = '../jmetal-core/src/main/resources/pareto_fronts/C2_Convex_DTLZ2.3D.pf[91]';
+%     [f1,f2,f3] = textread(filepath,'%f %f %f');
+%     scatter3(f1,f2,f3,'bo');
+% filepath = sprintf('../../jmetal-data/MOEACDStudy/data/CNSGAIII/%s/FUN%d.tsv', ins,i);
+%     %filepath = sprintf('../../jmetal-data/MOEACDStudy/data/C-NSGAIII/%s/FUN%d.tsv', ins,i);
+%     [f1,f2,f3] = textread(filepath,'%f %f %f');
+%     scatter3(f1,f2,f3,'bo');
 end
 
 

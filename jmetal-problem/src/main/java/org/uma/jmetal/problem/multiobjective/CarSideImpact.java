@@ -96,7 +96,7 @@ public class CarSideImpact extends AbstractDoubleProblem implements ConstrainedP
                 violatedConstraints++;
             }
         }
-
+        solution.setAttribute("overallConstraintViolationDegree", overallConstraintViolation);
         overallConstraintViolationDegree.setAttribute(solution, overallConstraintViolation);
         numberOfViolatedConstraints.setAttribute(solution, violatedConstraints);
     }
