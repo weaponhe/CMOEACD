@@ -16,6 +16,8 @@ import java.util.Random;
  * Created by weaponhe on 2017/11/28.
  */
 public class CMOEACD_SR extends MOEACD implements Measurable {
+    private double pf = 0.05;
+
     public CMOEACD_SR(Measurable measureManager,
                       Problem<DoubleSolution> problem,
                       int[] arrayH,
@@ -42,16 +44,13 @@ public class CMOEACD_SR extends MOEACD implements Measurable {
     }
 
     protected DoubleSolution getBetterSolutionByIndicator(DoubleSolution newSolution, DoubleSolution storedSolution, ConeSubRegion coneSubRegion) {
+        double r = randomGenerator.nextDouble(0, 1);
         boolean newFessible = isFessible(newSolution);
         boolean storeFessible = isFessible(storedSolution);
-        if (newFessible && storeFessible) {
+        if ((newFessible && storeFessible) || r < pf) {
             double newFun = fitnessFunction(newSolution, coneSubRegion.getRefDirection());
-            double storeFun = fitnessFunction(newSolution, coneSubRegion.getRefDirection());
+            double storeFun = fitnessFunction(storedSolution, coneSubRegion.getRefDirection());
             return newFun < storeFun ? newSolution : storedSolution;
-        } else if (newFessible) {
-            return newSolution;
-        } else if (storeFessible) {
-            return storedSolution;
         } else {
             double newCV = getOverallConstraintViolationDegree(newSolution);
             double storedCV = getOverallConstraintViolationDegree(storedSolution);

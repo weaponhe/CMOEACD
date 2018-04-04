@@ -90,6 +90,7 @@ public class Machining extends AbstractDoubleProblem implements ConstrainedProbl
             }
         }
 
+        solution.setAttribute("overallConstraintViolationDegree", overallConstraintViolation);
         overallConstraintViolationDegree.setAttribute(solution, overallConstraintViolation);
         numberOfViolatedConstraints.setAttribute(solution, violatedConstraints);
     }

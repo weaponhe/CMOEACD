@@ -23,7 +23,9 @@ public class MOEACDBuilder implements AlgorithmBuilder<AbstractMOEACD> {
         CMOEACDMeasure,
         CMOEACD_CL_CDP,
         CMOEACD_CDP,
+        CMOEACD_ADP,
         CMOEACD_SR,
+        CMOEACD_ASR,
         CMOEACD_PF,
 
         MOEACDMeasure,
@@ -377,8 +379,18 @@ public class MOEACDBuilder implements AlgorithmBuilder<AbstractMOEACD> {
                     populationSize, maxEvaluations, maxGen, neighborhoodSize,
                     neighborhoodSelectionProbability,
                     sbxCrossover, deCrossover, mutation, functionType);
+        } else if (moeacdVariant.equals(Variant.CMOEACD_ADP)) {
+            algorithm = new CMOEACD_ADP(measureManager, problem, numOfDivision, integratedTaus,
+                    populationSize, maxEvaluations, maxGen, neighborhoodSize,
+                    neighborhoodSelectionProbability,
+                    sbxCrossover, deCrossover, mutation, functionType);
         } else if (moeacdVariant.equals(Variant.CMOEACD_SR)) {
             algorithm = new CMOEACD_SR(measureManager, problem, numOfDivision, integratedTaus,
+                    populationSize, maxEvaluations, maxGen, neighborhoodSize,
+                    neighborhoodSelectionProbability,
+                    sbxCrossover, deCrossover, mutation, functionType);
+        } else if (moeacdVariant.equals(Variant.CMOEACD_ASR)) {
+            algorithm = new CMOEACD_ASR(measureManager, problem, numOfDivision, integratedTaus,
                     populationSize, maxEvaluations, maxGen, neighborhoodSize,
                     neighborhoodSelectionProbability,
                     sbxCrossover, deCrossover, mutation, functionType);

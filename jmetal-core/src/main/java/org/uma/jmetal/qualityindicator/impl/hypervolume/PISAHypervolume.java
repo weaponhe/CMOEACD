@@ -88,6 +88,13 @@ public class PISAHypervolume<S extends Solution<?>> extends Hypervolume<S> {
 
     return hypervolume(new ArrayFront(paretoFrontApproximation), referenceParetoFront);  }
 
+   public Double evaluate(String filename) throws FileNotFoundException {
+    if (filename == null) {
+      throw new JMetalException("The pareto front approximation is null") ;
+    }
+
+    return hypervolume(new ArrayFront(filename), referenceParetoFront);  }
+
   /*
    returns true if 'point1' dominates 'points2' with respect to the
    to the first 'noObjectives' objectives

@@ -44,7 +44,7 @@ public class CMOEACD_CDP extends MOEACD implements Measurable {
         boolean storeFessible = isFessible(storedSolution);
         if (newFessible && storeFessible) {
             double newFun = fitnessFunction(newSolution, coneSubRegion.getRefDirection());
-            double storeFun = fitnessFunction(newSolution, coneSubRegion.getRefDirection());
+            double storeFun = fitnessFunction(storedSolution, coneSubRegion.getRefDirection());
             return newFun < storeFun ? newSolution : storedSolution;
         } else if (newFessible) {
             return newSolution;

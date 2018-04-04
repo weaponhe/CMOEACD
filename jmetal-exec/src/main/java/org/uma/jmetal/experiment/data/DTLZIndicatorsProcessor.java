@@ -15,8 +15,8 @@ public class DTLZIndicatorsProcessor {
     public static void main(String[] args) throws IOException {
         int runs = 5;
         File file = new File(basrDir);
-        System.out.println(file.getCanonicalPath());//获取标准的路径
-        System.out.println(file.getAbsolutePath());//获取绝对路径
+//        System.out.println(file.getCanonicalPath());//获取标准的路径
+//        System.out.println(file.getAbsolutePath());//获取绝对路径
         File[] algorithmList = file.listFiles();
 
 
@@ -27,63 +27,39 @@ public class DTLZIndicatorsProcessor {
 
 
         //数据预处理
-        for (int indicator = 0; indicator < indicators.length; indicator++) {
-            for (int i = 0; i < algorithmList.length; i++) {
-                if (algorithmList[i].isDirectory()) {
-                    String algorithmName = algorithmList[i].getName();
-                    algorithms.put(algorithmName, true);
-                    File[] problemList = algorithmList[i].listFiles();
-                    for (int j = 0; j < problemList.length; j++) {
-                        if (problemList[j].isDirectory()) {
-                            String temp = problemList[j].getName();
-                            int splitPoint = temp.lastIndexOf("_");
-                            String problemName = temp.substring(0, splitPoint);
-                            String D = temp.substring(splitPoint + 1);
-                            Integer dimention = Integer.parseInt(D.substring(0, D.length() - 1));
-                            problems.put(problemName, true);
-                            dimentions.put(dimention, true);
-                        }
-                    }
-                }
-            }
-            break;
-        }
+//        for (int indicator = 0; indicator < indicators.length; indicator++) {
+//            for (int i = 0; i < algorithmList.length; i++) {
+//                if (algorithmList[i].isDirectory()) {
+//                    String algorithmName = algorithmList[i].getName();
+//                    algorithms.put(algorithmName, true);
+//                    File[] problemList = algorithmList[i].listFiles();
+//                    for (int j = 0; j < problemList.length; j++) {
+//                        if (problemList[j].isDirectory()) {
+//                            String temp = problemList[j].getName();
+//                            int splitPoint = temp.lastIndexOf("_");
+//                            String problemName = temp.substring(0, splitPoint);
+//                            System.out.println(problemName);
+//                            String D = temp.substring(splitPoint + 1);
+//                            Integer dimention = Integer.parseInt(D.substring(0, D.length() - 1));
+//                            problems.put(problemName, true);
+//                            dimentions.put(dimention, true);
+//                        }
+//                    }
+//                }
+//            }
+//            break;
+//        }
 
         //自定义算法列表
         algorithms = new HashMap<>();
         String[] algorithmNames = {
-//                "C-MOEACD(PBI)",
-//                "CMOEACD4Selection_randout",
-//                "CMOEACD4Selection_randin",
-//                "CMOEACD4Selection_randout_tour",
-//                "CMOEACD4Selection_randin_tour",
-//                "CMOEACD4C1DTLZ3_randout",
-//                "CMOEACD4C1DTLZ3_randin",
-//                "CMOEACD4C1DTLZ3_randout_tour",
-//                "CMOEACD4C1DTLZ3(1)",
-//                "CMOEACD4C1DTLZ3(2)",
-//                "CMOEACD4C1DTLZ3(3)",
-//                "CMOEACD4C1DTLZ3(4)",
-//                "CMOEACD4C1DTLZ3(5)",
-//                "CMOEACD4C1DTLZ3(6)",
-//                "CMOEACD4C1DTLZ3(7)",
-                "CMOEACD",
-//                "CMOEACD4C1DTLZ3(9)",
-//                "CMOEACD4C1DTLZ3(10)",
-//                "CMOEACD4C1DTLZ3(Adaptive)",
-//                "CMOEACD4C1DTLZ3_randin_tour",
-//                "CMOEACD4C1DTLZ3_randout_noelite",
-//                "CMOEACD4C1DTLZ3_randin_noelite",
-//                "CMOEACD4C1DTLZ3_randout_tour_noelite",
-//                "CMOEACD4C1DTLZ3_randin_tour_noelite",
-//                "C-MOEACD-C1DTLZ3",
-//                "C-MOEACD(TCH)",
-//                "C-MOEACD(LP2)",
-//                "C-MOEAD",
-                "CNSGAIII",
-//                "C-MOEADD"
-//                "C-MOEACD-CDP",
-//                "C-MOEACD-SR"
+                "C-MOEAD-SR",
+                "C-MOEAD-CDP",
+                "C-MOEAD-ACV",
+                "C-NSGAIII",
+                "C-MOEADD",
+                "C-MOEACD"
+
         };
         for (int i = 0; i < algorithmNames.length; i++) {
             algorithms.put(algorithmNames[i], true);
@@ -100,6 +76,13 @@ public class DTLZIndicatorsProcessor {
         };
         for (int i = 0; i < problemNames.length; i++) {
             problems.put(problemNames[i], true);
+        }
+
+        int[] dimentionArray = {
+                3, 5, 8, 10, 15
+        };
+        for (int i = 0; i < dimentionArray.length; i++) {
+            dimentions.put(dimentionArray[i], true);
         }
 
 
@@ -127,80 +110,196 @@ public class DTLZIndicatorsProcessor {
             }
         }
 
-        //数据处理
 
-        for (int indicator = 0; indicator < indicators.length; indicator++) {
-            System.out.println(indicators[indicator]);
-            System.out.print("Test Instance\t");
-            System.out.print("m\t");
-//            for (String algorithm : algorithms.keySet()) {
-            for (String algorithm : algorithmNames) {
-                System.out.print(String.format("%s\t", algorithm));
+        for (int p = 0; p < problemNames.length; p++) {
+            String problem = problemNames[p];
+            //print header
+
+//            System.out.println("\\begin{table}[H]");
+            System.out.println("\\begin{center}");
+            System.out.println("\\renewcommand{\\arraystretch}{0.6}");
+            System.out.println("\\scriptsize");
+
+            System.out.print("\\begin{longtabu} to \\linewidth{X[2,c]|X[1,c]");
+            for (int i = 0; i < algorithmNames.length; i++) {
+                System.out.print("|X[5,c]");
             }
-            System.out.print("\n");
+            System.out.print("}\n");
 
+            System.out.println(String.format("\\caption{各个对比算法在%s测试例的IGD值和IGD+值实验结果(最优值,中位值,最劣值)}", recombineString(problem)));
+            System.out.println(String.format("\\label{table:result:%s}\\\\", recombineString(problem)));
+            System.out.println("\\nopagebreak");
+            System.out.println("\\toprule");
+
+            System.out.print("\\textbf{指标} &  \\textbf{m} ");
+            for (int i = 0; i < algorithmNames.length; i++) {
+                System.out.print(String.format("&   \\textbf{%s}", algorithmNames[i]));
+            }
+            System.out.print("\\\\\n");
+
+            System.out.println("\\endfirsthead");
+            System.out.println(String.format("\\multicolumn{%d}{c}{\\small 表 \\ref{table:result:%s}\\ 各个对比算法在%s测试例的IGD值和IGD+值实验结果(续)}\\\\",
+                    2 + algorithmNames.length,
+                    recombineString(problem),
+                    recombineString(problem)
+            ));
+
+
+            System.out.println("\\toprule");
+            System.out.print("\\textbf{指标} &  \\textbf{m} ");
+            for (int i = 0; i < algorithmNames.length; i++) {
+                System.out.print(String.format("&   \\textbf{%s}", algorithmNames[i]));
+            }
+            System.out.print("\\\\\n");
+            System.out.println("\\hline");
+            System.out.println("\\endhead");
+            System.out.println("\\bottomrule");
+            System.out.println(String.format("\\multicolumn{%d}{c}{\\small 表格接下页  }\\\\", 2 + algorithmNames.length));
+            System.out.println("\\endfoot");
+            System.out.println("\\endlastfoot");
+            System.out.println("\\nopagebreak");
             Map<String, Integer> bestCountMap = new HashMap<>();
-//            for (String algorithm : algorithms.keySet()) {
+            Map<String, Integer> secondCountMap = new HashMap<>();
             for (String algorithm : algorithmNames) {
                 bestCountMap.put(algorithm, 0);
+                secondCountMap.put(algorithm, 0);
             }
-            for (String problem : problems.keySet()) {
+
+            for (int indicator = 0; indicator < indicators.length; indicator++) {
                 boolean newProblem = true;
                 for (Integer dimention : dimentions.keySet()) {
                     for (int count = 0; count <= 2; count++) {
                         if (newProblem) {
-                            System.out.print(problem + "\t");
+                            System.out.print("\n\\hline\n");
+                            System.out.print(String.format("\\multirow{15}*{\\begin{sideways} \\textbf{%s}\\end{sideways}}", indicators[indicator]) + "\n");
                             newProblem = false;
                         } else {
-                            System.out.print("\t");
+//                            System.out.print("\t");
                         }
                         if (count == 0) {
-                            System.out.print(dimention + "\t");
+                            if (dimention != dimentionArray[0]) {
+                                System.out.print(String.format("\\cline{2-%d}", 2 + algorithmNames.length));
+                            }
+                            System.out.print(String.format("& \\multirow{3}*{%d}", dimention) + "\n");
                         } else {
-                            System.out.print("\t");
+//                            System.out.print("\t");
                         }
 
                         String bestKey = "";
                         Double bestValue = Double.MAX_VALUE;
+                        List<Double> oneLineData = new ArrayList<>();
                         for (String algorithm : algorithmNames) {
                             List<Double> array = data.get(indicators[indicator]).get(algorithm).get(problem).get(dimention);
-
-                            //处理不完整数据
                             if (array.size() == 0) {
                                 //Best/Median/Worst都是—
-                                System.out.print("-" + "\t");
-                                continue;
-                            } else if (array.size() < runs && count == 2) {
-                                //Worst为-
-                                System.out.print("-" + "\t");
-                                continue;
+                                oneLineData.add(Double.POSITIVE_INFINITY);
+                            } else {
+                                if (count == 0) {
+                                    oneLineData.add(getBest(array));
+                                } else if (count == 1) {
+                                    oneLineData.add(getMedian(array));
+                                } else if (count == 2) {
+                                    if (array.size() < runs) {
+                                        oneLineData.add(Double.POSITIVE_INFINITY);
+                                    } else {
+                                        oneLineData.add(getWorst(array));
+                                    }
+                                }
                             }
-
-                            Double value = 0.0;
-                            if (count == 0) {
-                                value = getBest(array);
-                            } else if (count == 1) {
-                                value = getMedian(array);
-                            } else if (count == 2) {
-                                value = getWorst(array);
-                            }
-                            if (value < bestValue) {
-                                bestValue = value;
-                                bestKey = algorithm;
-                            }
-                            System.out.print(value + "\t");
                         }
-
-                        bestCountMap.put(bestKey, bestCountMap.get(bestKey) + 1);
+                        //对oneLineData排序，得到序号数组
+                        List<Integer> oneLineRank = new ArrayList<>();
+                        for (int col = 0; col < oneLineData.size(); col++) {
+                            oneLineRank.add(1);
+                        }
+                        for (int i1 = 0; i1 < oneLineData.size(); i1++) {
+                            for (int i2 = 0; i2 < oneLineData.size(); i2++) {
+                                if (oneLineData.get(i2) < oneLineData.get(i1)) {
+                                    oneLineRank.set(i1, oneLineRank.get(i1) + 1);
+                                }
+                            }
+                        }
+                        for (int col = 0; col < oneLineData.size(); col++) {
+                            if (count != 0 && col == 0) {
+                                System.out.print("& ");
+                            }
+                            System.out.print("& ");
+                            if (oneLineRank.get(col) == 1) {
+                                System.out.print("\\cellcolor{gray95}");
+                            }
+                            if (oneLineRank.get(col) == 2) {
+                                System.out.print("\\cellcolor{gray25}");
+                            }
+                            if (oneLineData.get(col) == Double.POSITIVE_INFINITY) {
+                                System.out.print("${-}$ ");
+                            } else {
+                                System.out.print(String.format("${%f_{(%d)}}$ ", oneLineData.get(col), oneLineRank.get(col)));
+                            }
+                            if (col == oneLineData.size() - 1) {
+                                System.out.print("\\\\");
+                            }
+                        }
                         System.out.print("\n");
-                    }
+                        System.out.print("\\nopagebreak\n");
+                        String bestAlgorithmName = algorithmNames[oneLineRank.indexOf(1)];
+                        String secondAlgorithmName = algorithmNames[oneLineRank.indexOf(2)];
+                        bestCountMap.put(bestAlgorithmName, bestCountMap.get(bestAlgorithmName) + 1);
+                        secondCountMap.put(secondAlgorithmName, secondCountMap.get(secondAlgorithmName) + 1);
 
+//                        for (String algorithm : algorithmNames) {
+//                            List<Double> array = data.get(indicators[indicator]).get(algorithm).get(problem).get(dimention);
+//
+//                            //处理不完整数据
+//                            if (array.size() == 0) {
+//                                //Best/Median/Worst都是—
+//                                System.out.print("-" + "\t");
+//                                continue;
+//                            } else if (array.size() < runs && count == 2) {
+//                                //Worst为-
+//                                System.out.print("-" + "\t");
+//                                continue;
+//                            }
+//
+//                            Double value = 0.0;
+//                            if (count == 0) {
+//                                value = getBest(array);
+//                            } else if (count == 1) {
+//                                value = getMedian(array);
+//                            } else if (count == 2) {
+//                                value = getWorst(array);
+//                            }
+//                            if (value < bestValue) {
+//                                bestValue = value;
+//                                bestKey = algorithm;
+//                            }
+//                            if (count != 0 && algorithm != algorithmNames[algorithmNames.length - 1]) {
+//                                System.out.print("& ");
+//                            }
+//                            System.out.print(String.format("& ${%f}$", value) + "\t");
+//                            if (algorithm == algorithmNames[algorithmNames.length - 1]) {
+//                                //last one
+//                                System.out.print("\\\\");
+//                            }
+//                        }
+//                        System.out.print("\n");
+                    }
                 }
             }
-            System.out.print("\t\t");
-//            for (String algorithm : algorithms.keySet()) {
+            //print footer
+            System.out.println("\\bottomrule");
+            System.out.println("\\end{longtabu}");
+            System.out.println("\\begin{minipage}{\\linewidth}");
+            System.out.println("\\flushleft \\scriptsize\\ \\textit{注：} 每一个IGD值或IGD+值在所有对比算法中的排序通过下标的形式标识，其中，每一行数据的最优值以深灰为底色，次优值以 浅灰为底色。");
+            System.out.println("\\end{minipage}");
+            System.out.println("\\end{center}");
+//            System.out.println("\\end{table}");
+
             for (String algorithm : algorithmNames) {
                 System.out.print(bestCountMap.get(algorithm) + "\t");
+            }
+            System.out.print("\n");
+            for (String algorithm : algorithmNames) {
+                System.out.print(secondCountMap.get(algorithm) + "\t");
             }
             System.out.print("\n");
         }
@@ -244,5 +343,11 @@ public class DTLZIndicatorsProcessor {
         }
         reader.close();
         return data;
+    }
+
+    static String recombineString(String oldString) {
+        int splitPoint = oldString.indexOf('_');
+        String newString = oldString.substring(0, splitPoint) + '-' + oldString.substring(splitPoint + 1);
+        return newString;
     }
 }

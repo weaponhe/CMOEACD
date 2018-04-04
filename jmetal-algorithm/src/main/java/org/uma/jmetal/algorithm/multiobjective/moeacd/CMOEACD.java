@@ -152,6 +152,7 @@ public class CMOEACD extends MOEACD {
 
     @Override
     public void run() {
+        measureManager.durationMeasure.start();
         initializeConeSubRegions();
         initializePopulation(this.populationSize * this.constraintLayerSize);
         int gen = 0;
@@ -187,6 +188,7 @@ public class CMOEACD extends MOEACD {
             gen++;
 
         } while (gen < maxGen);
+        measureManager.durationMeasure.stop();
     }
 
     @Override

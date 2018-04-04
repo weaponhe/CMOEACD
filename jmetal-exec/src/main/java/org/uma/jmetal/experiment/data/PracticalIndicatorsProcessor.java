@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.*;
 
 /**
@@ -16,12 +17,14 @@ public class PracticalIndicatorsProcessor {
         Map<String, Boolean> algorithms = new HashMap<>();
         Map<String, Boolean> problems = new HashMap<>();
         String[] indicators = {"IGD", "IGDPlus"};
-        int runs = 20;
+        int runs = 5;
         String[] algorithmNames = {
-                "C-MOEAD",
-                "CNSGAIII",
+                "C-MOEAD-SR",
+                "C-MOEAD-CDP",
+                "C-MOEAD-ACV",
+                "C-NSGAIII",
                 "C-MOEADD",
-                "CMOEACD"
+                "C-MOEACD"
         };
         for (int i = 0; i < algorithmNames.length; i++) {
             algorithms.put(algorithmNames[i], true);
@@ -30,10 +33,18 @@ public class PracticalIndicatorsProcessor {
         problems = new HashMap<>();
         String[] problemNames = {
                 "Water",
+//                "Golinski",
+//                "Binh2",
+//                "Tanaka",
+//                "Srinivas",
+//                "Osyczka2"
         };
         for (int i = 0; i < problemNames.length; i++) {
             problems.put(problemNames[i], true);
         }
+
+
+        DecimalFormat df = new DecimalFormat("#.######");
 
         Map<String, Map<String, Map<String, List<Double>>>> data = new HashMap<>();
         for (int k = 0; k < indicators.length; k++) {
@@ -108,7 +119,7 @@ public class PracticalIndicatorsProcessor {
                             bestValue = value;
                             bestKey = algorithm;
                         }
-                        System.out.print(value + "\t");
+                        System.out.print(df.format(value) + "\t");
                     }
 
                     bestCountMap.put(bestKey, bestCountMap.get(bestKey) + 1);

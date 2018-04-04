@@ -95,6 +95,7 @@ public class Srinivas extends AbstractDoubleProblem implements ConstrainedProble
       }
     }
 
+    solution.setAttribute("overallConstraintViolationDegree", overallConstraintViolation);
     overallConstraintViolationDegree.setAttribute(solution, overallConstraintViolation);
     numberOfViolatedConstraints.setAttribute(solution, violatedConstraints);
   }

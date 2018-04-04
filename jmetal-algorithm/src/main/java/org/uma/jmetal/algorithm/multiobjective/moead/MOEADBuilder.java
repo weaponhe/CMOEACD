@@ -34,6 +34,7 @@ public class MOEADBuilder implements AlgorithmBuilder<AbstractMOEAD<DoubleSoluti
         MOEADGR, MOEADGRMeasure, MOEADGRN, MOEADGRNMeasure,
         MOEADAGR, MOEADAGRMeasure, MOEADAGRN, MOEADAGRNMeasure,
         CMOEADD, CMOEADDMeasure, CMOEADDN, CMOEADDNMeasure,
+        CMOEADSR, CMOEADCDP,
         MOEADACDSBX, MOEADACDSBXMeasure,
         MOEADGRSBX, MOEADGRSBXMeasure,
         MOEADAGRSBX, MOEADAGRSBXMeasure,
@@ -94,7 +95,7 @@ public class MOEADBuilder implements AlgorithmBuilder<AbstractMOEAD<DoubleSoluti
         crossover = new DifferentialEvolutionCrossover();
         mutation = new PolynomialMutation(1.0 / problem.getNumberOfVariables(), 20.0);
         functionType = MOEAD.FunctionType.TCH;
-        neighborhoodSelectionProbability = 0.1;
+        neighborhoodSelectionProbability = 0.9;
         maximumNumberOfReplacedSolutions = 2;
     /*modified by Yuehong Xie 2016/03/22 */
         kIndex = 9;
@@ -355,6 +356,14 @@ public class MOEADBuilder implements AlgorithmBuilder<AbstractMOEAD<DoubleSoluti
                         maximumNumberOfReplacedSolutions, neighborSize);
             } else if (moeadVariant.equals(Variant.ConstraintMOEAD)) {
                 algorithm = new ConstraintMOEAD(problem, populationSize, resultPopulationSize, maxEvaluations, maxGen, mutation,
+                        crossover, functionType, numOfDivision, integratedTau, neighborhoodSelectionProbability,
+                        maximumNumberOfReplacedSolutions, neighborSize);
+            } else if (moeadVariant.equals(Variant.CMOEADSR)) {
+                algorithm = new CMOEADSR(problem, populationSize, resultPopulationSize, maxEvaluations, maxGen, mutation,
+                        crossover, functionType, numOfDivision, integratedTau, neighborhoodSelectionProbability,
+                        maximumNumberOfReplacedSolutions, neighborSize);
+            } else if (moeadVariant.equals(Variant.CMOEADCDP)) {
+                algorithm = new CMOEADCDP(problem, populationSize, resultPopulationSize, maxEvaluations, maxGen, mutation,
                         crossover, functionType, numOfDivision, integratedTau, neighborhoodSelectionProbability,
                         maximumNumberOfReplacedSolutions, neighborSize);
             } else if (moeadVariant.equals(Variant.MOEADDRA)) {

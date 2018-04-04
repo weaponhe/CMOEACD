@@ -1,7 +1,11 @@
 
 algorithmList = {
-    'CMOEACD';
-    'CNSGAIII';
+     'C-MOEACD';
+     'C-NSGAIII';
+     'C-MOEADD';
+     'C-MOEAD-ACV';
+    'C-MOEAD-SR';
+    'C-MOEAD-CDP';
     };
 instanceList = {
     'C1_DTLZ1_15D';
@@ -35,6 +39,7 @@ for j=1:length(algorithmList)
         xlabel('Objective No.')
         ylabel('Objective Value')
         print('-depsc','-painters',saveFile);
+%         saveas(gca, saveFile);
         %clf
     end
 end

@@ -1,6 +1,8 @@
-instances = {'C1_DTLZ1';'C1_DTLZ3';'C2_DTLZ2';'ConvexC2_DTLZ2';'C3_DTLZ1';'C3_DTLZ4'};
+instances = {'C1_DTLZ1';
+    'C1_DTLZ3';'C2_DTLZ2';'ConvexC2_DTLZ2';'C3_DTLZ1';'C3_DTLZ4'
+    };
 objCounts = [3,5,8,10,15];
-algrithms = {'C-NSGAIII';'C-MOEADD';'C-MOEACD(PBI)'};
+algrithms = {'C-NSGAIII';'C-MOEADD';'C-MOEAD-SR';'C-MOEAD-CDP';'C-MOEAD-ACV';'C-MOEACD'};
 for  k=1:length(instances)
     ins = instances{k};
     z=[];
@@ -8,7 +10,7 @@ for  k=1:length(instances)
         alg = algrithms{i};
         temp = [];
         for obj=objCounts
-            filepath = sprintf('../jmetal-data/MOEACDStudy/data/%s/%s_%dD/Time',alg,ins,obj);
+            filepath = sprintf('../../jmetal-data/MOEACDStudy/data/%s/%s_%dD/Time',alg,ins,obj);
             [v] = textread(filepath,'%f');
             t = min(v);
             temp=[temp,t];
@@ -17,12 +19,14 @@ for  k=1:length(instances)
     end
     
     figure;
-%     saveFile='../Figure/Time/DTLZ1.eps';
+    saveFile=sprintf('./Figures/time_%s.eps',ins);
     bar3(z);
     set(gca,'FontSize',12,'FontName','Arial','FontWeight','Bold');
-    title(sprintf('The running time for %s',ins));
+    title(sprintf('The running time for %s',strrep(ins,'_','\_')));
     set(gca,'xticklabel',{ '3'  '5'  '8'  '10'  '15'});
     set(gca,'yticklabel',algrithms);
     zlabel('Time(ms)');
-    % print('-depsc','-painters',saveFile);
+    print('-depsc','-painters',saveFile);
 end
+close all;
+ 

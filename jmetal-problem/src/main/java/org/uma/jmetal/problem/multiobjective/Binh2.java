@@ -93,7 +93,7 @@ public class Binh2 extends AbstractDoubleProblem implements ConstrainedProblem<D
         violatedConstraints++;
       }
     }
-
+    solution.setAttribute("overallConstraintViolationDegree", overallConstraintViolation);
     overallConstraintViolationDegree.setAttribute(solution, overallConstraintViolation);
     numberOfViolatedConstraints.setAttribute(solution, violatedConstraints);
   }

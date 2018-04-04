@@ -114,7 +114,7 @@ public class Osyczka2 extends AbstractDoubleProblem implements ConstrainedProble
         violatedConstraints++;
       }
     }
-
+    solution.setAttribute("overallConstraintViolationDegree", overallConstraintViolation);
     overallConstraintViolationDegree.setAttribute(solution, overallConstraintViolation);
     numberOfViolatedConstraints.setAttribute(solution, violatedConstraints);
   }

@@ -91,7 +91,7 @@ public class Tanaka extends AbstractDoubleProblem implements ConstrainedProblem<
         violatedConstraints++;
       }
     }
-
+    solution.setAttribute("overallConstraintViolationDegree", overallConstraintViolation);
     overallConstraintViolationDegree.setAttribute(solution, overallConstraintViolation);
     numberOfViolatedConstraints.setAttribute(solution, violatedConstraints);
   }

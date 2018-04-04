@@ -50,6 +50,7 @@ public class CMOEADD extends MOEADD implements Measurable {
         measure = new MyAlgorithmMeasures<>();
         measure.initMeasures();
     }
+
     public CMOEADD(Problem<DoubleSolution> problem,
                    int populationSize,
                    int resultPopulationSize,
@@ -72,6 +73,7 @@ public class CMOEADD extends MOEADD implements Measurable {
         measure.initMeasures();
 
     }
+
     public CMOEADD(Problem<DoubleSolution> problem,
                    int populationSize,
                    int resultPopulationSize,
@@ -129,12 +131,15 @@ public class CMOEADD extends MOEADD implements Measurable {
         }
 
         evaluations = populationSize;
+//        maxEvaluations = populationSize * maxGen;
         int gen = 0;
         do {
             int[] permutation = new int[populationSize];
             MOEADUtils.randomPermutation(permutation, populationSize);
 
-            for (int i = 0; i < populationSize && evaluations < maxEvaluations; i++) {
+//            for (int i = 0; i < populationSize && evaluations < maxEvaluations; i++) {
+            for (int i = 0; i < populationSize; i++) {
+
                 int subProblemId = permutation[i];
 
                 NeighborType neighborType = chooseNeighborType();
@@ -144,28 +149,20 @@ public class CMOEADD extends MOEADD implements Measurable {
                 List<DoubleSolution> children = differentialEvolutionCrossover.execute(parents);
 
                 DoubleSolution child1 = children.get(0);
-//                DoubleSolution child2 = children.get(1);
 
                 mutationOperator.execute(child1);
-//                mutationOperator.execute(child2);
 
                 problem.evaluate(child1);
                 ((ConstrainedProblem<DoubleSolution>) problem).evaluateConstraints(child1);
 
-//                problem.evaluate(child2);
-//                ((ConstrainedProblem<DoubleSolution>) problem).evaluateConstraints(child2);
 
-
-                evaluations += 1;
+//                evaluations += 1;
 
                 updateIdealPoint(child1);
-//                updateIdealPoint(child2);
 
                 updateNadirPoint(child1);
-//                updateNadirPoint(child2);
 
                 updateArchive(child1);
-//                updateArchive(child2);
             }
             gen++;
         } while (gen < maxGen);
